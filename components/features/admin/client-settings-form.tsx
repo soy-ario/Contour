@@ -15,10 +15,28 @@ import {
 } from "@/lib/actions/client.actions";
 import { toast } from "sonner";
 import { Loader2, Globe, Shield, CreditCard, UserCheck, ShieldAlert } from "lucide-react";
-import { PaymentStatus } from "@prisma/client";
+import { ClientStatus, PaymentStatus, Prisma } from "@prisma/client";
+
+interface ClientData {
+  id: string;
+  brandName: string;
+  website: string | null;
+  industry: string | null;
+  description: string | null;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string | null;
+  monthlyRetainer: number | string | Prisma.Decimal;
+  monthlyBudget: number | string | Prisma.Decimal | null;
+  contractStart: string | Date | null;
+  contractEnd: string | Date | null;
+  amountPaid: number | string | Prisma.Decimal;
+  paymentStatus: PaymentStatus;
+  marketingTheme: string | null;
+}
 
 interface ClientSettingsFormProps {
-  client: any;
+  client: ClientData;
 }
 
 export default function ClientSettingsForm({ client }: ClientSettingsFormProps) {
@@ -26,7 +44,7 @@ export default function ClientSettingsForm({ client }: ClientSettingsFormProps) 
   const [errorSection, setErrorSection] = React.useState<string | null>(null);
   const [serverError, setServerError] = React.useState<string | null>(null);
 
-  const formatDateForInput = (dateVal: any) => {
+  const formatDateForInput = (dateVal: string | Date | null) => {
     if (!dateVal) return "";
     const d = new Date(dateVal);
     if (isNaN(d.getTime())) return "";
@@ -52,7 +70,12 @@ export default function ClientSettingsForm({ client }: ClientSettingsFormProps) 
     },
   });
 
-  const onSaveBusiness = async (data: any) => {
+  const onSaveBusiness = async (data: {
+    brandName: string;
+    website: string;
+    industry: string;
+    description: string;
+  }) => {
     setServerError(null);
     setErrorSection(null);
     startTransition(async () => {
@@ -89,7 +112,11 @@ export default function ClientSettingsForm({ client }: ClientSettingsFormProps) 
     },
   });
 
-  const onSaveContact = async (data: any) => {
+  const onSaveContact = async (data: {
+    contactName: string;
+    contactEmail: string;
+    contactPhone: string;
+  }) => {
     setServerError(null);
     setErrorSection(null);
     startTransition(async () => {
@@ -132,7 +159,15 @@ export default function ClientSettingsForm({ client }: ClientSettingsFormProps) 
     },
   });
 
-  const onSaveFinancial = async (data: any) => {
+  const onSaveFinancial = async (data: {
+    monthlyRetainer: number;
+    monthlyBudget?: number;
+    contractStart: string;
+    contractEnd: string;
+    amountPaid: number;
+    paymentStatus: string;
+    marketingTheme: string;
+  }) => {
     setServerError(null);
     setErrorSection(null);
     startTransition(async () => {

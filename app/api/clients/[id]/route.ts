@@ -13,7 +13,7 @@ import {
   internalErrorResponse,
 } from "@/lib/api-helpers";
 import { z } from "zod";
-import { PaymentStatus } from "@prisma/client";
+import { PaymentStatus, Prisma } from "@prisma/client";
 
 const patchClientSchema = updateClientSchema.extend({
   amountPaid: z.coerce.number().min(0).optional(),
@@ -131,7 +131,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     }
 
     // Build update payload
-    const updateData: any = {};
+    const updateData: Prisma.ClientUpdateInput = {};
     if (data.brandName !== undefined) updateData.brandName = data.brandName;
     if (data.website !== undefined) updateData.website = data.website || null;
     if (data.industry !== undefined) updateData.industry = data.industry || null;
@@ -158,8 +158,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       action: "CLIENT_UPDATED",
       entityType: "Client",
       entityId: id,
-      beforeSnapshot: client as any,
-      afterSnapshot: updatedClient as any,
+      beforeSnapshot: client as unknown as Record<string, unknown>,
+      afterSnapshot: updatedClient as unknown as Record<string, unknown>,
     });
 
     return successResponse({
@@ -203,8 +203,8 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
       action: "CLIENT_ARCHIVED",
       entityType: "Client",
       entityId: id,
-      beforeSnapshot: client as any,
-      afterSnapshot: archivedClient as any,
+      beforeSnapshot: client as unknown as Record<string, unknown>,
+      afterSnapshot: archivedClient as unknown as Record<string, unknown>,
     });
 
     return successResponse({

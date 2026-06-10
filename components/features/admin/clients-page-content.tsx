@@ -48,13 +48,15 @@ export default function ClientsPageContent({
   user,
 }: ClientsPageContentProps) {
   const [clients, setClients] = React.useState<ClientData[]>(initialClients);
+  const [prevInitialClients, setPrevInitialClients] = React.useState<ClientData[]>(initialClients);
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
   const [selectedClient, setSelectedClient] = React.useState<ClientData | undefined>(undefined);
 
   // Keep state sync with props updates (due to revalidatePath)
-  React.useEffect(() => {
+  if (initialClients !== prevInitialClients) {
+    setPrevInitialClients(initialClients);
     setClients(initialClients);
-  }, [initialClients]);
+  }
 
   const handleCreateNew = () => {
     setSelectedClient(undefined);

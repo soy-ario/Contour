@@ -159,7 +159,7 @@ export default function CreateContentSheet({
               assetUrlsString: item.assetUrls ? item.assetUrls.join(", ") : "",
               adSpend: item.adSpend ? String(item.adSpend) : "0",
               notes: item.notes || "",
-              productIds: item.products ? item.products.map((p: any) => p.id) : [],
+              productIds: item.products ? item.products.map((p: { id: string }) => p.id) : [],
             });
           }
         })
@@ -245,8 +245,9 @@ export default function CreateContentSheet({
       } else {
         toast.error(result.error || "Operation failed");
       }
-    } catch (e: any) {
-      toast.error(e.message || "An unexpected error occurred");
+    } catch (e) {
+      const errorMsg = e instanceof Error ? e.message : "An unexpected error occurred";
+      toast.error(errorMsg);
     } finally {
       setSaving(false);
     }

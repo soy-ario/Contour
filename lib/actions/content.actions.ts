@@ -10,12 +10,12 @@ import {
 } from "@/lib/validations/content";
 import { sendContentSubmittedEmail } from "@/lib/services/email.service";
 import type { ActionResult } from "@/types";
-import { ContentStatus } from "@prisma/client";
+import { ContentStatus, Content } from "@prisma/client";
 
 export async function createContentAction(
-  prevState: any,
-  formData: any
-): Promise<ActionResult<any>> {
+  prevState: unknown,
+  formData: unknown
+): Promise<ActionResult<Content>> {
   try {
     const user = await requireAdmin();
 
@@ -68,7 +68,7 @@ export async function createContentAction(
       action: "CONTENT_CREATED",
       entityType: "Content",
       entityId: newContent.id,
-      afterSnapshot: newContent as any,
+      afterSnapshot: newContent as unknown as Record<string, unknown>,
     });
 
     // Revalidate relevant pages
@@ -76,16 +76,17 @@ export async function createContentAction(
     revalidatePath(`/clients/${contentData.clientId}/content`);
 
     return { success: true, data: newContent };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[createContentAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred" };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred";
+    return { success: false, error: msg };
   }
 }
 
 export async function updateContentAction(
   contentId: string,
-  data: any
-): Promise<ActionResult<any>> {
+  data: unknown
+): Promise<ActionResult<Content>> {
   try {
     const user = await requireAdmin();
 
@@ -147,17 +148,18 @@ export async function updateContentAction(
       action: "CONTENT_UPDATED",
       entityType: "Content",
       entityId: contentId,
-      beforeSnapshot: content as any,
-      afterSnapshot: updatedContent as any,
+      beforeSnapshot: content as unknown as Record<string, unknown>,
+      afterSnapshot: updatedContent as unknown as Record<string, unknown>,
     });
 
     revalidatePath("/content");
     revalidatePath(`/clients/${content.clientId}/content`);
 
     return { success: true, data: updatedContent };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[updateContentAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred" };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred";
+    return { success: false, error: msg };
   }
 }
 
@@ -196,22 +198,23 @@ export async function deleteContentAction(
       action: "CONTENT_DELETED",
       entityType: "Content",
       entityId: contentId,
-      beforeSnapshot: content as any,
+      beforeSnapshot: content as unknown as Record<string, unknown>,
     });
 
     revalidatePath("/content");
     revalidatePath(`/clients/${content.clientId}/content`);
 
     return { success: true };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[deleteContentAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred" };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred";
+    return { success: false, error: msg };
   }
 }
 
 export async function submitContentAction(
   contentId: string
-): Promise<ActionResult<any>> {
+): Promise<ActionResult<Content>> {
   try {
     const user = await requireAdmin();
 
@@ -272,8 +275,8 @@ export async function submitContentAction(
       action: "CONTENT_SUBMITTED",
       entityType: "Content",
       entityId: contentId,
-      beforeSnapshot: content as any,
-      afterSnapshot: updatedContent as any,
+      beforeSnapshot: content as unknown as Record<string, unknown>,
+      afterSnapshot: updatedContent as unknown as Record<string, unknown>,
     });
 
     // Send email notification to client
@@ -286,16 +289,17 @@ export async function submitContentAction(
     revalidatePath(`/clients/${content.clientId}/content`);
 
     return { success: true, data: updatedContent };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[submitContentAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred" };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred";
+    return { success: false, error: msg };
   }
 }
 
 export async function scheduleContentAction(
   contentId: string,
   scheduledDate: string | Date
-): Promise<ActionResult<any>> {
+): Promise<ActionResult<Content>> {
   try {
     const user = await requireAdmin();
 
@@ -344,16 +348,17 @@ export async function scheduleContentAction(
       action: "CONTENT_SCHEDULED",
       entityType: "Content",
       entityId: contentId,
-      beforeSnapshot: content as any,
-      afterSnapshot: updatedContent as any,
+      beforeSnapshot: content as unknown as Record<string, unknown>,
+      afterSnapshot: updatedContent as unknown as Record<string, unknown>,
     });
 
     revalidatePath("/content");
     revalidatePath(`/clients/${content.clientId}/content`);
 
     return { success: true, data: updatedContent };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[scheduleContentAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred" };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred";
+    return { success: false, error: msg };
   }
 }

@@ -14,7 +14,7 @@ import {
   internalErrorResponse,
   errorResponse,
 } from "@/lib/api-helpers";
-import { ContentStatus, Platform, ContentType } from "@prisma/client";
+import { ContentStatus, Platform, ContentType, Prisma } from "@prisma/client";
 
 interface RouteParams {
   params: Promise<{
@@ -42,7 +42,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     const platformParam = searchParams.get("platform");
     const contentTypeParam = searchParams.get("contentType");
 
-    const where: any = { clientId };
+    const where: Prisma.ContentWhereInput = { clientId };
 
     if (statusParam) {
       where.status = statusParam as ContentStatus;
@@ -155,7 +155,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       action: "CONTENT_CREATED",
       entityType: "Content",
       entityId: content.id,
-      afterSnapshot: content as any,
+      afterSnapshot: content as unknown as Record<string, unknown>,
     });
 
     return successResponse(

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
+import type { Prisma } from "@prisma/client";
 
 interface AuditLogInput {
   actorId?: string | null;
@@ -26,8 +27,8 @@ export async function createAuditLog(input: AuditLogInput): Promise<void> {
         action: input.action,
         entityType: input.entityType ?? null,
         entityId: input.entityId ?? null,
-        beforeSnapshot: input.beforeSnapshot ? (input.beforeSnapshot as any) : undefined,
-        afterSnapshot: input.afterSnapshot ? (input.afterSnapshot as any) : undefined,
+        beforeSnapshot: input.beforeSnapshot ? (input.beforeSnapshot as Prisma.InputJsonValue) : undefined,
+        afterSnapshot: input.afterSnapshot ? (input.afterSnapshot as Prisma.InputJsonValue) : undefined,
         ipAddress,
         userAgent,
         requestId,

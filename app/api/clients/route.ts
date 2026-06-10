@@ -13,7 +13,7 @@ import {
   conflictResponse,
   internalErrorResponse,
 } from "@/lib/api-helpers";
-import { ClientStatus, PaymentStatus } from "@prisma/client";
+import { ClientStatus, PaymentStatus, Prisma } from "@prisma/client";
 
 export async function GET(req: NextRequest) {
   try {
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     const sortBy = searchParams.get("sortBy") || "createdAt";
     const sortOrder = searchParams.get("sortOrder") || "desc";
 
-    const where: any = {};
+    const where: Prisma.ClientWhereInput = {};
 
     if (statusParam) {
       where.status = statusParam as ClientStatus;
@@ -170,7 +170,7 @@ export async function POST(req: NextRequest) {
       action: "CLIENT_CREATED",
       entityType: "Client",
       entityId: client.id,
-      afterSnapshot: client as any,
+      afterSnapshot: client as unknown as Record<string, unknown>,
     });
 
     return successResponse(

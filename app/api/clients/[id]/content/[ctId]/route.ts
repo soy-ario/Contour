@@ -162,8 +162,8 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
       action: "CONTENT_UPDATED",
       entityType: "Content",
       entityId: ctId,
-      beforeSnapshot: content as any,
-      afterSnapshot: updatedContent as any,
+      beforeSnapshot: content as unknown as Record<string, unknown>,
+      afterSnapshot: updatedContent as unknown as Record<string, unknown>,
     });
 
     return successResponse({
@@ -208,7 +208,7 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
       action: "CONTENT_DELETED",
       entityType: "Content",
       entityId: ctId,
-      beforeSnapshot: content as any,
+      beforeSnapshot: content as unknown as Record<string, unknown>,
     });
 
     return successResponse({ id: ctId });

@@ -36,10 +36,12 @@ export default function InternalNotes({ clientId, initialNotes }: InternalNotesP
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [editingContent, setEditingContent] = React.useState("");
   const [isPending, startTransition] = useTransition();
+  const [prevInitialNotes, setPrevInitialNotes] = React.useState<Note[]>(initialNotes);
 
-  React.useEffect(() => {
+  if (initialNotes !== prevInitialNotes) {
+    setPrevInitialNotes(initialNotes);
     setNotes(initialNotes);
-  }, [initialNotes]);
+  }
 
   const handleCreate = async () => {
     if (!newContent.trim()) return;

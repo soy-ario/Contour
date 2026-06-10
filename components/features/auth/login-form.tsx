@@ -63,7 +63,7 @@ export default function LoginForm() {
           router.refresh();
         }
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Login submission error:", err);
       setErrorMsg("An unexpected error occurred. Please try again.");
       setIsLoading(false);

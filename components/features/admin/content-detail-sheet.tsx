@@ -37,7 +37,7 @@ interface Product {
   id: string;
   name: string;
   category: string | null;
-  price: number | any | null;
+  price: number | string | null;
 }
 
 interface ApprovalEvent {
@@ -146,10 +146,13 @@ export default function ContentDetailSheet({
 
   React.useEffect(() => {
     if (open && contentId) {
-      fetchContentDetail();
-      setShowScheduleInput(false);
-      setScheduleDate("");
-      setCommentText("");
+      const timer = setTimeout(() => {
+        setShowScheduleInput(false);
+        setScheduleDate("");
+        setCommentText("");
+        fetchContentDetail();
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [open, contentId, fetchContentDetail]);
 
@@ -161,7 +164,7 @@ export default function ContentDetailSheet({
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const handleAction = async (actionPath: string, body?: any, successMsg = "Operation completed") => {
+  const handleAction = async (actionPath: string, body?: Record<string, unknown> | null, successMsg = "Operation completed") => {
     if (!contentId || !clientId) return;
     setSubmitting(true);
     try {

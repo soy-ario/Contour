@@ -9,7 +9,7 @@ import {
   forbiddenResponse,
   internalErrorResponse,
 } from "@/lib/api-helpers";
-import { ContentStatus, Platform, ContentType } from "@prisma/client";
+import { ContentStatus, Platform, ContentType, Prisma } from "@prisma/client";
 
 export async function GET(req: NextRequest) {
   try {
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     const contentTypeParam = searchParams.get("contentType");
     const clientIdParam = searchParams.get("clientId");
 
-    const where: any = {};
+    const where: Prisma.ContentWhereInput = {};
 
     if (statusParam) {
       where.status = statusParam as ContentStatus;

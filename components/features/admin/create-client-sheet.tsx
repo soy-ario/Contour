@@ -19,10 +19,31 @@ import { createClientAction, updateClientAction } from "@/lib/actions/client.act
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
+import { ClientStatus, PaymentStatus, Prisma } from "@prisma/client";
+import { Resolver } from "react-hook-form";
+
+interface ClientData {
+  id: string;
+  brandName: string;
+  website: string | null;
+  industry: string | null;
+  description: string | null;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string | null;
+  monthlyRetainer: number | string | Prisma.Decimal;
+  monthlyBudget: number | string | Prisma.Decimal | null;
+  contractStart: string | Date | null;
+  contractEnd: string | Date | null;
+  amountPaid: number | string | Prisma.Decimal;
+  paymentStatus: PaymentStatus;
+  marketingTheme: string | null;
+}
+
 interface CreateClientSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  client?: any; // If passed, we are in edit mode
+  client?: ClientData; // If passed, we are in edit mode
   onSuccess?: () => void;
 }
 
@@ -52,7 +73,7 @@ export default function CreateClientSheet({
 
   const isEditMode = !!client;
 
-  const formatDateForInput = (dateVal: any) => {
+  const formatDateForInput = (dateVal: string | Date | null) => {
     if (!dateVal) return "";
     const d = new Date(dateVal);
     if (isNaN(d.getTime())) return "";
@@ -98,22 +119,22 @@ export default function CreateClientSheet({
     reset,
     formState: { errors },
   } = useForm<ClientFormValues>({
-    resolver: zodResolver(createClientSchema) as any,
-    values: defaultValues as any, // dynamic values update when client changes
+    resolver: zodResolver(createClientSchema) as Resolver<ClientFormValues>,
+    values: defaultValues, // dynamic values update when client changes
   });
 
-  // Reset form when sheet opens/closes or client changes
-  React.useEffect(() => {
-    if (open) {
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
       setServerError(null);
     }
-  }, [open, client, defaultValues]);
+    onOpenChange(newOpen);
+  };
 
   const onSubmit = async (data: ClientFormValues) => {
     setServerError(null);
     startTransition(async () => {
       // Map empty strings to undefined to fit Zod schemas
-      const payload: any = {
+      const payload: CreateClientInput = {
         ...data,
         website: data.website || undefined,
         industry: data.industry || undefined,
@@ -131,7 +152,7 @@ export default function CreateClientSheet({
       if (result.success) {
         toast.success(isEditMode ? "Client updated successfully" : "Client created successfully");
         reset();
-        onOpenChange(false);
+        handleOpenChange(false);
         if (onSuccess) onSuccess();
       } else {
         setServerError(result.error || "An unexpected error occurred");
@@ -140,7 +161,7 @@ export default function CreateClientSheet({
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent className="sm:max-w-xl overflow-y-auto bg-zinc-950 border-zinc-800 text-foreground">
         <SheetHeader className="mb-6">
           <SheetTitle className="text-xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">

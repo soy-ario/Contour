@@ -15,10 +15,16 @@ export interface ApiResponse<T> {
   error?: ApiError;
 }
 
+export interface ValidationErrorDetail {
+  field: string;
+  message: string;
+  received?: unknown;
+}
+
 export interface ApiError {
   code: string;
   message: string;
-  details?: any;
+  details?: ValidationErrorDetail[] | Record<string, unknown> | unknown;
 }
 
 export interface PaginatedResponse<T> {

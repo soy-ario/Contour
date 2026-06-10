@@ -62,10 +62,16 @@ export default function ConnectSocialAccountModal({
 
   React.useEffect(() => {
     if (open) {
-      setServerError(null);
       reset();
     }
   }, [open, reset]);
+
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      setServerError(null);
+    }
+    onOpenChange(newOpen);
+  };
 
   const onSubmit = async (data: SocialAccountFormValues) => {
     if (!platform) return;
@@ -110,7 +116,7 @@ export default function ConnectSocialAccountModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-lg bg-zinc-950 border-zinc-800 text-foreground">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold text-foreground">
@@ -202,7 +208,7 @@ export default function ConnectSocialAccountModal({
             <Button
               type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() => handleOpenChange(false)}
               disabled={isPending}
               className="bg-transparent border-zinc-800 hover:bg-zinc-900 text-foreground text-xs font-semibold"
             >

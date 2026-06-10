@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import type { ZodError } from "zod";
+import type { ValidationErrorDetail } from "@/types/api";
 
 async function getMeta() {
   let requestId: string | null = null;
   try {
     const headersList = await headers();
     requestId = headersList.get("x-request-id");
-  } catch (e) {
+  } catch {
     // Headers read might fail if outside request context
   }
   return {
@@ -28,7 +29,7 @@ export async function successResponse<T>(data: T, status = 200) {
   );
 }
 
-export async function paginatedResponse<T>(data: T[], pagination: any, status = 200) {
+export async function paginatedResponse<T>(data: T[], pagination: Record<string, unknown> | unknown, status = 200) {
   const meta = await getMeta();
   return NextResponse.json(
     {
@@ -41,7 +42,12 @@ export async function paginatedResponse<T>(data: T[], pagination: any, status = 
   );
 }
 
-export async function errorResponse(code: string, message: string, details?: any, status = 400) {
+export async function errorResponse(
+  code: string,
+  message: string,
+  details?: ValidationErrorDetail[] | Record<string, unknown> | unknown,
+  status = 400
+) {
   const meta = await getMeta();
   return NextResponse.json(
     {
@@ -69,7 +75,7 @@ export async function validationErrorResponse(zodError: ZodError) {
   const details = zodError.issues.map((err) => ({
     field: err.path.join("."),
     message: err.message,
-    received: (err as any).value ?? undefined,
+    received: (err as unknown as { value?: unknown }).value ?? undefined,
   }));
   return errorResponse("VALIDATION_ERROR", "Request validation failed", details, 400);
 }

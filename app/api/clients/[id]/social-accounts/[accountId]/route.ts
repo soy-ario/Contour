@@ -12,7 +12,7 @@ import {
   internalErrorResponse,
 } from "@/lib/api-helpers";
 import { z } from "zod";
-import { ConnectionStatus } from "@prisma/client";
+import { ConnectionStatus, Prisma } from "@prisma/client";
 
 const patchSocialAccountSchema = z.object({
   accessToken: z.string().optional(),
@@ -52,7 +52,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
     if (!result.success) return validationErrorResponse(result.error);
 
     const data = result.data;
-    const updateData: any = {};
+    const updateData: Prisma.SocialAccountUpdateInput = {};
 
     if (data.accessToken !== undefined) {
       updateData.accessTokenEnc = encrypt(data.accessToken);

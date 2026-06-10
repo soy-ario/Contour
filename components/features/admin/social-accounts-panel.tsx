@@ -77,10 +77,12 @@ export default function SocialAccountsPanel({
   const [selectedPlatform, setSelectedPlatform] = React.useState<Platform | null>(null);
   const [actionPendingId, setActionPendingId] = React.useState<string | null>(null);
   const [actionType, setActionType] = React.useState<"sync" | "disconnect" | null>(null);
+  const [prevInitialAccounts, setPrevInitialAccounts] = React.useState<SocialAccount[]>(initialAccounts);
 
-  React.useEffect(() => {
+  if (initialAccounts !== prevInitialAccounts) {
+    setPrevInitialAccounts(initialAccounts);
     setAccounts(initialAccounts);
-  }, [initialAccounts]);
+  }
 
   const platforms = [
     { name: "INSTAGRAM", label: "Instagram", icon: InstagramIcon, color: "text-pink-500" },

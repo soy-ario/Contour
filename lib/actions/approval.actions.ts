@@ -10,7 +10,7 @@ import {
   sendChangesRequestedEmail,
 } from "@/lib/services/email.service";
 import type { ActionResult } from "@/types";
-import { ContentStatus, ApprovalAction } from "@prisma/client";
+import { ContentStatus, ApprovalAction, Content, ApprovalEvent } from "@prisma/client";
 
 /**
  * Common helper to authenticate, verify client ownership, and fetch content details.
@@ -47,7 +47,7 @@ async function getAdminEmails(): Promise<string[]> {
 export async function approveContentAction(
   contentId: string,
   comment?: string
-): Promise<ActionResult<any>> {
+): Promise<ActionResult<Content>> {
   try {
     const { content, user } = await validateAccessAndGetContent(contentId);
 
@@ -93,8 +93,8 @@ export async function approveContentAction(
       action: "CONTENT_APPROVED",
       entityType: "Content",
       entityId: contentId,
-      beforeSnapshot: content as any,
-      afterSnapshot: updatedContent as any,
+      beforeSnapshot: content as unknown as Record<string, unknown>,
+      afterSnapshot: updatedContent as unknown as Record<string, unknown>,
     });
 
     // Notify admins
@@ -107,16 +107,17 @@ export async function approveContentAction(
     revalidatePath(`/clients/${content.clientId}/content`);
 
     return { success: true, data: updatedContent };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[approveContentAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred" };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred";
+    return { success: false, error: msg };
   }
 }
 
 export async function rejectContentAction(
   contentId: string,
   comment: string
-): Promise<ActionResult<any>> {
+): Promise<ActionResult<Content>> {
   try {
     if (!comment || comment.trim() === "") {
       return { success: false, error: "A reason comment is required for rejection" };
@@ -166,8 +167,8 @@ export async function rejectContentAction(
       action: "CONTENT_REJECTED",
       entityType: "Content",
       entityId: contentId,
-      beforeSnapshot: content as any,
-      afterSnapshot: updatedContent as any,
+      beforeSnapshot: content as unknown as Record<string, unknown>,
+      afterSnapshot: updatedContent as unknown as Record<string, unknown>,
     });
 
     // Notify admins
@@ -180,16 +181,17 @@ export async function rejectContentAction(
     revalidatePath(`/clients/${content.clientId}/content`);
 
     return { success: true, data: updatedContent };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[rejectContentAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred" };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred";
+    return { success: false, error: msg };
   }
 }
 
 export async function requestChangesAction(
   contentId: string,
   comment: string
-): Promise<ActionResult<any>> {
+): Promise<ActionResult<Content>> {
   try {
     if (!comment || comment.trim() === "") {
       return { success: false, error: "Feedback comment is required for change requests" };
@@ -239,8 +241,8 @@ export async function requestChangesAction(
       action: "CONTENT_CHANGES_REQUESTED",
       entityType: "Content",
       entityId: contentId,
-      beforeSnapshot: content as any,
-      afterSnapshot: updatedContent as any,
+      beforeSnapshot: content as unknown as Record<string, unknown>,
+      afterSnapshot: updatedContent as unknown as Record<string, unknown>,
     });
 
     // Notify admins
@@ -253,16 +255,17 @@ export async function requestChangesAction(
     revalidatePath(`/clients/${content.clientId}/content`);
 
     return { success: true, data: updatedContent };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[requestChangesAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred" };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred";
+    return { success: false, error: msg };
   }
 }
 
 export async function addCommentAction(
   contentId: string,
   comment: string
-): Promise<ActionResult<any>> {
+): Promise<ActionResult<ApprovalEvent>> {
   try {
     if (!comment || comment.trim() === "") {
       return { success: false, error: "Comment body cannot be empty" };
@@ -277,24 +280,15 @@ export async function addCommentAction(
         actorId: user.id,
         comment,
       },
-      include: {
-        actor: {
-          select: {
-            id: true,
-            name: true,
-            username: true,
-            image: true,
-          },
-        },
-      },
     });
 
     revalidatePath("/content");
     revalidatePath(`/clients/${content.clientId}/content`);
 
     return { success: true, data: event };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[addCommentAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred" };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred";
+    return { success: false, error: msg };
   }
 }

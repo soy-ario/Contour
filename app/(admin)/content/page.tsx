@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
 import ContentPageContent from "@/components/features/admin/content-page-content";
-import { ContentStatus, Platform, ClientStatus } from "@prisma/client";
+import { ContentStatus, Platform, ClientStatus, Prisma } from "@prisma/client";
 import { format } from "date-fns";
 
 export const dynamic = "force-dynamic";
@@ -31,7 +31,7 @@ export default async function ContentPage({ searchParams }: PageProps) {
   const month = params.month || "";
 
   // 1. Build Query Filters
-  const where: any = {};
+  const where: Prisma.ContentWhereInput = {};
 
   if (filterClient !== "all") {
     where.clientId = filterClient;

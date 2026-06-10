@@ -31,9 +31,10 @@ export async function createNoteAction(clientId: string, content: string) {
 
     revalidatePath(`/admin/clients/${clientId}/overview`);
     return { success: true, data: note };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[createNoteAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred." };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred.";
+    return { success: false, error: msg };
   }
 }
 
@@ -68,9 +69,10 @@ export async function updateNoteAction(id: string, content: string) {
 
     revalidatePath(`/admin/clients/${existing.clientId}/overview`);
     return { success: true, data: note };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[updateNoteAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred." };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred.";
+    return { success: false, error: msg };
   }
 }
 
@@ -99,8 +101,9 @@ export async function deleteNoteAction(id: string) {
 
     revalidatePath(`/admin/clients/${existing.clientId}/overview`);
     return { success: true };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[deleteNoteAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred." };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred.";
+    return { success: false, error: msg };
   }
 }

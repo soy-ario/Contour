@@ -5,7 +5,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 export async function sendContentSubmittedEmail(
   clientEmail: string,
   contentTitle: string,
-  clientId: string
+  _clientId: string
 ): Promise<void> {
   const approvalLink = `${BASE_URL}/client/content`; // Scoped to client portal
   await sendEmail({

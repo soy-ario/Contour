@@ -6,9 +6,9 @@ import { createClientSchema, updateClientSchema } from "@/lib/validations/client
 import { createAuditLog } from "@/lib/services/audit.service";
 import { requireAdmin } from "@/lib/session";
 import bcrypt from "bcryptjs";
-import { ClientStatus } from "@prisma/client";
+import { ClientStatus, Client } from "@prisma/client";
 
-export async function createClientAction(formData: any) {
+export async function createClientAction(formData: unknown) {
   try {
     const user = await requireAdmin();
     const result = createClientSchema.safeParse(formData);
@@ -49,14 +49,15 @@ export async function createClientAction(formData: any) {
       action: "CLIENT_CREATED",
       entityType: "Client",
       entityId: client.id,
-      afterSnapshot: client as any,
+      afterSnapshot: client as unknown as Record<string, unknown>,
     });
 
     revalidatePath("/admin/clients");
     return { success: true, data: { id: client.id } };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[createClientAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred." };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred.";
+    return { success: false, error: msg };
   }
 }
 
@@ -69,7 +70,7 @@ const actionUpdateClientSchema = updateClientSchema.extend({
   logoUrl: z.string().optional().nullable(),
 });
 
-export async function updateClientAction(id: string, formData: any) {
+export async function updateClientAction(id: string, formData: unknown) {
   try {
     const user = await requireAdmin();
     const result = actionUpdateClientSchema.safeParse(formData);
@@ -96,7 +97,7 @@ export async function updateClientAction(id: string, formData: any) {
       }
     }
 
-    const updateData: any = {};
+    const updateData: Partial<Client> = {};
     if (data.brandName !== undefined) updateData.brandName = data.brandName;
     if (data.website !== undefined) updateData.website = data.website || null;
     if (data.industry !== undefined) updateData.industry = data.industry || null;
@@ -123,8 +124,8 @@ export async function updateClientAction(id: string, formData: any) {
       action: "CLIENT_UPDATED",
       entityType: "Client",
       entityId: id,
-      beforeSnapshot: client as any,
-      afterSnapshot: updatedClient as any,
+      beforeSnapshot: client as unknown as Record<string, unknown>,
+      afterSnapshot: updatedClient as unknown as Record<string, unknown>,
     });
 
     revalidatePath("/admin/clients");
@@ -132,16 +133,17 @@ export async function updateClientAction(id: string, formData: any) {
     revalidatePath(`/admin/clients/${id}/overview`);
     revalidatePath(`/admin/clients/${id}/settings`);
     return { success: true, data: { id: updatedClient.id } };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[updateClientAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred." };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred.";
+    return { success: false, error: msg };
   }
 }
 
 export async function updateClientLogoAction(clientId: string, logoUrl: string) {
   try {
     const user = await requireAdmin();
-    const updated = await prisma.client.update({
+    await prisma.client.update({
       where: { id: clientId },
       data: { logoUrl },
     });
@@ -158,9 +160,10 @@ export async function updateClientLogoAction(clientId: string, logoUrl: string) 
     revalidatePath(`/admin/clients/${clientId}/overview`);
     revalidatePath(`/admin/clients/${clientId}/settings`);
     return { success: true, url: logoUrl };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[updateClientLogoAction] Error:", error);
-    return { success: false, error: error.message };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred.";
+    return { success: false, error: msg };
   }
 }
 
@@ -226,9 +229,10 @@ export async function updateClientStatusAction(id: string, status: ClientStatus)
     revalidatePath(`/admin/clients/${id}`);
     revalidatePath(`/admin/clients/${id}/overview`);
     return { success: true, data: { id: updatedClient.id, status: updatedClient.status } };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[updateClientStatusAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred." };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred.";
+    return { success: false, error: msg };
   }
 }
 
@@ -297,8 +301,9 @@ export async function createClientUserAction(clientId: string, username: string,
     revalidatePath(`/admin/clients/${clientId}`);
     revalidatePath(`/admin/clients/${clientId}/overview`);
     return { success: true, data: { id: clientUser.id, username: clientUser.username } };
-  } catch (error: any) {
+  } catch (error) {
     console.error("[createClientUserAction] Error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred." };
+    const msg = error instanceof Error ? error.message : "An unexpected error occurred.";
+    return { success: false, error: msg };
   }
 }

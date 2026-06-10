@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { signOut } from "@/lib/auth-client";
-import { Bell, LogOut, FileVideo, LayoutDashboard, ShoppingBag, MessageSquare, Menu } from "lucide-react";
+import { Bell, LogOut, FileVideo, LayoutDashboard, ShoppingBag, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {

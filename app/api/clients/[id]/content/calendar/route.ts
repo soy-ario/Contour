@@ -7,7 +7,7 @@ import {
   forbiddenResponse,
   internalErrorResponse,
 } from "@/lib/api-helpers";
-import { Platform } from "@prisma/client";
+import { Platform, Prisma } from "@prisma/client";
 
 interface RouteParams {
   params: Promise<{
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     const startOfMonth = new Date(Date.UTC(year, month, 1, 0, 0, 0, 0));
     const endOfMonth = new Date(Date.UTC(year, month + 1, 0, 23, 59, 59, 999));
 
-    const where: any = {
+    const where: Prisma.ContentWhereInput = {
       clientId,
       OR: [
         {

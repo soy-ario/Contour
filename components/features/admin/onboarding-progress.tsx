@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
-import { ClientStatus } from "@prisma/client";
+import type { ClientStatus } from "@prisma/client";
 
 interface OnboardingProgressProps {
   status: ClientStatus;

@@ -3,7 +3,7 @@ import StatusBadge from "@/components/shared/status-badge";
 import HealthScoreRing from "@/components/shared/health-score-ring";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Calendar, DollarSign, Briefcase } from "lucide-react";
-import { ClientStatus } from "@prisma/client";
+import type { ClientStatus } from "@prisma/client";
 
 interface ClientHeaderProps {
   client: {

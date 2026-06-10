@@ -9,7 +9,7 @@ import ClientListTable from "@/components/features/admin/client-list-table";
 import CreateClientSheet from "@/components/features/admin/create-client-sheet";
 import { updateClientStatusAction } from "@/lib/actions/client.actions";
 import { toast } from "sonner";
-import { ClientStatus } from "@prisma/client";
+import type { ClientStatus } from "@prisma/client";
 
 interface ClientData {
   id: string;

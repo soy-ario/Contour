@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Platform, ContentStatus, ContentType, ApprovalAction } from "@prisma/client";
+import type { Platform, ContentStatus, ContentType, ApprovalAction } from "@prisma/client";
 import {
   Sheet,
   SheetContent,
@@ -426,7 +426,7 @@ export default function ContentDetailSheet({
                 {/* Timeline / Event Feed */}
                 <div className="space-y-3 pt-2">
                   {content.approvalEvents.map((evt) => {
-                    const isComment = evt.action === ApprovalAction.COMMENTED;
+                    const isComment = evt.action === "COMMENTED";
                     const actorName = evt.actor?.name || evt.actor?.username || "System";
                     
                     return (
@@ -527,7 +527,7 @@ export default function ContentDetailSheet({
               )}
 
               {/* Utility edit buttons */}
-              {onEdit && (isDraft || content.status === ContentStatus.CLIENT_APPROVAL_PENDING) && isAdmin && (
+              {onEdit && (isDraft || content.status === "CLIENT_APPROVAL_PENDING") && isAdmin && (
                 <Button
                   variant="outline"
                   onClick={() => {

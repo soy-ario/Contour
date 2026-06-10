@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Platform } from "@prisma/client";
+import type { Platform } from "@prisma/client";
 import { cn } from "@/lib/utils";
 
 export const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -49,17 +49,17 @@ interface PlatformIconProps extends React.SVGProps<SVGSVGElement> {
 
 export function PlatformIcon({ platform, className, ...props }: PlatformIconProps) {
   switch (platform) {
-    case Platform.INSTAGRAM:
+    case "INSTAGRAM":
       return <InstagramIcon className={cn("text-pink-500", className)} {...props} />;
-    case Platform.FACEBOOK:
+    case "FACEBOOK":
       return <FacebookIcon className={cn("text-blue-600", className)} {...props} />;
-    case Platform.LINKEDIN:
+    case "LINKEDIN":
       return <LinkedinIcon className={cn("text-blue-500", className)} {...props} />;
-    case Platform.YOUTUBE:
+    case "YOUTUBE":
       return <YoutubeIcon className={cn("text-red-500", className)} {...props} />;
-    case Platform.TIKTOK:
+    case "TIKTOK":
       return <TiktokIcon className={cn("text-cyan-400", className)} {...props} />;
-    case Platform.X:
+    case "X":
       return <TwitterIcon className={cn("text-zinc-200", className)} {...props} />;
     default:
       return null;

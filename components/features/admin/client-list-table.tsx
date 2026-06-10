@@ -45,7 +45,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { ClientStatus, PaymentStatus } from "@prisma/client";
+import type { ClientStatus, PaymentStatus } from "@prisma/client";
 
 interface ClientData {
   id: string;

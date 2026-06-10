@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Platform, ContentStatus, ContentType } from "@prisma/client";
+import type { Platform, ContentType } from "@prisma/client";
 import { PlatformIcon } from "@/components/shared/social-icons";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";

@@ -13,7 +13,7 @@ import {
 } from "@/lib/actions/client.actions";
 import { toast } from "sonner";
 import { Loader2, Globe, Shield, CreditCard, UserCheck, ShieldAlert } from "lucide-react";
-import { PaymentStatus, Prisma } from "@prisma/client";
+import type { PaymentStatus, Prisma } from "@prisma/client";
 
 interface ClientData {
   id: string;

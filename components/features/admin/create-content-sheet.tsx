@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Platform, ContentStatus, ContentType } from "@prisma/client";
+import type { Platform, ContentType } from "@prisma/client";
 import {
   Sheet,
   SheetContent,

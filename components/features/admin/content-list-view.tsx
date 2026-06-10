@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Platform, ContentStatus, ContentType } from "@prisma/client";
+import type { Platform, ContentStatus, ContentType } from "@prisma/client";
 import {
   ColumnDef,
   SortingState,

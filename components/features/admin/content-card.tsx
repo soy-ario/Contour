@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Platform, ContentStatus, ContentType } from "@prisma/client";
+import type { Platform, ContentStatus, ContentType } from "@prisma/client";
 import { Calendar, CircleDollarSign, Edit3, CheckCircle, Send, MoreVertical, Eye } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

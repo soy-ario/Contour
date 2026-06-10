@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Platform } from "@prisma/client";
+import type { Platform } from "@prisma/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 

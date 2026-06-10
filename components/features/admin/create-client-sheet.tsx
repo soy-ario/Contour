@@ -18,7 +18,7 @@ import { createClientAction, updateClientAction } from "@/lib/actions/client.act
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
-import { PaymentStatus, Prisma } from "@prisma/client";
+import type { PaymentStatus, Prisma } from "@prisma/client";
 
 interface ClientData {
   id: string;

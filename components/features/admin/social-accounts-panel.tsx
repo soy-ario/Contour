@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Platform } from "@prisma/client";
+import type { Platform } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import StatusBadge from "@/components/shared/status-badge";

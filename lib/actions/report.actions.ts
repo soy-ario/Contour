@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/session";
 import { generateReportSummary } from "@/lib/ai";
 import type { ActionResult } from "@/types";
-import { Report } from "@prisma/client";
+import type { Prisma, Report } from "@prisma/client";
 
 interface GenerateReportInput {
   clientId: string;
@@ -146,7 +146,7 @@ export async function generateReportAction(
           month,
           year,
           status: "GENERATING",
-          dataSnapshot: reportData as any,
+          dataSnapshot: reportData as Prisma.InputJsonValue,
           aiSummary: aiSummary ?? undefined,
           generatedBy: user.id,
         },

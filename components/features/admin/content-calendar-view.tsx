@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useQueryState } from "nuqs";
-import { Platform, ContentStatus, ContentType } from "@prisma/client";
+import type { Platform, ContentStatus, ContentType } from "@prisma/client";
 import {
   format,
   addMonths,
@@ -44,17 +44,17 @@ const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 // Status color helper for calendar dots
 function getStatusDotColor(status: ContentStatus) {
   switch (status) {
-    case ContentStatus.POSTED:
+    case "POSTED":
       return "bg-emerald-400";
-    case ContentStatus.CLIENT_APPROVAL_PENDING:
+    case "CLIENT_APPROVAL_PENDING":
       return "bg-amber-400";
-    case ContentStatus.IDEA:
-    case ContentStatus.DRAFT:
+    case "IDEA":
+    case "DRAFT":
       return "bg-zinc-400";
-    case ContentStatus.APPROVED:
-    case ContentStatus.SCHEDULED:
+    case "APPROVED":
+    case "SCHEDULED":
       return "bg-blue-400";
-    case ContentStatus.REJECTED:
+    case "REJECTED":
       return "bg-rose-400";
     default:
       return "bg-zinc-400";

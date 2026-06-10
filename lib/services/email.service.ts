@@ -1,6 +1,9 @@
 import { sendEmail } from "@/lib/resend";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const BASE_URL =
+  process.env.NEXT_PUBLIC_APP_URL ||
+  process.env.BETTER_AUTH_URL ||
+  "http://localhost:3000";
 
 export async function sendContentSubmittedEmail(
   clientEmail: string,
@@ -32,7 +35,7 @@ export async function sendContentApprovedEmail(
   adminEmail: string,
   contentTitle: string
 ): Promise<void> {
-  const contentLink = `${BASE_URL}/content`; // Scoped to admin panel
+  const contentLink = `${BASE_URL}/admin/content`; // Scoped to admin panel
   await sendEmail({
     to: adminEmail,
     subject: `Contour: Content Approved — ${contentTitle}`,
@@ -57,7 +60,7 @@ export async function sendContentRejectedEmail(
   contentTitle: string,
   reason: string
 ): Promise<void> {
-  const contentLink = `${BASE_URL}/content`;
+  const contentLink = `${BASE_URL}/admin/content`;
   await sendEmail({
     to: adminEmail,
     subject: `Contour: Content Rejected — ${contentTitle}`,
@@ -85,7 +88,7 @@ export async function sendChangesRequestedEmail(
   contentTitle: string,
   feedback: string
 ): Promise<void> {
-  const contentLink = `${BASE_URL}/content`;
+  const contentLink = `${BASE_URL}/admin/content`;
   await sendEmail({
     to: adminEmail,
     subject: `Contour: Changes Requested — ${contentTitle}`,

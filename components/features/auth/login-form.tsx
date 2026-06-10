@@ -35,11 +35,8 @@ export default function LoginForm() {
     setErrorMsg(null);
 
     try {
-      // Sign in using Better Auth's signIn.email
-      // The username plugin configured on the server allows us to pass
-      // the username directly in the email field.
-      const result = await signIn.email({
-        email: data.username,
+      const result = await signIn.username({
+        username: data.username,
         password: data.password,
         callbackURL: "/", // Fallback callback URL
       });

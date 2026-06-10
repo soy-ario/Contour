@@ -1,0 +1,648 @@
+// prisma/schema.prisma
+// Contour Platform — Production Database Schema
+// PostgreSQL 16 | Prisma 7.x | Neon Serverless
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearchPostgres"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ENUMS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+enum UserRole {
+  ADMIN
+  CLIENT
+}
+
+enum ClientStatus {
+  LEAD
+  DISCOVERY
+  PROPOSAL_SENT
+  CONTRACT_SIGNED
+  SETUP
+  DASHBOARD_READY
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  OVERDUE
+  PARTIAL
+}
+
+enum Platform {
+  INSTAGRAM
+  FACEBOOK
+  LINKEDIN
+  TIKTOK
+  YOUTUBE
+  X
+}
+
+enum ConnectionStatus {
+  CONNECTED
+  DISCONNECTED
+  TOKEN_EXPIRED
+  ERROR
+}
+
+enum ContentType {
+  REEL
+  POST
+  STORY
+  VIDEO
+  CAROUSEL
+  THREAD
+  SHORT
+  LIVE
+}
+
+enum ContentStatus {
+  IDEA
+  DRAFT
+  CLIENT_APPROVAL_PENDING
+  APPROVED
+  SCHEDULED
+  POSTED
+  REJECTED
+  ARCHIVED
+}
+
+enum ApprovalAction {
+  SUBMITTED
+  APPROVED
+  REJECTED
+  CHANGES_REQUESTED
+  COMMENTED
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  DISCONTINUED
+}
+
+enum ReportStatus {
+  GENERATING
+  READY
+  FAILED
+}
+
+enum RequestStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum SyncStatus {
+  STARTED
+  SUCCESS
+  PARTIAL
+  FAILED
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// IDENTITY & AUTH DOMAIN
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String   @map("password_hash")
+  role         UserRole @default(CLIENT)
+
+  // Client linkage (null for ADMIN)
+  clientId     String?  @unique @map("client_id")
+  client       Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
+  // MFA
+  mfaEnabled   Boolean  @default(false) @map("mfa_enabled")
+  mfaSecret    String?  @map("mfa_secret")
+
+  // Relations (outgoing)
+  sessions          Session[]
+  auditLogs         AuditLog[]
+  approvalEvents    ApprovalEvent[]
+  requestComments   RequestComment[]
+  internalNotes     InternalNote[]
+  reports           Report[]
+  statusLogs        StatusLog[]
+  createdContents   Content[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  @@map("users")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token        String   @unique
+  refreshToken String   @unique @map("refresh_token")
+  expiresAt    DateTime @map("expires_at")
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model VerificationToken {
+  id         String   @id @default(cuid())
+  identifier String
+  token      String   @unique
+  type       String
+  expiresAt  DateTime @map("expires_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([identifier])
+  @@map("verification_tokens")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CLIENT MANAGEMENT DOMAIN
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model Client {
+  id String @id @default(cuid())
+
+  // Business Info
+  brandName   String  @map("brand_name")
+  website     String?
+  industry    String?
+  logoUrl     String? @map("logo_url")
+  description String?
+
+  // Contact Info
+  contactName  String  @map("contact_name")
+  contactEmail String  @map("contact_email")
+  contactPhone String? @map("contact_phone")
+
+  // Financial
+  monthlyRetainer Decimal       @default(0) @db.Decimal(12, 2) @map("monthly_retainer")
+  amountPaid      Decimal       @default(0) @db.Decimal(12, 2) @map("amount_paid")
+  paymentStatus   PaymentStatus @default(PENDING)              @map("payment_status")
+  contractStart   DateTime?     @db.Date                       @map("contract_start")
+  contractEnd     DateTime?     @db.Date                       @map("contract_end")
+
+  // Marketing
+  marketingTheme String?  @map("marketing_theme")
+  monthlyBudget  Decimal? @db.Decimal(12, 2) @map("monthly_budget")
+
+  // Status
+  status      ClientStatus @default(LEAD)
+  healthScore Int?         @map("health_score")
+  archivedAt  DateTime?    @map("archived_at")
+
+  // Relations
+  user                 User?
+  socialAccounts       SocialAccount[]
+  contents             Content[]
+  products             Product[]
+  analyticsSnapshots   AnalyticsSnapshot[]
+  platformDailyMetrics PlatformDailyMetric[]
+  healthScoreLogs      HealthScoreLog[]
+  requests             Request[]
+  internalNotes        InternalNote[]
+  reports              Report[]
+  syncLogs             SyncLog[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([healthScore(sort: Desc)])
+  @@map("clients")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// SOCIAL INTEGRATION DOMAIN
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model SocialAccount {
+  id               String           @id @default(cuid())
+  clientId         String           @map("client_id")
+  client           Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  platform         Platform
+  accountId        String           @map("account_id")
+  accountName      String?          @map("account_name")
+  accessTokenEnc   String           @map("access_token_enc")
+  refreshTokenEnc  String?          @map("refresh_token_enc")
+  tokenExpiresAt   DateTime?        @map("token_expires_at")
+  scope            String?
+  status           ConnectionStatus @default(CONNECTED)
+  lastSyncAt       DateTime?        @map("last_sync_at")
+  syncError        String?          @map("sync_error")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt      @map("updated_at")
+
+  @@unique([clientId, platform])
+  @@index([platform])
+  @@index([status])
+  @@map("social_accounts")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONTENT DOMAIN
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model Content {
+  id          String        @id @default(cuid())
+  clientId    String        @map("client_id")
+  client      Client        @relation(fields: [clientId], references: [id], onDelete: Restrict)
+
+  // Core
+  title       String
+  topic       String?
+  platform    Platform
+  contentType ContentType   @map("content_type")
+  status      ContentStatus @default(IDEA)
+
+  // Creative
+  caption     String?
+  script      String?
+  hashtags    String[]      @default([])
+  assetUrls   String[]      @default([]) @map("asset_urls")
+
+  // Scheduling
+  publishDate DateTime?    @db.Date    @map("publish_date")
+  scheduledAt DateTime?               @map("scheduled_at")
+  postedAt    DateTime?               @map("posted_at")
+
+  // Financial
+  adSpend     Decimal?     @db.Decimal(12, 2) @map("ad_spend")
+
+  // Admin
+  notes       String?
+
+  // Relations
+  products        ContentProduct[]
+  approvalEvents  ApprovalEvent[]
+  analytics       ContentAnalytic?
+  statusLogs      StatusLog[]
+
+  createdBy   String?  @map("created_by")
+  creator     User?    @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt      @map("updated_at")
+
+  @@index([clientId, status])
+  @@index([clientId, platform])
+  @@index([clientId, scheduledAt(sort: Desc)])
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("contents")
+}
+
+model ContentProduct {
+  contentId  String   @map("content_id")
+  content    Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  productId  String   @map("product_id")
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@id([contentId, productId])
+  @@index([productId])
+  @@map("content_products")
+}
+
+model ApprovalEvent {
+  id        String         @id @default(cuid())
+  contentId String         @map("content_id")
+  content   Content        @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  action    ApprovalAction
+  comment   String?
+  actorId   String?        @map("actor_id")
+  actor     User?          @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  createdAt DateTime       @default(now()) @map("created_at")
+
+  @@index([contentId])
+  @@index([actorId])
+  @@index([createdAt(sort: Desc)])
+  @@map("approval_events")
+}
+
+model StatusLog {
+  id         String         @id @default(cuid())
+  contentId  String         @map("content_id")
+  content    Content        @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  fromStatus ContentStatus? @map("from_status")
+  toStatus   ContentStatus  @map("to_status")
+  changedBy  String?        @map("changed_by")
+  changer    User?          @relation(fields: [changedBy], references: [id], onDelete: SetNull)
+  note       String?
+  createdAt  DateTime       @default(now()) @map("created_at")
+
+  @@index([contentId])
+  @@index([createdAt(sort: Desc)])
+  @@map("status_logs")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PRODUCT DOMAIN
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model Product {
+  id          String        @id @default(cuid())
+  clientId    String        @map("client_id")
+  client      Client        @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  name        String
+  category    String?
+  description String?
+  imageUrl    String?       @map("image_url")
+  price       Decimal?      @db.Decimal(12, 2)
+  url         String?
+  status      ProductStatus @default(ACTIVE)
+  contents    ContentProduct[]
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt      @map("updated_at")
+
+  @@index([clientId, status])
+  @@index([clientId, category])
+  @@map("products")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ANALYTICS DOMAIN
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model AnalyticsSnapshot {
+  id       String   @id @default(cuid())
+  clientId String   @map("client_id")
+  client   Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  platform Platform
+  periodStart DateTime @db.Date @map("period_start")
+  periodEnd   DateTime @db.Date @map("period_end")
+
+  // Volume metrics
+  totalViews       BigInt @default(0) @map("total_views")
+  totalReach       BigInt @default(0) @map("total_reach")
+  totalImpressions BigInt @default(0) @map("total_impressions")
+  totalEngagement  BigInt @default(0) @map("total_engagement")
+  totalLikes       BigInt @default(0) @map("total_likes")
+  totalComments    BigInt @default(0) @map("total_comments")
+  totalShares      BigInt @default(0) @map("total_shares")
+  totalSaves       BigInt @default(0) @map("total_saves")
+
+  // Follower metrics
+  followerCountStart BigInt? @map("follower_count_start")
+  followerCountEnd   BigInt? @map("follower_count_end")
+  followerGrowth     Int     @default(0) @map("follower_growth")
+
+  // Video metrics
+  videoViews       BigInt @default(0) @map("video_views")
+  watchTimeSeconds BigInt @default(0) @map("watch_time_seconds")
+
+  // Rate metrics
+  avgEngagementRate Decimal? @db.Decimal(8, 4) @map("avg_engagement_rate")
+  avgCtr            Decimal? @db.Decimal(8, 4) @map("avg_ctr")
+
+  // Content counts
+  postCount  Int @default(0) @map("post_count")
+  storyCount Int @default(0) @map("story_count")
+  reelCount  Int @default(0) @map("reel_count")
+
+  // Sync metadata
+  syncedAt   DateTime @default(now()) @map("synced_at")
+  rawPayload Json?    @map("raw_payload")
+
+  @@unique([clientId, platform, periodStart, periodEnd])
+  @@index([clientId, platform, periodStart(sort: Desc)])
+  @@index([clientId, periodStart(sort: Desc)])
+  @@index([platform, periodStart(sort: Desc)])
+  @@map("analytics_snapshots")
+}
+
+model ContentAnalytic {
+  id          String  @id @default(cuid())
+  contentId   String  @unique @map("content_id")
+  content     Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  // Engagement
+  views          BigInt  @default(0)
+  reach          BigInt  @default(0)
+  impressions    BigInt  @default(0)
+  likes          Int     @default(0)
+  comments       Int     @default(0)
+  shares         Int     @default(0)
+  saves          Int     @default(0)
+  engagementRate Decimal @default(0) @db.Decimal(8, 4) @map("engagement_rate")
+
+  // Video
+  videoViews    BigInt   @default(0) @map("video_views")
+  watchTimeSecs BigInt   @default(0) @map("watch_time_secs")
+  avgWatchPct   Decimal? @db.Decimal(5, 2) @map("avg_watch_pct")
+  ctr           Decimal? @db.Decimal(8, 4)
+
+  // Platform sync
+  nativePostId String?   @map("native_post_id")
+  permalink    String?
+  lastSyncedAt DateTime? @map("last_synced_at")
+
+  @@index([engagementRate(sort: Desc)])
+  @@index([reach(sort: Desc)])
+  @@index([views(sort: Desc)])
+  @@map("content_analytics")
+}
+
+model PlatformDailyMetric {
+  id          String   @id @default(cuid())
+  clientId    String   @map("client_id")
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  platform    Platform
+  metricDate  DateTime @db.Date @map("metric_date")
+
+  views         BigInt @default(0)
+  reach         BigInt @default(0)
+  impressions   BigInt @default(0)
+  engagement    BigInt @default(0)
+  likes         BigInt @default(0)
+  comments      BigInt @default(0)
+  shares        BigInt @default(0)
+  saves         BigInt @default(0)
+  followerDelta Int    @default(0) @map("follower_delta")
+  videoViews    BigInt @default(0) @map("video_views")
+
+  syncedAt DateTime @default(now()) @map("synced_at")
+
+  @@unique([clientId, platform, metricDate])
+  @@index([clientId, platform, metricDate(sort: Desc)])
+  @@index([clientId, metricDate(sort: Desc)])
+  @@map("platform_daily_metrics")
+}
+
+model HealthScoreLog {
+  id       String @id @default(cuid())
+  clientId String @map("client_id")
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  score    Int
+
+  // Component scores (0-100 each)
+  engagementComponent  Int @map("engagement_component")
+  reachComponent       Int @map("reach_component")
+  consistencyComponent Int @map("consistency_component")
+  approvalComponent    Int @map("approval_component")
+  growthComponent      Int @map("growth_component")
+
+  periodMonth   Int      @map("period_month")
+  periodYear    Int      @map("period_year")
+  calculatedAt  DateTime @default(now()) @map("calculated_at")
+
+  @@index([clientId, periodYear(sort: Desc), periodMonth(sort: Desc)])
+  @@map("health_score_logs")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// REPORTING DOMAIN
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model Report {
+  id       String @id @default(cuid())
+  clientId String @map("client_id")
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  month    Int
+  year     Int
+  status   ReportStatus @default(GENERATING)
+
+  // Content
+  dataSnapshot      Json    @default("{}") @map("data_snapshot")
+  aiSummary         String? @map("ai_summary")
+  aiRecommendations Json?   @map("ai_recommendations")
+
+  // Export
+  pdfR2Key String? @map("pdf_r2_key")
+
+  // Meta
+  generatedBy   String?  @map("generated_by")
+  generator     User?    @relation(fields: [generatedBy], references: [id], onDelete: SetNull)
+  errorMessage  String?  @map("error_message")
+  sections      ReportSection[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  @@unique([clientId, month, year])
+  @@index([clientId, createdAt(sort: Desc)])
+  @@map("reports")
+}
+
+model ReportSection {
+  id        String @id @default(cuid())
+  reportId  String @map("report_id")
+  report    Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  section   String
+  sortOrder Int    @map("sort_order")
+  title     String
+  content   Json   @default("{}")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  @@unique([reportId, section])
+  @@map("report_sections")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// COMMUNICATION DOMAIN
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model Request {
+  id         String        @id @default(cuid())
+  clientId   String        @map("client_id")
+  client     Client        @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  title      String
+  body       String?
+  status     RequestStatus @default(OPEN)
+  resolvedAt DateTime?     @map("resolved_at")
+  comments   RequestComment[]
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt      @map("updated_at")
+
+  @@index([clientId, createdAt(sort: Desc)])
+  @@index([clientId, status])
+  @@map("requests")
+}
+
+model RequestComment {
+  id        String   @id @default(cuid())
+  requestId String   @map("request_id")
+  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  authorId  String?  @map("author_id")
+  author    User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  body      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  @@index([requestId, createdAt(sort: Asc)])
+  @@map("request_comments")
+}
+
+model InternalNote {
+  id        String   @id @default(cuid())
+  clientId  String   @map("client_id")
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  content   String
+  createdBy String?  @map("created_by")
+  creator   User?    @relation(fields: [createdBy], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+
+  @@index([clientId, createdAt(sort: Desc)])
+  @@map("internal_notes")
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// AUDIT DOMAIN
+// ═══════════════════════════════════════════════════════════════════════════════
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  actorId        String?  @map("actor_id")
+  actor          User?    @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action         String
+  entityType     String?  @map("entity_type")
+  entityId       String?  @map("entity_id")
+  beforeSnapshot Json?    @map("before_snapshot")
+  afterSnapshot  Json?    @map("after_snapshot")
+  ipAddress      String?  @map("ip_address")
+  userAgent      String?  @map("user_agent")
+  requestId      String?  @map("request_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([actorId, createdAt(sort: Desc)])
+  @@index([entityType, entityId, createdAt(sort: Desc)])
+  @@index([action, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
+}
+
+model SyncLog {
+  id            String     @id @default(cuid())
+  clientId      String     @map("client_id")
+  client        Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  platform      Platform
+  status        SyncStatus @default(STARTED)
+  recordsSynced Int        @default(0) @map("records_synced")
+  errorMessage  String?    @map("error_message")
+  startedAt     DateTime   @default(now()) @map("started_at")
+  completedAt   DateTime?  @map("completed_at")
+
+  @@index([clientId, platform, startedAt(sort: Desc)])
+  @@index([status, startedAt(sort: Desc)])
+  @@map("sync_logs")
+}

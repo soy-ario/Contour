@@ -3,7 +3,12 @@
 import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Platform, ContentStatus, ContentType, ApprovalAction } from "@prisma/client";
+import type {
+  Platform,
+  ContentType,
+  ContentStatus,
+  ApprovalAction,
+} from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,6 +37,15 @@ import {
   addCommentAction,
 } from "@/lib/actions/approval.actions";
 
+const ContentStatusValues = {
+  APPROVED: "APPROVED",
+  REJECTED: "REJECTED",
+  CLIENT_APPROVAL_PENDING: "CLIENT_APPROVAL_PENDING",
+} as const;
+
+const ApprovalActionValues = {
+  COMMENTED: "COMMENTED",
+} as const;
 interface Product {
   id: string;
   name: string;
@@ -102,7 +116,7 @@ export default function ContentDetailComponent({ content: initialContent }: Cont
         toast.success("Content approved successfully!");
         router.refresh();
         // Since we refresh, let's update local status too
-        setContent((prev) => ({ ...prev, status: ContentStatus.APPROVED }));
+        setContent((prev) => ({ ...prev, status: ContentStatusValues.APPROVED }));
         setActionComment("");
       } else {
         toast.error(res.error || "Failed to approve content");
@@ -147,7 +161,7 @@ export default function ContentDetailComponent({ content: initialContent }: Cont
       if (res.success && res.data) {
         toast.success("Content rejected!");
         router.refresh();
-        setContent((prev) => ({ ...prev, status: ContentStatus.REJECTED }));
+        setContent((prev) => ({ ...prev, status: ContentStatusValues.REJECTED }));
         setActionComment("");
       } else {
         toast.error(res.error || "Failed to reject content");
@@ -182,7 +196,7 @@ export default function ContentDetailComponent({ content: initialContent }: Cont
     }
   };
 
-  const isPending = content.status === ContentStatus.CLIENT_APPROVAL_PENDING;
+  const isPending = content.status === ContentStatusValues.CLIENT_APPROVAL_PENDING;
 
   return (
     <div className="space-y-6">
@@ -452,7 +466,7 @@ export default function ContentDetailComponent({ content: initialContent }: Cont
                   <p className="text-xs text-muted-foreground text-center py-4">No comments or activity yet.</p>
                 ) : (
                   content.approvalEvents.map((evt) => {
-                    const isComment = evt.action === ApprovalAction.COMMENTED;
+                    const isComment = evt.action === ApprovalActionValues.COMMENTED;
                     const actorName = evt.actor?.name || evt.actor?.username || "System";
                     
                     return (

@@ -116,21 +116,31 @@ enum SyncStatus {
 // ═══════════════════════════════════════════════════════════════════════════════
 
 model User {
-  id           String   @id @default(cuid())
-  username     String   @unique
-  passwordHash String   @map("password_hash")
-  role         UserRole @default(CLIENT)
+  id            String   @id @default(cuid())
+  username      String   @unique
+  passwordHash  String   @map("password_hash")
+  role          UserRole @default(CLIENT)
 
   // Client linkage (null for ADMIN)
-  clientId     String?  @unique @map("client_id")
-  client       Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  clientId      String?  @unique @map("client_id")
+  client        Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
+
+  // Better Auth standard fields
+  name          String   @default("")
+  email         String   @unique
+  emailVerified Boolean  @default(false) @map("email_verified")
+  image         String?
 
   // MFA
-  mfaEnabled   Boolean  @default(false) @map("mfa_enabled")
-  mfaSecret    String?  @map("mfa_secret")
+  twoFactorEnabled Boolean? @default(false) @map("mfa_enabled")
+  mfaSecret        String?  @map("mfa_secret")
 
-  // Relations (outgoing)
-  sessions          Session[]
+  // Better Auth relations
+  sessions      Session[]
+  accounts      Account[]
+  twofactors    TwoFactor[]
+
+  // Custom relations
   auditLogs         AuditLog[]
   approvalEvents    ApprovalEvent[]
   requestComments   RequestComment[]
@@ -146,31 +156,73 @@ model User {
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  userId       String   @map("user_id")
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  token        String   @unique
-  refreshToken String   @unique @map("refresh_token")
-  expiresAt    DateTime @map("expires_at")
-  ipAddress    String?  @map("ip_address")
-  userAgent    String?  @map("user_agent")
-  createdAt    DateTime @default(now()) @map("created_at")
+  id        String   @id @default(cuid())
+  expiresAt DateTime @map("expires_at")
+  token     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt      @map("updated_at")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([expiresAt])
   @@map("sessions")
 }
 
-model VerificationToken {
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String    @map("account_id")
+  providerId            String    @map("provider_id")
+  userId                String    @map("user_id")
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?   @map("access_token")
+  refreshToken          String?   @map("refresh_token")
+  idToken               String?   @map("id_token")
+  accessTokenExpiresAt  DateTime? @map("access_token_expires_at")
+  refreshTokenExpiresAt DateTime? @map("refresh_token_expires_at")
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt      @map("updated_at")
+
+  @@index([userId])
+  @@map("accounts")
+}
+
+model Verification {
   id         String   @id @default(cuid())
   identifier String
-  token      String   @unique
-  type       String
+  value      String
   expiresAt  DateTime @map("expires_at")
   createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt      @map("updated_at")
 
   @@index([identifier])
-  @@map("verification_tokens")
+  @@map("verifications")
+}
+
+model TwoFactor {
+  id          String   @id @default(cuid())
+  secret      String
+  backupCodes String   @map("backup_codes")
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verified    Boolean? @default(true)
+
+  @@index([secret])
+  @@index([userId])
+  @@map("two_factors")
+}
+
+model RateLimit {
+  id          String @id @default(cuid())
+  key         String
+  count       Int
+  lastRequest BigInt @map("last_request")
+
+  @@unique([key])
+  @@map("rate_limits")
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════

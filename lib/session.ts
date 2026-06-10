@@ -31,6 +31,8 @@ export async function getRequiredSession(): Promise<{
   return {
     user: {
       id: session.user.id,
+      name: session.user.name,
+      email: session.user.email,
       username: dbUser.username,
       role: dbUser.role,
       clientId: dbUser.clientId,

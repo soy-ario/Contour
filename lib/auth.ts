@@ -1,7 +1,8 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { twoFactor } from "better-auth/plugins";
+import { twoFactor, username } from "better-auth/plugins";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
@@ -17,9 +18,18 @@ export const auth = betterAuth({
 
   emailAndPassword: {
     enabled: true,
+    password: {
+      hash: async (password: string) => {
+        return await bcrypt.hash(password, 12);
+      },
+      verify: async ({ hash, password }) => {
+        return await bcrypt.compare(password, hash);
+      },
+    },
   },
 
   plugins: [
+    username(),
     twoFactor({
       issuer: "Contour",
       otpOptions: {
@@ -37,6 +47,24 @@ export const auth = betterAuth({
 
   advanced: {
     cookiePrefix: "contour",
+  },
+
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: false,
+        defaultValue: "CLIENT",
+      },
+      clientId: {
+        type: "string",
+        required: false,
+      },
+      username: {
+        type: "string",
+        required: true,
+      },
+    },
   },
 });
 

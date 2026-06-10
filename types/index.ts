@@ -70,6 +70,8 @@ export type {
 export interface SessionUser {
   id: string;
   username: string;
+  name: string;
+  email: string;
   role: UserRole;
   clientId: string | null;
 }

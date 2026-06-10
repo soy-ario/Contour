@@ -31,7 +31,7 @@ Contour is a centralized agency operating system designed to streamline client m
 - **Data Visualization**: Recharts (Responsive Line, Area, and Bar Chart wrappers)
 - **AI Integrations**: Google Gemini 3.5 Flash API (REST fetch integration)
 - **Outbound Email**: Resend API (Transactional workflows: approvals, rejections, change requests)
-- **Object Storage**: Cloudflare R2 / AWS S3 (Creative assets, logos, and PDFs)
+- **Object Storage**: Supabase Storage (Current MVP) / Cloudflare R2 (Supported migration provider)
 
 ---
 
@@ -89,7 +89,15 @@ GEMINI_API_KEY="your-google-ai-studio-api-key"
 # Outbound Email (Resend)
 RESEND_API_KEY="re_your-resend-api-key"
 
-# Cloudflare R2 / S3 Storage
+# Storage Configuration
+STORAGE_PROVIDER="SUPABASE" # or "R2"
+
+# Supabase Storage (Current MVP)
+SUPABASE_URL="https://your-supabase-project.supabase.co"
+SUPABASE_SERVICE_ROLE_KEY="your-supabase-service-role-key"
+SUPABASE_BUCKET_NAME="contour-assets"
+
+# Cloudflare R2 (Future implementation)
 R2_ACCOUNT_ID="your-r2-account-id"
 R2_ACCESS_KEY_ID="your-r2-access-key-id"
 R2_SECRET_ACCESS_KEY="your-r2-secret-access-key"

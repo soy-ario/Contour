@@ -58,14 +58,21 @@ export default async function ClientsPage() {
     id: client.id,
     brandName: client.brandName,
     industry: client.industry,
+    website: client.website,
+    description: client.description,
     status: client.status,
     monthlyRetainer: Number(client.monthlyRetainer),
+    monthlyBudget: client.monthlyBudget ? Number(client.monthlyBudget) : null,
     healthScore: client.healthScore,
     contractStart: client.contractStart,
     contractEnd: client.contractEnd,
     contactName: client.contactName,
     contactEmail: client.contactEmail,
+    contactPhone: client.contactPhone,
     logoUrl: client.logoUrl,
+    amountPaid: Number(client.amountPaid),
+    paymentStatus: client.paymentStatus,
+    marketingTheme: client.marketingTheme,
   }));
 
   const stats = {

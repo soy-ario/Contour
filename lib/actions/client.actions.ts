@@ -6,7 +6,7 @@ import { createClientSchema, updateClientSchema } from "@/lib/validations/client
 import { createAuditLog } from "@/lib/services/audit.service";
 import { requireAdmin } from "@/lib/session";
 import bcrypt from "bcryptjs";
-import { ClientStatus, Client } from "@prisma/client";
+import { ClientStatus, Prisma } from "@prisma/client";
 
 export async function createClientAction(formData: unknown) {
   try {
@@ -97,7 +97,7 @@ export async function updateClientAction(id: string, formData: unknown) {
       }
     }
 
-    const updateData: Partial<Client> = {};
+    const updateData: Prisma.ClientUpdateInput = {};
     if (data.brandName !== undefined) updateData.brandName = data.brandName;
     if (data.website !== undefined) updateData.website = data.website || null;
     if (data.industry !== undefined) updateData.industry = data.industry || null;
@@ -282,6 +282,13 @@ export async function createClientUserAction(clientId: string, username: string,
         name: client.contactName,
         email: client.contactEmail,
         emailVerified: true,
+        accounts: {
+          create: {
+            accountId: client.contactEmail,
+            providerId: "credential",
+            password: passwordHash,
+          },
+        },
       },
     });
 

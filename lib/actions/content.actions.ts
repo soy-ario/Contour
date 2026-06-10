@@ -29,6 +29,22 @@ export async function createContentAction(
 
     const { productIds, ...contentData } = result.data;
 
+    if (productIds && productIds.length > 0) {
+      const ownedProductCount = await prisma.product.count({
+        where: {
+          id: { in: productIds },
+          clientId: contentData.clientId,
+        },
+      });
+
+      if (ownedProductCount !== productIds.length) {
+        return {
+          success: false,
+          error: "One or more products do not exist or belong to a different client",
+        };
+      }
+    }
+
     const newContent = await prisma.$transaction(async (tx) => {
       // 1. Create content record
       const content = await tx.content.create({
@@ -120,6 +136,22 @@ export async function updateContentAction(
     }
 
     const { productIds, ...contentData } = result.data;
+
+    if (productIds && productIds.length > 0) {
+      const ownedProductCount = await prisma.product.count({
+        where: {
+          id: { in: productIds },
+          clientId: content.clientId,
+        },
+      });
+
+      if (ownedProductCount !== productIds.length) {
+        return {
+          success: false,
+          error: "One or more products do not exist or belong to a different client",
+        };
+      }
+    }
 
     const updatedContent = await prisma.$transaction(async (tx) => {
       // Update client product mapping if productIds is provided

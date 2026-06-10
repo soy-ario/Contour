@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -46,20 +45,27 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { ClientStatus } from "@prisma/client";
+import { ClientStatus, PaymentStatus } from "@prisma/client";
 
 interface ClientData {
   id: string;
   brandName: string;
+  website: string | null;
   industry: string | null;
+  description: string | null;
   status: ClientStatus;
   monthlyRetainer: number;
+  monthlyBudget: number | null;
   healthScore: number | null;
   contractStart: string | Date | null;
   contractEnd: string | Date | null;
   contactName: string;
   contactEmail: string;
+  contactPhone: string | null;
   logoUrl: string | null;
+  amountPaid: number;
+  paymentStatus: PaymentStatus;
+  marketingTheme: string | null;
 }
 
 interface ClientListTableProps {
@@ -75,7 +81,6 @@ export default function ClientListTable({
   onEdit,
   onArchive,
 }: ClientListTableProps) {
-  const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 

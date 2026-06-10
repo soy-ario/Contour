@@ -117,6 +117,24 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       return notFoundResponse("Client");
     }
 
+    if (productIds && productIds.length > 0) {
+      const ownedProductCount = await prisma.product.count({
+        where: {
+          id: { in: productIds },
+          clientId,
+        },
+      });
+
+      if (ownedProductCount !== productIds.length) {
+        return errorResponse(
+          "PRODUCT_WRONG_CLIENT",
+          "One or more products do not exist or belong to a different client",
+          undefined,
+          422
+        );
+      }
+    }
+
     const content = await prisma.$transaction(async (tx) => {
       // 1. Create content record
       const createdContent = await tx.content.create({

@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Sheet,
   SheetContent,
@@ -14,13 +13,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { createClientSchema, CreateClientInput } from "@/lib/validations/client";
+import { CreateClientInput } from "@/lib/validations/client";
 import { createClientAction, updateClientAction } from "@/lib/actions/client.actions";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
-import { ClientStatus, PaymentStatus, Prisma } from "@prisma/client";
-import { Resolver } from "react-hook-form";
+import { PaymentStatus, Prisma } from "@prisma/client";
 
 interface ClientData {
   id: string;
@@ -90,8 +88,8 @@ export default function CreateClientSheet({
         contactName: client.contactName || "",
         contactEmail: client.contactEmail || "",
         contactPhone: client.contactPhone || "",
-        monthlyRetainer: client.monthlyRetainer || 0,
-        monthlyBudget: client.monthlyBudget || undefined,
+        monthlyRetainer: Number(client.monthlyRetainer) || 0,
+        monthlyBudget: client.monthlyBudget == null ? undefined : Number(client.monthlyBudget),
         marketingTheme: client.marketingTheme || "",
         contractStart: formatDateForInput(client.contractStart),
         contractEnd: formatDateForInput(client.contractEnd),
@@ -119,7 +117,6 @@ export default function CreateClientSheet({
     reset,
     formState: { errors },
   } = useForm<ClientFormValues>({
-    resolver: zodResolver(createClientSchema) as Resolver<ClientFormValues>,
     values: defaultValues, // dynamic values update when client changes
   });
 

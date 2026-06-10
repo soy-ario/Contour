@@ -26,7 +26,11 @@ type StatusValue =
   | "PENDING"
   | "PAID"
   | "OVERDUE"
-  | "PARTIAL";
+  | "PARTIAL"
+  // ReportStatus
+  | "GENERATING"
+  | "READY"
+  | "FAILED";
 
 interface StatusBadgeProps {
   status: StatusValue;
@@ -49,12 +53,14 @@ export default function StatusBadge({ status, size = "sm", className }: StatusBa
     case "ACTIVE":
     case "PAID":
     case "POSTED":
+    case "READY":
       badgeStyle = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
       dotStyle = "bg-emerald-400";
       break;
 
     case "PENDING":
     case "PARTIAL":
+    case "GENERATING":
     case "CLIENT_APPROVAL_PENDING":
     case "LEAD":
     case "DISCOVERY":
@@ -82,6 +88,7 @@ export default function StatusBadge({ status, size = "sm", className }: StatusBa
     case "REJECTED":
     case "OVERDUE":
     case "DISCONTINUED":
+    case "FAILED":
       badgeStyle = "bg-rose-500/10 text-rose-400 border border-rose-500/20";
       dotStyle = "bg-rose-400";
       break;

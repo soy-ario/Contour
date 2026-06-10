@@ -6,6 +6,8 @@ import bcrypt from "bcryptjs";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
+  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL,
 
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days

@@ -2,20 +2,18 @@
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { createClientSchema, updateClientSchema } from "@/lib/validations/client";
 import {
   updateClientAction,
   createClientUserAction,
 } from "@/lib/actions/client.actions";
 import { toast } from "sonner";
 import { Loader2, Globe, Shield, CreditCard, UserCheck, ShieldAlert } from "lucide-react";
-import { ClientStatus, PaymentStatus, Prisma } from "@prisma/client";
+import { PaymentStatus, Prisma } from "@prisma/client";
 
 interface ClientData {
   id: string;
@@ -33,6 +31,11 @@ interface ClientData {
   amountPaid: number | string | Prisma.Decimal;
   paymentStatus: PaymentStatus;
   marketingTheme: string | null;
+  user?: {
+    id: string;
+    username: string;
+    email: string;
+  } | null;
 }
 
 interface ClientSettingsFormProps {
@@ -90,7 +93,7 @@ export default function ClientSettingsForm({ client }: ClientSettingsFormProps) 
         toast.success("Business details updated successfully");
       } else {
         setErrorSection("business");
-        setServerError(result.error);
+        setServerError(result.error ?? "Failed to update business details");
       }
     });
   };
@@ -129,7 +132,7 @@ export default function ClientSettingsForm({ client }: ClientSettingsFormProps) 
         toast.success("Contact details updated successfully");
       } else {
         setErrorSection("contact");
-        setServerError(result.error);
+        setServerError(result.error ?? "Failed to update contact details");
       }
     });
   };
@@ -138,7 +141,6 @@ export default function ClientSettingsForm({ client }: ClientSettingsFormProps) 
   const {
     register: regFinancial,
     handleSubmit: subFinancial,
-    formState: { errors: errFinancial },
   } = useForm<{
     monthlyRetainer: number;
     monthlyBudget?: number;
@@ -185,7 +187,7 @@ export default function ClientSettingsForm({ client }: ClientSettingsFormProps) 
         toast.success("Financial parameters updated successfully");
       } else {
         setErrorSection("financial");
-        setServerError(result.error);
+        setServerError(result.error ?? "Failed to update financial parameters");
       }
     });
   };

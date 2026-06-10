@@ -14,15 +14,22 @@ import { ClientStatus } from "@prisma/client";
 interface ClientData {
   id: string;
   brandName: string;
+  website: string | null;
   industry: string | null;
+  description: string | null;
   status: ClientStatus;
   monthlyRetainer: number;
+  monthlyBudget: number | null;
   healthScore: number | null;
   contractStart: string | Date | null;
   contractEnd: string | Date | null;
   contactName: string;
   contactEmail: string;
+  contactPhone: string | null;
   logoUrl: string | null;
+  amountPaid: number;
+  paymentStatus: "PENDING" | "PAID" | "OVERDUE" | "PARTIAL";
+  marketingTheme: string | null;
 }
 
 interface ClientsPageContentProps {
@@ -83,7 +90,7 @@ export default function ClientsPageContent({
       } else {
         toast.error(result.error || "Failed to archive client", { id: toastId });
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred while archiving the client", { id: toastId });
     }
   };

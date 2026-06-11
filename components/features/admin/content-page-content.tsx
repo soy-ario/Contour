@@ -20,12 +20,8 @@ import {
   CalendarDays,
   Plus,
   Search,
-  Filter,
-  CheckCircle,
-  Clock,
-  CirclePlay,
 } from "lucide-react";
-import { PLATFORM_LABELS } from "@/types";
+import { PLATFORM_LABELS, CONTENT_STATUS_LABELS } from "@/types";
 
 interface ClientOption {
   id: string;
@@ -51,7 +47,7 @@ interface ContentPageContentProps {
   initialContents: ContentItem[];
   pendingContents: ContentItem[];
   clients: ClientOption[];
-  clientId?: string | null; // Pre-filtered if on client page
+  clientId?: string | null;
   user: {
     name: string;
     email: string;
@@ -68,20 +64,17 @@ export default function ContentPageContent({
 }: ContentPageContentProps) {
   const router = useRouter();
 
-  // URL State Management using nuqs
   const [view, setView] = useQueryState("view", { defaultValue: "list" });
   const [search, setSearch] = useQueryState("search", { defaultValue: "" });
   const [filterClient, setFilterClient] = useQueryState("filterClient", { defaultValue: "all" });
   const [filterPlatform, setFilterPlatform] = useQueryState("filterPlatform", { defaultValue: "all" });
   const [filterStatus, setFilterStatus] = useQueryState("filterStatus", { defaultValue: "all" });
 
-  // UI Dialog/Sheet States
   const [selectedContentId, setSelectedContentId] = React.useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);
   const [createSheetOpen, setCreateSheetOpen] = React.useState(false);
   const [editContentId, setEditContentId] = React.useState<string | null>(null);
 
-  // Active client ID context (prioritizes route parameter, falls back to filter state)
   const activeClientId = clientId || (filterClient !== "all" ? filterClient : null);
 
   const handleViewDetails = (id: string) => {
@@ -123,7 +116,7 @@ export default function ContentPageContent({
       } else {
         toast.error(result.error?.message || "Failed to delete content", { id: toastId });
       }
-    } catch (e) {
+    } catch {
       toast.error("Network error. Please try again.", { id: toastId });
     }
   };
@@ -147,7 +140,7 @@ export default function ContentPageContent({
       } else {
         toast.error(result.error?.message || "Failed to approve content", { id: toastId });
       }
-    } catch (e) {
+    } catch {
       toast.error("Network error. Please try again.", { id: toastId });
     }
   };
@@ -169,157 +162,158 @@ export default function ContentPageContent({
       } else {
         toast.error(result.error?.message || "Failed to submit content", { id: toastId });
       }
-    } catch (e) {
+    } catch {
       toast.error("Network error. Please try again.", { id: toastId });
     }
   };
 
+  const breadcrumbs = [{ label: "Content", href: "/admin/content" }];
+
   return (
     <PageShell
-      title={clientId ? "Content Management" : "Global Content Pipeline"}
+      title="Content"
+      breadcrumbs={breadcrumbs}
       user={user}
       actions={
         <Button
           onClick={handleCreateContent}
-          className="bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-bold text-xs h-9 shadow-lg shadow-emerald-500/10 flex items-center gap-1.5"
+          className="h-11 px-[18px] rounded-xl bg-[#C5F135] hover:bg-[#B8E620] active:bg-[#8FBF00] text-[#111827] text-sm font-semibold flex items-center gap-2 shadow-sm"
         >
-          <Plus className="w-4 h-4" /> Create Content
+          <Plus className="w-4 h-4" />
+          Create Content
         </Button>
       }
     >
-      <div className="flex flex-col lg:flex-row gap-6">
-        {/* Main Content Workspace */}
-        <div className="flex-1 space-y-4 min-w-0">
-          {/* Filters and View Toggles */}
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-zinc-900/10 p-3 border border-border/40 rounded-xl">
-            {/* Filter controls */}
-            <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
-              <div className="relative w-full md:w-56">
-                <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-600" />
-                <Input
-                  placeholder="Search titles/concepts..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-9 bg-zinc-950 border-zinc-850 text-xs placeholder:text-zinc-600 focus-visible:ring-zinc-700"
-                />
-              </div>
+      <div className="max-w-[1440px] mx-auto space-y-5">
+        {/* Filter Card */}
+        <div className="bg-white rounded-[20px] border border-[#ECECF4] p-5">
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1 max-w-[280px]">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#9CA3AF] pointer-events-none" />
+              <Input
+                placeholder="Search titles, concepts..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full h-[42px] pl-10 pr-4 rounded-xl border border-[#ECECF4] text-sm text-[#111827] placeholder:text-[#9CA3AF] bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135] focus-visible:border-transparent"
+              />
+            </div>
 
-              {!clientId && (
-                <Select value={filterClient} onValueChange={(val) => setFilterClient(val)}>
-                  <SelectTrigger className="w-full md:w-40 bg-zinc-950 border-zinc-850 focus:ring-zinc-700 text-xs text-zinc-300">
-                    <SelectValue placeholder="All Clients" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-zinc-950 border-zinc-850 text-zinc-200">
-                    <SelectItem value="all">All Clients</SelectItem>
-                    {clients.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.brandName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-
-              <Select value={filterPlatform} onValueChange={(val) => setFilterPlatform(val)}>
-                <SelectTrigger className="w-full md:w-36 bg-zinc-950 border-zinc-850 focus:ring-zinc-700 text-xs text-zinc-300">
-                  <SelectValue placeholder="All Platforms" />
+            {!clientId && (
+              <Select value={filterClient} onValueChange={(val) => setFilterClient(val)}>
+                <SelectTrigger className="w-[220px] h-[42px] rounded-xl border border-[#ECECF4] text-sm text-[#111827] bg-white focus:ring-[#C5F135] px-3.5">
+                  <SelectValue placeholder="All Clients" />
                 </SelectTrigger>
-                <SelectContent className="bg-zinc-950 border-zinc-850 text-zinc-200">
-                  <SelectItem value="all">All Platforms</SelectItem>
-                  {Object.entries(PLATFORM_LABELS).map(([k, v]) => (
-                    <SelectItem key={k} value={k}>
-                      {v}
+                <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
+                  <SelectItem value="all">All Clients</SelectItem>
+                  {clients.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.brandName}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+            )}
 
-              <Select value={filterStatus} onValueChange={(val) => setFilterStatus(val)}>
-                <SelectTrigger className="w-full md:w-36 bg-zinc-950 border-zinc-850 focus:ring-zinc-700 text-xs text-zinc-300">
-                  <SelectValue placeholder="All Statuses" />
-                </SelectTrigger>
-                <SelectContent className="bg-zinc-950 border-zinc-850 text-zinc-200">
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="IDEA">Idea</SelectItem>
-                  <SelectItem value="DRAFT">Draft</SelectItem>
-                  <SelectItem value="CLIENT_APPROVAL_PENDING">Pending Approval</SelectItem>
-                  <SelectItem value="APPROVED">Approved</SelectItem>
-                  <SelectItem value="SCHEDULED">Scheduled</SelectItem>
-                  <SelectItem value="POSTED">Posted</SelectItem>
-                  <SelectItem value="REJECTED">Rejected</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Select value={filterPlatform} onValueChange={(val) => setFilterPlatform(val)}>
+              <SelectTrigger className="w-[220px] h-[42px] rounded-xl border border-[#ECECF4] text-sm text-[#111827] bg-white focus:ring-[#C5F135] px-3.5">
+                <SelectValue placeholder="All Platforms" />
+              </SelectTrigger>
+              <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
+                <SelectItem value="all">All Platforms</SelectItem>
+                {Object.entries(PLATFORM_LABELS).map(([k, v]) => (
+                  <SelectItem key={k} value={k}>
+                    {v}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-            {/* View toggler */}
-            <div className="flex items-center space-x-1 border border-border/40 rounded-lg p-0.5 bg-zinc-950/60 shrink-0">
-              <Button
-                size="sm"
-                variant={view === "list" ? "secondary" : "ghost"}
+            <Select value={filterStatus} onValueChange={(val) => setFilterStatus(val)}>
+              <SelectTrigger className="w-[180px] h-[42px] rounded-xl border border-[#ECECF4] text-sm text-[#111827] bg-white focus:ring-[#C5F135] px-3.5">
+                <SelectValue placeholder="All Statuses" />
+              </SelectTrigger>
+              <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
+                <SelectItem value="all">All Statuses</SelectItem>
+                {Object.entries(CONTENT_STATUS_LABELS).map(([k, v]) => (
+                  <SelectItem key={k} value={k}>
+                    {v}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <div className="ml-auto flex items-center rounded-lg border border-[#ECECF4] p-0.5 bg-white">
+              <button
                 onClick={() => setView("list")}
                 className={cn(
-                  "h-7 text-xs font-semibold px-2.5",
-                  view === "list" ? "bg-zinc-900 text-foreground border-border/20 border" : "text-muted-foreground"
+                  "flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium transition-all",
+                  view === "list"
+                    ? "bg-[#F2F8D7] text-[#111827]"
+                    : "text-[#9CA3AF] hover:text-[#6B7280] bg-white"
                 )}
               >
-                <List className="w-3.5 h-3.5 mr-1" /> List
-              </Button>
-              <Button
-                size="sm"
-                variant={view === "calendar" ? "secondary" : "ghost"}
+                <List className="w-3.5 h-3.5" />
+                List
+              </button>
+              <button
                 onClick={() => setView("calendar")}
                 className={cn(
-                  "h-7 text-xs font-semibold px-2.5",
-                  view === "calendar" ? "bg-zinc-900 text-foreground border-border/20 border" : "text-muted-foreground"
+                  "flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium transition-all",
+                  view === "calendar"
+                    ? "bg-[#F2F8D7] text-[#111827]"
+                    : "text-[#9CA3AF] hover:text-[#6B7280] bg-white"
                 )}
               >
-                <CalendarDays className="w-3.5 h-3.5 mr-1" /> Calendar
-              </Button>
+                <CalendarDays className="w-3.5 h-3.5" />
+                Calendar
+              </button>
             </div>
           </div>
-
-          {/* Table / Calendar Renderer */}
-          {view === "list" ? (
-            <ContentListView
-              data={initialContents}
-              showClient={!clientId}
-              onViewDetails={handleViewDetails}
-              onEdit={handleEditContent}
-              onSubmitApproval={handleSubmitApproval}
-              onApprove={handleApprove}
-              onDelete={handleDelete}
-              onSchedule={handleViewDetails} // Schedule opens detail modal to select date
-            />
-          ) : (
-            <ContentCalendarView
-              data={initialContents}
-              onViewDetails={handleViewDetails}
-              onCreateContent={handleCreateContent}
-            />
-          )}
         </div>
 
-        {/* Sidebar Approval Queue Panel (Only on list view and global pages) */}
-        {!clientId && view === "list" && (
-          <div className="w-full lg:w-80 shrink-0">
-            <ApprovalQueuePanel
-              items={pendingContents.map((c) => ({
-                id: c.id,
-                title: c.title,
-                platform: c.platform,
-                contentType: c.contentType,
-                clientBrandName: c.clientBrandName || "Brand",
-                clientId: c.clientId,
-                updatedAt: c.updatedAt,
-              }))}
-              onView={handleViewDetails}
-              onApproveSuccess={handleSuccess}
-            />
+        {/* Main Content Layout */}
+        <div className="flex gap-5">
+          <div className="flex-1 min-w-0">
+            {view === "list" ? (
+              <ContentListView
+                data={initialContents}
+                showClient={!clientId}
+                onViewDetails={handleViewDetails}
+                onEdit={handleEditContent}
+                onSubmitApproval={handleSubmitApproval}
+                onApprove={handleApprove}
+                onDelete={handleDelete}
+                onSchedule={handleViewDetails}
+              />
+            ) : (
+              <ContentCalendarView
+                data={initialContents}
+                onViewDetails={handleViewDetails}
+                onCreateContent={handleCreateContent}
+              />
+            )}
           </div>
-        )}
+
+          {!clientId && view === "list" && (
+            <div className="w-[300px] shrink-0">
+              <ApprovalQueuePanel
+                items={pendingContents.map((c) => ({
+                  id: c.id,
+                  title: c.title,
+                  platform: c.platform,
+                  contentType: c.contentType,
+                  clientBrandName: c.clientBrandName || "Brand",
+                  clientId: c.clientId,
+                  updatedAt: c.updatedAt,
+                }))}
+                onView={handleViewDetails}
+                onApproveSuccess={handleSuccess}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Content Detail Sheet */}
       <ContentDetailSheet
         contentId={selectedContentId}
         clientId={
@@ -333,7 +327,6 @@ export default function ContentPageContent({
         onStateChanged={handleSuccess}
       />
 
-      {/* Create / Edit Content Sheet */}
       <CreateContentSheet
         clientId={clientId || activeClientId}
         contentIdToEdit={editContentId}

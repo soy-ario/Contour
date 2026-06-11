@@ -16,8 +16,7 @@ import {
   startOfWeek,
   endOfWeek,
 } from "date-fns";
-import { ChevronLeft, ChevronRight, Plus, HelpCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PlatformIcon } from "@/components/shared/social-icons";
 import { cn } from "@/lib/utils";
 
@@ -41,44 +40,36 @@ interface ContentCalendarViewProps {
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-// Status color helper for calendar dots
-function getStatusDotColor(status: ContentStatus) {
-  switch (status) {
-    case "POSTED":
-      return "bg-emerald-400";
-    case "CLIENT_APPROVAL_PENDING":
-      return "bg-amber-400";
-    case "IDEA":
-    case "DRAFT":
-      return "bg-zinc-400";
-    case "APPROVED":
-    case "SCHEDULED":
-      return "bg-blue-400";
-    case "REJECTED":
-      return "bg-rose-400";
-    default:
-      return "bg-zinc-400";
-  }
+const CONTENT_CHIP_COLORS: Record<string, string> = {
+  REEL: "bg-purple-50 text-purple-700 border-purple-200",
+  POST: "bg-blue-50 text-blue-700 border-blue-200",
+  STORY: "bg-orange-50 text-orange-700 border-orange-200",
+  VIDEO: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  CAROUSEL: "bg-pink-50 text-pink-700 border-pink-200",
+  THREAD: "bg-indigo-50 text-indigo-700 border-indigo-200",
+  SHORT: "bg-amber-50 text-amber-700 border-amber-200",
+  LIVE: "bg-red-50 text-red-700 border-red-200",
+};
+
+function getChipStyle(contentType: ContentType): string {
+  return CONTENT_CHIP_COLORS[contentType] || "bg-[#F5F5F5] text-[#6B6B80] border-[#ECECF4]";
 }
 
 export default function ContentCalendarView({
   data,
   onViewDetails,
-  onCreateContent,
   isAdmin = true,
 }: ContentCalendarViewProps) {
-  // Synchronize the selected month with the URL query parameter `month` (format: YYYY-MM)
   const [monthQuery, setMonthQuery] = useQueryState("month", {
     defaultValue: format(new Date(), "yyyy-MM"),
   });
 
-  // Parse active month or fallback to today
   const activeDate = React.useMemo(() => {
     try {
       if (monthQuery && /^\d{4}-\d{2}$/.test(monthQuery)) {
-        return new Date(`${monthQuery}-02T00:00:00`); // Use day 2 to avoid timezone shifts
+        return new Date(`${monthQuery}-02T00:00:00`);
       }
-    } catch (e) {
+    } catch {
       // Ignore
     }
     return new Date();
@@ -98,17 +89,14 @@ export default function ContentCalendarView({
     setMonthQuery(format(new Date(), "yyyy-MM"));
   };
 
-  // Generate full calendar days grid including padding days of start and end weeks
   const daysGrid = React.useMemo(() => {
     const monthStart = startOfMonth(activeDate);
     const monthEnd = endOfMonth(monthStart);
     const gridStart = startOfWeek(monthStart);
     const gridEnd = endOfWeek(monthEnd);
-
     return eachDayOfInterval({ start: gridStart, end: gridEnd });
   }, [activeDate]);
 
-  // Group items by day for faster lookups
   const itemsByDayMap = React.useMemo(() => {
     const map = new Map<string, CalendarItem[]>();
     data.forEach((item) => {
@@ -124,112 +112,113 @@ export default function ContentCalendarView({
     return map;
   }, [data]);
 
-  return (
-    <div className="flex flex-col space-y-4">
-      {/* Calendar Header with Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-zinc-950/20 p-4 border border-border/80 rounded-xl backdrop-blur-sm">
-        <h2 className="text-lg font-bold text-foreground flex items-center">
-          {format(activeDate, "MMMM yyyy")}
-        </h2>
+  const isCurrentMonthActive = isSameMonth(activeDate, new Date());
 
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleToday}
-            className="h-8 text-xs bg-zinc-900 border-border text-foreground hover:bg-zinc-800"
+  return (
+    <div className="bg-white border border-[#ECECF4] rounded-[24px] p-5">
+      {/* Calendar Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handlePrevMonth}
+            className="flex items-center justify-center w-7 h-7 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] bg-white transition-all"
           >
-            Today
-          </Button>
-          <div className="flex items-center border border-border rounded-lg bg-zinc-900 overflow-hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handlePrevMonth}
-              className="h-8 w-8 hover:bg-zinc-800 border-r border-border rounded-none"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleNextMonth}
-              className="h-8 w-8 hover:bg-zinc-800 rounded-none"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
+            <ChevronLeft className="w-3.5 h-3.5" />
+          </button>
+          <h2 className="text-base font-bold text-[#111827] min-w-[140px] text-center select-none">
+            {format(activeDate, "MMMM yyyy")}
+          </h2>
+          <button
+            onClick={handleNextMonth}
+            className="flex items-center justify-center w-7 h-7 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] bg-white transition-all"
+          >
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
         </div>
+        <button
+          onClick={handleToday}
+          className={cn(
+            "h-7 px-3 rounded-lg text-xs font-medium transition-all border",
+            isCurrentMonthActive
+              ? "bg-[#F2F8D7] text-[#111827] border-[#C5F135]"
+              : "bg-white text-[#6B7280] border-[#ECECF4] hover:text-[#111827] hover:border-[#C5F135]"
+          )}
+        >
+          Today
+        </button>
       </div>
 
-      {/* Calendar Grid Container */}
-      <div className="border border-border/80 rounded-xl bg-zinc-950/20 backdrop-blur-sm overflow-hidden flex flex-col">
-        {/* Weekday headers */}
-        <div className="grid grid-cols-7 border-b border-border bg-zinc-950/50 py-3 text-center">
+      {/* Calendar Grid */}
+      <div className="overflow-hidden">
+        {/* Week Header */}
+        <div className="grid grid-cols-7 mb-1">
           {WEEKDAYS.map((day) => (
-            <span key={day} className="text-xs font-semibold text-zinc-400 tracking-wider">
-              {day}
-            </span>
+            <div key={day} className="py-2 text-center">
+              <span className="text-[13px] font-medium text-[#9CA3AF]">{day}</span>
+            </div>
           ))}
         </div>
 
-        {/* Days grid */}
-        <div className="grid grid-cols-7 auto-rows-[120px] divide-x divide-y divide-border/60 border-t border-l border-border/60">
+        {/* Day Cells */}
+        <div className="grid grid-cols-7 border-t border-l border-[#ECECF4] rounded-[12px] overflow-hidden">
           {daysGrid.map((day, idx) => {
             const dateKey = format(day, "yyyy-MM-dd");
             const dayItems = itemsByDayMap.get(dateKey) || [];
             const isCurrentMonth = isSameMonth(day, activeDate);
             const isDayToday = isToday(day);
+            const displayItems = dayItems.slice(0, 2);
+            const remainingCount = dayItems.length - 2;
 
             return (
               <div
                 key={idx}
                 className={cn(
-                  "p-2 flex flex-col justify-between group relative border-r border-b border-border/60 overflow-hidden transition-colors hover:bg-zinc-900/10",
-                  !isCurrentMonth && "bg-zinc-950/40 text-zinc-600 opacity-60"
+                  "h-[110px] p-2 flex flex-col border-r border-b border-[#ECECF4] transition-colors",
+                  isCurrentMonth ? "bg-white" : "bg-[#FAFAFC]"
                 )}
               >
-                {/* Day Number and Add Button */}
-                <div className="flex items-center justify-between mb-1.5 shrink-0">
+                {/* Date Number */}
+                <div className="flex items-center justify-between shrink-0 mb-1">
                   <span
                     className={cn(
-                      "text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full",
+                      "text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full leading-none",
                       isDayToday
-                        ? "bg-emerald-500 text-zinc-950 font-black shadow-md shadow-emerald-500/20"
+                        ? "bg-[#C5F135] text-[#111827] font-bold"
                         : isCurrentMonth
-                        ? "text-zinc-200"
-                        : "text-zinc-500"
+                        ? "text-[#6B7280]"
+                        : "text-[#D1D5DB]"
                     )}
                   >
                     {format(day, "d")}
                   </span>
-
-                  {onCreateContent && isAdmin && isCurrentMonth && (
-                    <button
-                      onClick={() => onCreateContent(day)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded-md hover:bg-zinc-800 text-zinc-400 hover:text-white"
-                      title="Add content to this day"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                    </button>
-                  )}
                 </div>
 
-                {/* Day Items Chip List */}
-                <div className="flex-1 overflow-y-auto space-y-1 pr-0.5 scrollbar-thin">
-                  {dayItems.map((item) => (
+                {/* Content Chips */}
+                <div className="flex-1 space-y-0.5 overflow-hidden">
+                  {displayItems.map((item) => (
                     <button
                       key={item.id}
                       onClick={() => onViewDetails(item.id)}
-                      className="w-full text-left flex items-center space-x-1.5 p-1 rounded bg-zinc-900 border border-zinc-800/80 hover:border-zinc-700 hover:bg-zinc-900/60 transition-colors focus:outline-none shrink-0 group/chip"
+                      className={cn(
+                        "w-full flex items-center gap-1 h-6 px-2 rounded-md text-[11px] font-medium truncate border transition-colors",
+                        getChipStyle(item.contentType),
+                        "hover:opacity-80"
+                      )}
                     >
                       <PlatformIcon platform={item.platform} className="w-3 h-3 shrink-0" />
-                      <span className="truncate text-[10px] font-medium text-zinc-300 group-hover/chip:text-white leading-none flex-1">
-                        {item.title}
-                      </span>
-                      <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", getStatusDotColor(item.status))} />
+                      <span className="truncate leading-none">{item.title}</span>
                     </button>
                   ))}
+                  {remainingCount > 0 && (
+                    <button
+                      onClick={() => {
+                        /* Could open a day-detail view */
+                      }}
+                      className="text-[11px] font-medium text-[#6B7280] hover:text-[#111827] ml-1 leading-none"
+                    >
+                      +{remainingCount} more
+                    </button>
+                  )}
                 </div>
               </div>
             );

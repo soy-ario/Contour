@@ -1,10 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Plus } from "lucide-react";
+import { Plus, Briefcase, Activity, UserPlus, PauseCircle, Filter, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PageShell from "@/components/layout/page-shell";
-import StatCard from "@/components/shared/stat-card";
 import ClientListTable from "@/components/features/admin/client-list-table";
 import CreateClientSheet from "@/components/features/admin/create-client-sheet";
 import { updateClientStatusAction } from "@/lib/actions/client.actions";
@@ -49,6 +48,70 @@ interface ClientsPageContentProps {
   };
 }
 
+function Sparkline({ data }: { data: number[] }) {
+  if (data.length < 2) return null;
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const range = max - min === 0 ? 1 : max - min;
+  const width = 52;
+  const height = 18;
+  const points = data.map((val, idx) => {
+    const x = (idx / (data.length - 1)) * width;
+    const y = height - ((val - min) / range) * height;
+    return `${x},${y}`;
+  });
+  return (
+    <svg width={width} height={height} className="overflow-visible shrink-0">
+      <polyline
+        fill="none"
+        stroke="#C5F135"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        points={points.join(" ")}
+      />
+    </svg>
+  );
+}
+
+function KpiCard({
+  icon,
+  label,
+  value,
+  meta,
+  trend,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string | number;
+  meta: string;
+  trend?: number[];
+}) {
+  return (
+    <div className="bg-white border border-[#ECECF4] rounded-2xl p-4 transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] relative overflow-hidden">
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-full bg-[#F2F8D7] flex items-center justify-center shrink-0 mt-0.5">
+          {icon}
+        </div>
+        <div className="flex-1 min-w-0">
+          <span className="text-[11px] font-medium text-[#6B7280] tracking-widest uppercase block leading-none">
+            {label}
+          </span>
+          <span className="text-[28px] font-bold text-[#111827] leading-none mt-1.5 block tracking-tight">
+            {value}
+          </span>
+          <span className="text-[13px] text-[#6B7280] mt-0.5 block">{meta}</span>
+        </div>
+        {trend && (
+          <div className="self-start mt-1 shrink-0">
+            <Sparkline data={trend} />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ClientsPageContent({
   initialClients,
   stats,
@@ -59,7 +122,6 @@ export default function ClientsPageContent({
   const [isSheetOpen, setIsSheetOpen] = React.useState(false);
   const [selectedClient, setSelectedClient] = React.useState<ClientData | undefined>(undefined);
 
-  // Keep state sync with props updates (due to revalidatePath)
   if (initialClients !== prevInitialClients) {
     setPrevInitialClients(initialClients);
     setClients(initialClients);
@@ -85,7 +147,6 @@ export default function ClientsPageContent({
       const result = await updateClientStatusAction(id, "ARCHIVED");
       if (result.success) {
         toast.success("Client archived successfully", { id: toastId });
-        // Optimistically remove/update from state or rely on revalidation
         setClients((prev) => prev.filter((c) => c.id !== id));
       } else {
         toast.error(result.error || "Failed to archive client", { id: toastId });
@@ -96,69 +157,89 @@ export default function ClientsPageContent({
   };
 
   const handleFormSuccess = () => {
-    // Revalidation happens server-side, props will update.
-    // If not immediate, let's trigger a page refresh or route reload.
     window.location.reload();
   };
 
   const breadcrumbs = [{ label: "Clients", href: "/admin/clients" }];
 
-  const headerActions = (
-    <Button
-      onClick={handleCreateNew}
-      className="bg-primary text-primary-foreground hover:bg-primary/95 text-sm font-semibold flex items-center space-x-1.5"
-    >
-      <Plus className="w-4 h-4" />
-      <span>New Client</span>
-    </Button>
-  );
+  const totalDeltaPercent = stats.totalDelta !== undefined ? (stats.totalDelta * 100).toFixed(1) : "0.0";
+  const activePercent = stats.total > 0 ? ((stats.active / stats.total) * 100).toFixed(1) : "0.0";
 
   return (
-    <PageShell title="Client Portfolios" breadcrumbs={breadcrumbs} actions={headerActions} user={user}>
-      <div className="space-y-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* KPI Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard
-            label="Total Portfolios"
+    <PageShell title="Clients" breadcrumbs={breadcrumbs} user={user}>
+       <div className="max-w-[1440px] mx-auto space-y-6">
+        {/* Page Header */}
+        <div className="flex items-center justify-end">
+          <Button
+            onClick={handleCreateNew}
+            className="h-10 px-5 rounded-xl bg-[#C5F135] hover:bg-[#B8E620] active:bg-[#8FBF00] text-[#111827] text-sm font-semibold flex items-center gap-2 shadow-sm"
+          >
+            <Plus className="w-4 h-4" />
+            New Client
+          </Button>
+        </div>
+
+        {/* KPI Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <KpiCard
+            icon={<Briefcase className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+            label="TOTAL PORTFOLIOS"
             value={stats.total}
-            delta={stats.totalDelta}
-            deltaLabel="new this month"
+            meta={`${totalDeltaPercent}% new this month`}
+            trend={[10, 15, 12, 18, 22, 20, 25]}
           />
-          <StatCard
-            label="Active Retainers"
+          <KpiCard
+            icon={<Activity className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+            label="ACTIVE RETAINERS"
             value={stats.active}
-            delta={stats.activeDelta}
-            deltaLabel="active contracts"
+            meta={`${activePercent}% active contracts`}
+            trend={[20, 25, 22, 28, 30, 26, 32]}
           />
-          <StatCard
-            label="Onboarding Pipeline"
+          <KpiCard
+            icon={<UserPlus className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+            label="ONBOARDING PIPELINE"
             value={stats.onboarding}
+            meta="In progress"
           />
-          <StatCard
-            label="Paused Accounts"
+          <KpiCard
+            icon={<PauseCircle className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+            label="PAUSED ACCOUNTS"
             value={stats.paused}
+            meta="On hold"
           />
         </div>
 
-        {/* Client List Table */}
-        <div className="bg-zinc-950/20 rounded-xl border border-border/60 p-6">
-          <div className="flex flex-col space-y-4">
+        {/* Client Registry */}
+        <div className="bg-white border border-[#ECECF4] rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+          <div className="flex items-start justify-between mb-4">
             <div>
-              <h2 className="text-lg font-bold text-foreground">Client Registry</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                Manage all billing details, contact information, account lifecycles, and health scores.
+              <h2 className="text-lg font-bold text-[#111827] leading-tight tracking-tight">
+                Client Registry
+              </h2>
+              <p className="text-sm text-[#6B7280] mt-0.5">
+                View and manage all client portfolios, billing details, contract periods, and health scores.
               </p>
             </div>
-            <ClientListTable
-              data={clients}
-              onEdit={handleEdit}
-              onArchive={handleArchive}
-            />
+            <div className="flex items-center gap-2">
+              <button className="flex items-center gap-1.5 h-9 px-3.5 rounded-xl border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] text-sm font-medium transition-all bg-white">
+                <Filter className="w-3.5 h-3.5" />
+                Filter
+              </button>
+              <button className="flex items-center gap-1.5 h-9 px-3.5 rounded-xl border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] text-sm font-medium transition-all bg-white">
+                <Download className="w-3.5 h-3.5" />
+                Export
+              </button>
+            </div>
           </div>
+
+          <ClientListTable
+            data={clients}
+            onEdit={handleEdit}
+            onArchive={handleArchive}
+          />
         </div>
       </div>
 
-      {/* Slide-over Form Sheet */}
       <CreateClientSheet
         open={isSheetOpen}
         onOpenChange={setIsSheetOpen}

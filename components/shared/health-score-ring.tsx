@@ -20,22 +20,22 @@ export default function HealthScoreRing({
   const clampedScore = hasScore ? Math.max(0, Math.min(100, score)) : 0;
   const strokeDashoffset = circumference - (clampedScore / 100) * circumference;
 
-  let colorClass = "stroke-zinc-800 text-zinc-500";
-  let textColor = "text-zinc-400";
-  let labelText = "N/A";
+  let color = "#22c55e";
+  let textColor = "text-[#27AE60]";
+  let labelText = "Good";
 
   if (hasScore) {
     if (clampedScore < 40) {
-      colorClass = "stroke-rose-500 text-rose-500";
-      textColor = "text-rose-400";
+      color = "#ef4444";
+      textColor = "text-rose-500";
       labelText = "Risk";
     } else if (clampedScore < 70) {
-      colorClass = "stroke-amber-500 text-amber-500";
-      textColor = "text-amber-400";
+      color = "#E07A2F";
+      textColor = "text-[#E07A2F]";
       labelText = "Fair";
     } else {
-      colorClass = "stroke-emerald-500 text-emerald-500";
-      textColor = "text-emerald-400";
+      color = "#27AE60";
+      textColor = "text-[#27AE60]";
       labelText = "Good";
     }
   }
@@ -50,22 +50,21 @@ export default function HealthScoreRing({
         height={size}
         className="transform -rotate-90 overflow-visible"
       >
-        {/* Track circle */}
         <circle
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          className="stroke-zinc-800 fill-none"
+          className="stroke-[#E0E0E8] fill-none"
           strokeWidth={strokeWidth}
         />
-        {/* Progress circle */}
         {hasScore && (
           <circle
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            className={cn("fill-none transition-all duration-500 ease-out", colorClass.split(" ")[0])}
+            className="fill-none transition-all duration-500 ease-out"
             strokeWidth={strokeWidth}
+            stroke={color}
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
             strokeLinecap="round"
@@ -73,13 +72,12 @@ export default function HealthScoreRing({
         )}
       </svg>
 
-      {/* Score Text in Center */}
       <div className="absolute flex flex-col items-center justify-center leading-none text-center">
         <span className={cn("font-bold tracking-tight", size < 50 ? "text-xs" : "text-sm", textColor)}>
           {hasScore ? clampedScore : "—"}
         </span>
         {size >= 64 && (
-          <span className="text-[9px] font-medium text-muted-foreground uppercase mt-0.5 tracking-wider">
+          <span className="text-[9px] font-medium text-text-secondary uppercase mt-0.5 tracking-wider">
             {labelText}
           </span>
         )}

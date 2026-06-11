@@ -33,30 +33,33 @@ export default function LineChart({
   return (
     <ResponsiveContainer width="100%" height={height}>
       <RechartsLineChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#E0E0E8" vertical={false} />
         <XAxis
           dataKey={xKey}
-          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-          axisLine={{ stroke: "hsl(var(--border))" }}
+          tick={{ fill: "#A0A0B0", fontSize: 12 }}
+          axisLine={{ stroke: "#E0E0E8" }}
           tickLine={false}
         />
         <YAxis
-          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+          tick={{ fill: "#A0A0B0", fontSize: 12 }}
           axisLine={false}
           tickLine={false}
           width={48}
         />
         <Tooltip
           contentStyle={{
-            backgroundColor: "hsl(var(--card))",
-            border: "1px solid hsl(var(--border))",
-            borderRadius: "8px",
-            color: "hsl(var(--foreground))",
+            backgroundColor: "#1E1E2E",
+            border: "none",
+            borderRadius: "12px",
+            color: "#FFFFFF",
             fontSize: 13,
+            padding: "10px 14px",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
           }}
+          cursor={{ stroke: "#E0E0E8", strokeDasharray: "3 3" }}
         />
         <Legend
-          wrapperStyle={{ fontSize: 12, color: "hsl(var(--muted-foreground))" }}
+          wrapperStyle={{ fontSize: 12, color: "#6B6B80" }}
         />
         {lines.map((line) => (
           <Line
@@ -67,7 +70,7 @@ export default function LineChart({
             stroke={line.color}
             strokeWidth={2}
             dot={false}
-            activeDot={{ r: 4, strokeWidth: 0 }}
+            activeDot={{ r: 4, strokeWidth: 0, fill: line.color }}
           />
         ))}
       </RechartsLineChart>

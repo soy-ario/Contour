@@ -67,13 +67,12 @@ export default function ClientTopbar({ user }: ClientTopbarProps) {
   };
 
   return (
-    <header className="h-16 border-b border-border bg-sidebar text-sidebar-foreground sticky top-0 z-30 flex items-center justify-between px-6">
-      {/* Brand Logo */}
+    <header className="h-16 border-b border-sidebar-border bg-sidebar text-sidebar-foreground sticky top-0 z-30 flex items-center justify-between px-6 shadow-sm">
       <div className="flex items-center space-x-8">
-        <Link href="/client/dashboard" className="flex items-center space-x-2">
-          <div className="w-8 h-8 rounded bg-gradient-to-tr from-primary to-indigo-500 flex items-center justify-center">
+        <Link href="/client/dashboard" className="flex items-center space-x-3">
+          <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-sm">
             <svg
-              className="w-4 h-4 text-white"
+              className="w-5 h-5 text-sidebar-bg"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -93,12 +92,11 @@ export default function ClientTopbar({ user }: ClientTopbarProps) {
               />
             </svg>
           </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+          <span className="text-lg font-bold text-white tracking-tight">
             Contour
           </span>
         </Link>
 
-        {/* Navigation Links */}
         <nav className="hidden md:flex items-center space-x-1">
           {navItems.map((item) => {
             const isActive = pathname.startsWith(item.href);
@@ -107,10 +105,10 @@ export default function ClientTopbar({ user }: ClientTopbarProps) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-all duration-200",
+                  "flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200",
                   isActive
-                    ? "bg-sidebar-accent text-sidebar-primary-foreground font-semibold"
-                    : "text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-sidebar-accent/40"
+                    ? "bg-sidebar-primary text-sidebar-primary-foreground font-semibold"
+                    : "text-sidebar-muted hover:text-sidebar-foreground hover:bg-white/5"
                 )}
               >
                 <span>{item.label}</span>
@@ -120,21 +118,18 @@ export default function ClientTopbar({ user }: ClientTopbarProps) {
         </nav>
       </div>
 
-      {/* Right Side Actions */}
       <div className="flex items-center space-x-4">
-        {/* Notifications */}
         <div className="relative">
           <Button
             variant="ghost"
             size="icon"
-            className="text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground"
+            className="text-sidebar-muted hover:text-sidebar-foreground hover:bg-white/5 rounded-full"
           >
             <Bell className="w-5 h-5" />
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
           </Button>
         </div>
 
-        {/* User Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="rounded-full" />}>
             <Avatar className="w-8 h-8 border border-sidebar-border bg-primary/10 text-primary">
@@ -143,11 +138,11 @@ export default function ClientTopbar({ user }: ClientTopbarProps) {
               </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56 border-border bg-popover text-popover-foreground">
+          <DropdownMenuContent align="end" className="w-56 border-border bg-popover text-popover-foreground rounded-xl shadow-dropdown">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
                 <p className="text-sm font-semibold text-foreground leading-none">{user.name}</p>
-                <p className="text-xs text-muted-foreground leading-none truncate mt-0.5">{user.email}</p>
+                <p className="text-xs text-text-secondary leading-none truncate mt-0.5">{user.email}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-border" />

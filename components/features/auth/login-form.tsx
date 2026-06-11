@@ -4,19 +4,20 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Eye, EyeOff, User, Lock, ArrowRight } from "lucide-react";
 import { loginSchema, type LoginInput } from "@/lib/validations/auth";
 import { signIn } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function LoginForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const {
     register,
@@ -38,24 +39,19 @@ export default function LoginForm() {
       const result = await signIn.username({
         username: data.username,
         password: data.password,
-        callbackURL: "/", // Fallback callback URL
+        callbackURL: "/",
       });
 
       if (result.error) {
         setErrorMsg(result.error.message || "Invalid username or password");
         setIsLoading(false);
       } else {
-        // Successful login: the session was created and cookies set.
-        // Better Auth client handles redirection or we can redirect
-        // explicitly based on the role on the user object returned.
         const user = result.data?.user;
         if (user) {
           const redirectPath = user.role === "ADMIN" ? "/admin/dashboard" : "/client/dashboard";
           router.push(redirectPath);
           router.refresh();
         } else {
-          // If user object not returned immediately, redirecting to "/"
-          // which the middleware will intercept and route to the correct dashboard.
           router.push("/");
           router.refresh();
         }
@@ -68,63 +64,101 @@ export default function LoginForm() {
   };
 
   return (
-    <Card className="w-full max-w-md border-border bg-card shadow-2xl backdrop-blur-md">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold tracking-tight text-center text-foreground">
-          Sign In
-        </CardTitle>
-        <CardDescription className="text-center text-muted-foreground">
-          Enter your credentials to access the platform
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {errorMsg && (
-            <Alert variant="destructive" className="border-red-500/50 bg-red-950/20 text-red-400">
-              <AlertCircle className="w-4 h-4" />
-              <AlertDescription className="text-sm font-medium">{errorMsg}</AlertDescription>
-            </Alert>
-          )}
+    <div className="w-full max-w-[420px] mx-auto">
+      {/* Card */}
+      <div className="bg-white border border-[#ECECF4] rounded-[20px] shadow-[0_20px_60px_rgba(0,0,0,0.08)] p-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-[32px] font-bold text-[#1A1A2E] leading-tight tracking-tight">
+            Welcome back
+          </h1>
+          <p className="text-[14px] text-[#6B6B80] mt-1.5">
+            Sign in to access your Contour dashboard
+          </p>
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="username" className="text-sm font-medium text-foreground">
+        {/* Error */}
+        {errorMsg && (
+          <Alert variant="destructive" className="mb-5 border-rose-200 bg-rose-50 text-rose-600 rounded-xl">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <AlertDescription className="text-sm font-medium">{errorMsg}</AlertDescription>
+          </Alert>
+        )}
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          {/* Username */}
+          <div className="space-y-1.5">
+            <Label htmlFor="username" className="text-[13px] font-medium text-[#1A1A2E]">
               Username
             </Label>
-            <Input
-              id="username"
-              type="text"
-              placeholder="Enter your username"
-              className="border-input bg-background text-foreground focus-visible:ring-primary focus-visible:ring-1"
-              disabled={isLoading}
-              {...register("username")}
-            />
-            {errors.username && (
-              <p className="text-xs font-semibold text-red-500">{errors.username.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="text-sm font-medium text-foreground">
-                Password
-              </Label>
+            <div className="relative">
+              <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B6B80]" />
+              <Input
+                id="username"
+                type="text"
+                placeholder="Enter your username"
+                className="h-12 w-full rounded-xl border-[1.5px] border-[#E6E8F0] bg-white pl-10 pr-4 text-[14px] text-[#1A1A2E] placeholder:text-[#6B6B80]/60 focus-visible:border-[#C5F135] focus-visible:ring-[3px] focus-visible:ring-[#C5F135]/20 transition-all"
+                disabled={isLoading}
+                {...register("username")}
+              />
             </div>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              className="border-input bg-background text-foreground focus-visible:ring-primary focus-visible:ring-1"
-              disabled={isLoading}
-              {...register("password")}
-            />
-            {errors.password && (
-              <p className="text-xs font-semibold text-red-500">{errors.password.message}</p>
+            {errors.username && (
+              <p className="text-xs font-semibold text-rose-500">{errors.username.message}</p>
             )}
           </div>
 
+          {/* Password */}
+          <div className="space-y-1.5">
+            <Label htmlFor="password" className="text-[13px] font-medium text-[#1A1A2E]">
+              Password
+            </Label>
+            <div className="relative">
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B6B80]" />
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                className="h-12 w-full rounded-xl border-[1.5px] border-[#E6E8F0] bg-white pl-10 pr-10 text-[14px] text-[#1A1A2E] placeholder:text-[#6B6B80]/60 focus-visible:border-[#C5F135] focus-visible:ring-[3px] focus-visible:ring-[#C5F135]/20 transition-all"
+                disabled={isLoading}
+                {...register("password")}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#6B6B80] hover:text-[#1A1A2E] transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            {errors.password && (
+              <p className="text-xs font-semibold text-rose-500">{errors.password.message}</p>
+            )}
+          </div>
+
+          {/* Remember + Forgot */}
+          <div className="flex items-center justify-between">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-[#E6E8F0] text-[#C5F135] focus:ring-[#C5F135] focus:ring-offset-0 accent-[#C5F135]"
+              />
+              <span className="text-[13px] text-[#6B6B80]">Remember me</span>
+            </label>
+            <button
+              type="button"
+              className="text-[13px] text-[#6B6B80] hover:text-[#1A1A2E] transition-colors"
+            >
+              Forgot password?
+            </button>
+          </div>
+
+          {/* CTA */}
           <Button
             type="submit"
-            className="w-full mt-2 bg-primary hover:bg-primary/95 text-primary-foreground font-semibold py-2 transition-all duration-200"
+            className="w-full h-12 rounded-[12px] bg-[#C5F135] hover:bg-[#B8E620] active:bg-[#8FBF00] text-[#1A1A2E] text-[15px] font-semibold group transition-all"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -133,11 +167,14 @@ export default function LoginForm() {
                 Signing in...
               </>
             ) : (
-              "Sign In"
+              <>
+                Sign In
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
+              </>
             )}
           </Button>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

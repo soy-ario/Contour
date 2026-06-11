@@ -2,7 +2,6 @@ import { cn } from "@/lib/utils";
 import { Archive, Minus } from "lucide-react";
 
 type StatusValue =
-  // ClientStatus
   | "LEAD"
   | "DISCOVERY"
   | "PROPOSAL_SENT"
@@ -12,7 +11,6 @@ type StatusValue =
   | "ACTIVE"
   | "PAUSED"
   | "ARCHIVED"
-  // ContentStatus
   | "IDEA"
   | "DRAFT"
   | "CLIENT_APPROVAL_PENDING"
@@ -20,14 +18,12 @@ type StatusValue =
   | "SCHEDULED"
   | "POSTED"
   | "REJECTED"
-  // ProductStatus / PaymentStatus
   | "INACTIVE"
   | "DISCONTINUED"
   | "PENDING"
   | "PAID"
   | "OVERDUE"
   | "PARTIAL"
-  // ReportStatus
   | "GENERATING"
   | "READY"
   | "FAILED";
@@ -38,25 +34,26 @@ interface StatusBadgeProps {
   className?: string;
 }
 
-export default function StatusBadge({ status, size = "sm", className }: StatusBadgeProps) {
-  // Define mappings
-  let label = status.replace(/_/g, " ").toLowerCase();
-  // Capitalize first letter of each word
-  label = label.replace(/\b\w/g, (char) => char.toUpperCase());
+const statusStyles: Record<string, { bg: string; text: string; dot: string }> = {
+  completed: { bg: "bg-[#EEFAF3]", text: "text-[#27AE60]", dot: "bg-[#27AE60]" },
+  inprogress: { bg: "bg-[#EEF0FF]", text: "text-[#5B5EEF]", dot: "bg-[#5B5EEF]" },
+  pending: { bg: "bg-[#FFF4EC]", text: "text-[#E07A2F]", dot: "bg-[#E07A2F]" },
+  active: { bg: "bg-[#EEFAF3]", text: "text-[#27AE60]", dot: "bg-[#27AE60]" },
+  draft: { bg: "bg-[#F5F5F5]", text: "text-[#6B6B80]", dot: "bg-[#6B6B80]" },
+  error: { bg: "bg-rose-50", text: "text-rose-500", dot: "bg-rose-500" },
+  muted: { bg: "bg-zinc-50", text: "text-zinc-400", dot: "bg-zinc-400" },
+};
 
-  // Set colors based on status category
-  let badgeStyle = "";
-  let dotStyle = "";
-  let icon: React.ReactNode = null;
-
+function getStatusStyle(status: StatusValue) {
   switch (status) {
     case "ACTIVE":
     case "PAID":
     case "POSTED":
     case "READY":
-      badgeStyle = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-      dotStyle = "bg-emerald-400";
-      break;
+    case "APPROVED":
+    case "SCHEDULED":
+    case "DASHBOARD_READY":
+      return statusStyles.completed;
 
     case "PENDING":
     case "PARTIAL":
@@ -67,60 +64,55 @@ export default function StatusBadge({ status, size = "sm", className }: StatusBa
     case "PROPOSAL_SENT":
     case "CONTRACT_SIGNED":
     case "SETUP":
-      badgeStyle = "bg-amber-500/10 text-amber-400 border border-amber-500/20";
-      dotStyle = "bg-amber-400";
-      break;
+      return statusStyles.pending;
 
     case "DRAFT":
     case "IDEA":
     case "INACTIVE":
-      badgeStyle = "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20";
-      dotStyle = "bg-zinc-400";
-      break;
-
-    case "APPROVED":
-    case "SCHEDULED":
-    case "DASHBOARD_READY":
-      badgeStyle = "bg-blue-500/10 text-blue-400 border border-blue-500/20";
-      dotStyle = "bg-blue-400";
-      break;
+      return statusStyles.draft;
 
     case "REJECTED":
     case "OVERDUE":
     case "DISCONTINUED":
     case "FAILED":
-      badgeStyle = "bg-rose-500/10 text-rose-400 border border-rose-500/20";
-      dotStyle = "bg-rose-400";
-      break;
+      return statusStyles.error;
 
     case "PAUSED":
-      badgeStyle = "bg-orange-500/10 text-orange-400 border border-orange-500/20";
-      icon = <Minus className="w-3.5 h-3.5 mr-1" />;
-      break;
+      return statusStyles.inprogress;
 
     case "ARCHIVED":
-      badgeStyle = "bg-zinc-500/5 text-zinc-500 border border-zinc-500/10";
-      icon = <Archive className="w-3.5 h-3.5 mr-1" />;
-      break;
+      return statusStyles.muted;
 
     default:
-      badgeStyle = "bg-zinc-500/10 text-zinc-400 border border-zinc-500/20";
-      dotStyle = "bg-zinc-400";
+      return statusStyles.draft;
   }
+}
+
+export default function StatusBadge({ status, size = "sm", className }: StatusBadgeProps) {
+  let label = status.replace(/_/g, " ").toLowerCase();
+  label = label.replace(/\b\w/g, (char) => char.toUpperCase());
+  const style = getStatusStyle(status);
+
+  const isArchived = status === "ARCHIVED";
+  const isPaused = status === "PAUSED";
 
   return (
     <span
       role="status"
       className={cn(
-        "inline-flex items-center rounded-full font-medium tracking-wide uppercase",
-        size === "sm" ? "px-2 py-0.5 text-[10px] h-5" : "px-2.5 py-1 text-xs h-6",
-        badgeStyle,
+        "inline-flex items-center rounded-full font-semibold tracking-wide",
+        size === "sm" ? "px-2.5 py-0.5 text-[11px] h-5" : "px-3 py-1 text-xs h-6",
+        style.bg,
+        style.text,
         className
       )}
     >
-      {icon}
-      {!icon && dotStyle && (
-        <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 shrink-0", dotStyle)} />
+      {isArchived ? (
+        <Archive className="w-3 h-3 mr-1" />
+      ) : isPaused ? (
+        <Minus className="w-3 h-3 mr-1" />
+      ) : (
+        <span className={cn("w-1.5 h-1.5 rounded-full mr-1.5 shrink-0", style.dot)} />
       )}
       <span>{label}</span>
     </span>

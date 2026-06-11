@@ -22,27 +22,15 @@ export default function PageShell({
   children,
 }: PageShellProps) {
   return (
-    <div className="flex-1 flex flex-col min-w-0 bg-background">
+    <div className="flex-1 flex flex-col min-w-0 min-h-0 bg-[#F4F4FA]">
       <AdminTopbar title={title} breadcrumbs={breadcrumbs} user={user} />
-      
-      {/* Scrollable Content Area */}
-      <main className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
-        {/* Header Action Row (if actions are provided) */}
+      <main className="flex-1 overflow-y-auto px-6 py-6 min-h-0">
         {actions && (
-          <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
-            <div>
-              <h2 className="text-xl font-bold tracking-tight text-foreground">{title}</h2>
-              {breadcrumbs.length > 0 && (
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Scope operations for {title?.toLowerCase() || "dashboard"}
-                </p>
-              )}
-            </div>
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <div />
             <div className="flex items-center gap-2">{actions}</div>
           </div>
         )}
-
-        {/* Child Page Content */}
         <div className="animate-in fade-in duration-300">
           {children}
         </div>

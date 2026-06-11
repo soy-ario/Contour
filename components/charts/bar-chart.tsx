@@ -9,7 +9,6 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  Cell,
 } from "recharts";
 
 interface BarConfig {
@@ -41,20 +40,21 @@ export default function BarChart({
         data={data}
         layout={layout}
         margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+        barCategoryGap="20%"
       >
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#E0E0E8" vertical={false} />
         {isVertical ? (
           <>
             <XAxis
               type="number"
-              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-              axisLine={false}
+              tick={{ fill: "#A0A0B0", fontSize: 12 }}
+              axisLine={{ stroke: "#E0E0E8" }}
               tickLine={false}
             />
             <YAxis
               dataKey={xKey}
               type="category"
-              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+              tick={{ fill: "#A0A0B0", fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               width={90}
@@ -64,12 +64,12 @@ export default function BarChart({
           <>
             <XAxis
               dataKey={xKey}
-              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-              axisLine={{ stroke: "hsl(var(--border))" }}
+              tick={{ fill: "#A0A0B0", fontSize: 12 }}
+              axisLine={{ stroke: "#E0E0E8" }}
               tickLine={false}
             />
             <YAxis
-              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+              tick={{ fill: "#A0A0B0", fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               width={48}
@@ -78,16 +78,18 @@ export default function BarChart({
         )}
         <Tooltip
           contentStyle={{
-            backgroundColor: "hsl(var(--card))",
-            border: "1px solid hsl(var(--border))",
-            borderRadius: "8px",
-            color: "hsl(var(--foreground))",
+            backgroundColor: "#1E1E2E",
+            border: "none",
+            borderRadius: "12px",
+            color: "#FFFFFF",
             fontSize: 13,
+            padding: "10px 14px",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
           }}
-          cursor={{ fill: "hsl(var(--muted))", opacity: 0.5 }}
+          cursor={{ fill: "#E0E0E8", opacity: 0.3 }}
         />
         <Legend
-          wrapperStyle={{ fontSize: 12, color: "hsl(var(--muted-foreground))" }}
+          wrapperStyle={{ fontSize: 12, color: "#6B6B80" }}
         />
         {bars.map((bar) => (
           <Bar
@@ -95,7 +97,7 @@ export default function BarChart({
             dataKey={bar.key}
             name={bar.label}
             fill={bar.color}
-            radius={[4, 4, 0, 0]}
+            radius={[6, 6, 0, 0]}
             maxBarSize={48}
           />
         ))}

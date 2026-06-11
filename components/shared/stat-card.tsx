@@ -1,73 +1,63 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface StatCardProps {
   label: string;
   value: string | number;
-  delta?: number;
-  deltaLabel?: string;
+  icon?: React.ReactNode;
+  meta?: string;
+  trend?: number[];
   sparklineData?: number[];
   loading?: boolean;
-  size?: "sm" | "md" | "lg";
   className?: string;
+  size?: "sm" | "md" | "lg";
+  delta?: number;
+  deltaLabel?: string;
 }
 
 export default function StatCard({
   label,
   value,
-  delta,
-  deltaLabel = "vs last month",
+  icon,
+  meta,
+  trend,
   sparklineData,
   loading = false,
-  size = "md",
   className,
+  size,
+  delta,
+  deltaLabel = "vs last month",
 }: StatCardProps) {
   if (loading) {
     return (
-      <Card className={cn("bg-card border-border", className)}>
-        <CardContent className="p-6 space-y-4">
-          <Skeleton className="h-4 w-24 bg-muted" />
-          <Skeleton className="h-8 w-36 bg-muted" />
-          <Skeleton className="h-4 w-32 bg-muted" />
-        </CardContent>
-      </Card>
+      <div className={cn("bg-white border border-[#ECECF4] rounded-2xl p-4 space-y-3", className)}>
+        <Skeleton className="h-10 w-10 rounded-full bg-muted" />
+        <Skeleton className="h-3 w-16 bg-muted" />
+        <Skeleton className="h-8 w-24 bg-muted" />
+      </div>
     );
   }
 
-  const hasDelta = delta !== undefined;
-  const isPositive = hasDelta && delta > 0;
-  const isNegative = hasDelta && delta < 0;
-  
-  // Format delta: support both fraction (0.183) and percent number (18.3)
-  const deltaValue = hasDelta
-    ? Math.abs(delta) < 1
-      ? delta * 100
-      : delta
-    : 0;
-  
-  const deltaText = hasDelta
-    ? `${isPositive ? "▲" : isNegative ? "▼" : "—"} ${Math.abs(deltaValue).toFixed(1)}%`
-    : "";
+  const trendData = trend ?? sparklineData;
 
   const drawSparkline = (data: number[]) => {
     if (data.length < 2) return null;
     const max = Math.max(...data);
     const min = Math.min(...data);
     const range = max - min === 0 ? 1 : max - min;
-    const width = 80;
-    const height = 24;
+    const width = 52;
+    const height = 20;
     const points = data.map((val, idx) => {
       const x = (idx / (data.length - 1)) * width;
       const y = height - ((val - min) / range) * height;
       return `${x},${y}`;
     });
     return (
-      <svg width={width} height={height} className="overflow-visible stroke-primary drop-shadow-[0_0_4px_rgba(var(--color-primary-rgb,79,70,229),0.3)]">
+      <svg width={width} height={height} className="overflow-visible">
         <polyline
           fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
+          stroke="#C5F135"
+          strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
           points={points.join(" ")}
@@ -76,52 +66,54 @@ export default function StatCard({
     );
   };
 
+  const hasDelta = delta !== undefined;
+  const isPositive = hasDelta && delta > 0;
+  const isNegative = hasDelta && delta < 0;
+  const deltaValue = hasDelta
+    ? Math.abs(delta) < 1 ? delta * 100 : delta
+    : 0;
+  const deltaText = hasDelta
+    ? `${isPositive ? "▲" : isNegative ? "▼" : "—"} ${Math.abs(deltaValue).toFixed(1)}%`
+    : "";
+
+  const valueSize = size === "sm" ? "text-lg" : size === "lg" ? "text-3xl" : "text-[28px]";
+
   return (
-    <Card className={cn(
-      "bg-card border-border hover:border-zinc-700 transition-all duration-300 shadow-sm relative overflow-hidden group hover:-translate-y-0.5",
-      size === "sm" ? "p-4" : size === "lg" ? "p-8" : "p-6",
+    <div className={cn(
+      "bg-white border border-[#ECECF4] rounded-2xl p-4 transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] relative overflow-hidden",
       className
     )}>
-      {/* Decorative gradient overlay on hover */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-
-      <div className="flex flex-col justify-between h-full relative z-10 space-y-2">
-        <span className="text-xs font-medium text-muted-foreground tracking-wider uppercase">
-          {label}
-        </span>
-        
-        <div className="flex items-baseline justify-between">
-          <span className={cn(
-            "font-bold text-foreground bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent",
-            size === "sm" ? "text-2xl" : size === "lg" ? "text-4xl" : "text-3xl"
-          )}>
+      <div className="flex items-start gap-3">
+        {icon && (
+          <div className="w-10 h-10 rounded-full bg-[#F0F8D0] flex items-center justify-center shrink-0">
+            {icon}
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <span className="text-[11px] font-medium text-[#6B7280] tracking-widest uppercase block leading-none">
+            {label}
+          </span>
+          <span className={cn("font-bold text-[#111827] leading-none mt-1.5 block tracking-tight", valueSize)}>
             {value}
           </span>
-          {sparklineData && sparklineData.length > 0 && (
-            <div className="h-6 flex items-center">
-              {drawSparkline(sparklineData)}
-            </div>
+          {meta && (
+            <span className="text-[13px] text-[#6B7280] mt-1 block">{meta}</span>
+          )}
+          {hasDelta && !meta && (
+            <span className={cn(
+              "text-[13px] font-semibold",
+              isPositive ? "text-[#4CAF50]" : isNegative ? "text-rose-500" : "text-[#6B7280]"
+            )}>
+              {deltaText} <span className="font-normal text-[#6B7280]">{deltaLabel}</span>
+            </span>
           )}
         </div>
-
-        {hasDelta && (
-          <div className="flex items-center space-x-2 text-xs">
-            <span
-              className={cn(
-                "font-semibold flex items-center",
-                isPositive
-                  ? "text-emerald-500"
-                  : isNegative
-                  ? "text-rose-500"
-                  : "text-muted-foreground"
-              )}
-            >
-              {deltaText}
-            </span>
-            <span className="text-muted-foreground">{deltaLabel}</span>
+        {trendData && trendData.length > 0 && (
+          <div className="shrink-0 self-start mt-1">
+            {drawSparkline(trendData)}
           </div>
         )}
       </div>
-    </Card>
+    </div>
   );
 }

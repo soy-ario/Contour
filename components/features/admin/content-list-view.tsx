@@ -25,22 +25,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import StatusBadge from "@/components/shared/status-badge";
 import { PlatformIcon } from "@/components/shared/social-icons";
 import { formatCurrency, formatDate } from "@/lib/utils";
+import { CONTENT_TYPE_LABELS, CONTENT_STATUS_LABELS } from "@/types";
 import {
   MoreHorizontal,
-  ArrowUpDown,
   Eye,
   Edit,
   Send,
   CheckCircle,
   CalendarDays,
   Trash2,
+  FileText,
 } from "lucide-react";
-import { CONTENT_TYPE_LABELS } from "@/types";
 
 interface ContentItem {
   id: string;
@@ -68,6 +66,39 @@ interface ContentListViewProps {
   isAdmin?: boolean;
 }
 
+const STATUS_VARIANTS: Record<string, { bg: string; text: string }> = {
+  DRAFT: { bg: "bg-[#F5F5F5]", text: "text-[#6B6B80]" },
+  IDEA: { bg: "bg-[#F5F5F5]", text: "text-[#6B6B80]" },
+  CLIENT_APPROVAL_PENDING: { bg: "bg-[#FFF4EC]", text: "text-[#E07A2F]" },
+  APPROVED: { bg: "bg-[#EEF0FF]", text: "text-[#5B5EEF]" },
+  SCHEDULED: { bg: "bg-[#F0EEFF]", text: "text-[#7C5BEF]" },
+  POSTED: { bg: "bg-[#EEFAF3]", text: "text-[#27AE60]" },
+  REJECTED: { bg: "bg-rose-50", text: "text-rose-500" },
+};
+
+function StatusPill({ status }: { status: ContentStatus }) {
+  const variant = STATUS_VARIANTS[status] || STATUS_VARIANTS.DRAFT;
+  const label = CONTENT_STATUS_LABELS[status] || status.replace(/_/g, " ");
+  return (
+    <span
+      className={`inline-flex items-center h-7 px-2.5 rounded-full text-[11px] font-semibold ${variant.bg} ${variant.text}`}
+    >
+      {label}
+    </span>
+  );
+}
+
+const CONTENT_TYPE_COLORS: Record<string, { bg: string; text: string }> = {
+  REEL: { bg: "bg-purple-50", text: "text-purple-700" },
+  POST: { bg: "bg-blue-50", text: "text-blue-700" },
+  STORY: { bg: "bg-orange-50", text: "text-orange-700" },
+  VIDEO: { bg: "bg-emerald-50", text: "text-emerald-700" },
+  CAROUSEL: { bg: "bg-pink-50", text: "text-pink-700" },
+  THREAD: { bg: "bg-indigo-50", text: "text-indigo-700" },
+  SHORT: { bg: "bg-amber-50", text: "text-amber-700" },
+  LIVE: { bg: "bg-red-50", text: "text-red-700" },
+};
+
 export default function ContentListView({
   data,
   loading = false,
@@ -85,19 +116,35 @@ export default function ContentListView({
   const columns = React.useMemo<ColumnDef<ContentItem>[]>(() => {
     const cols: ColumnDef<ContentItem>[] = [
       {
+        id: "thumbnail",
+        size: 60,
+        header: "",
+        cell: ({ row }) => {
+          const type = row.original.contentType;
+          const color = CONTENT_TYPE_COLORS[type] || { bg: "bg-[#F5F5F5]", text: "text-[#6B6B80]" };
+          return (
+            <div className={`w-10 h-10 rounded-lg ${color.bg} flex items-center justify-center`}>
+              <FileText className={`w-4 h-4 ${color.text}`} />
+            </div>
+          );
+        },
+      },
+      {
         accessorKey: "title",
-        header: "Content Item",
+        header: "Content",
         cell: ({ row }) => {
           const content = row.original;
           return (
             <div className="flex flex-col min-w-0">
               <button
                 onClick={() => onViewDetails(content.id)}
-                className="font-semibold text-foreground hover:text-white transition-colors truncate text-left focus:outline-none"
+                className="text-sm font-semibold text-[#111827] hover:text-[#5B7A1A] transition-colors truncate text-left focus:outline-none"
               >
                 {content.title}
               </button>
-              <span className="text-[10px] text-zinc-500 mt-0.5">ID: {content.id}</span>
+              <span className="text-[12px] text-[#9CA3AF] mt-0.5">
+                {PLATFORM_LABELS[content.platform] || content.platform.toLowerCase()}
+              </span>
             </div>
           );
         },
@@ -108,10 +155,10 @@ export default function ContentListView({
         cell: ({ row }) => {
           const platform = row.getValue("platform") as Platform;
           return (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <PlatformIcon platform={platform} className="w-4 h-4 shrink-0" />
-              <span className="text-xs text-zinc-300 font-medium capitalize">
-                {platform.toLowerCase()}
+              <span className="text-[13px] text-[#6B7280] font-medium">
+                {PLATFORM_LABELS[platform] || platform.toLowerCase()}
               </span>
             </div>
           );
@@ -122,8 +169,9 @@ export default function ContentListView({
         header: "Type",
         cell: ({ row }) => {
           const type = row.getValue("contentType") as ContentType;
+          const color = CONTENT_TYPE_COLORS[type] || { bg: "bg-[#F5F5F5]", text: "text-[#6B6B80]" };
           return (
-            <span className="text-xs font-semibold text-zinc-400 bg-zinc-900 border border-zinc-800/80 px-2 py-0.5 rounded">
+            <span className={`inline-flex items-center h-6 px-2 rounded text-[11px] font-semibold ${color.bg} ${color.text}`}>
               {CONTENT_TYPE_LABELS[type] || type}
             </span>
           );
@@ -136,8 +184,8 @@ export default function ContentListView({
         accessorKey: "clientBrandName",
         header: "Client",
         cell: ({ row }) => (
-          <span className="font-semibold text-emerald-400 text-xs uppercase tracking-wider">
-            {row.original.clientBrandName || "N/A"}
+          <span className="text-[13px] font-semibold text-[#6B7280]">
+            {row.original.clientBrandName || "—"}
           </span>
         ),
       });
@@ -147,25 +195,16 @@ export default function ContentListView({
       {
         accessorKey: "status",
         header: "Status",
-        cell: ({ row }) => <StatusBadge status={row.getValue("status")} />,
+        cell: ({ row }) => <StatusPill status={row.getValue("status") as ContentStatus} />,
       },
       {
         accessorKey: "scheduledAt",
-        header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="hover:bg-transparent -ml-4 font-semibold text-foreground/80 hover:text-foreground"
-          >
-            Scheduled Date
-            <ArrowUpDown className="ml-2 h-4 w-4 shrink-0 opacity-70" />
-          </Button>
-        ),
+        header: "Publish Date",
         cell: ({ row }) => {
           const date = row.original.scheduledAt || row.original.publishDate;
-          if (!date) return <span className="text-zinc-600 text-xs">Unscheduled</span>;
+          if (!date) return <span className="text-[13px] text-[#9CA3AF]">Unscheduled</span>;
           return (
-            <span className="text-xs text-zinc-300 whitespace-nowrap">
+            <span className="text-[13px] text-[#6B7280] whitespace-nowrap">
               {formatDate(date, "MMM dd, yyyy")}
             </span>
           );
@@ -173,21 +212,12 @@ export default function ContentListView({
       },
       {
         accessorKey: "adSpend",
-        header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="hover:bg-transparent -ml-4 font-semibold text-foreground/80 hover:text-foreground"
-          >
-            Ad Spend
-            <ArrowUpDown className="ml-2 h-4 w-4 shrink-0 opacity-70" />
-          </Button>
-        ),
+        header: "Ad Spend",
         cell: ({ row }) => {
           const spend = row.getValue("adSpend") as number | null;
-          if (spend === null || spend === 0) return <span className="text-zinc-600 text-xs">—</span>;
+          if (spend === null || spend === 0) return <span className="text-[13px] text-[#9CA3AF]">—</span>;
           return (
-            <span className="font-semibold text-emerald-400">
+            <span className="text-[13px] font-semibold text-[#111827]">
               {formatCurrency(spend)}
             </span>
           );
@@ -197,7 +227,7 @@ export default function ContentListView({
         id: "actions",
         cell: ({ row }) => {
           const content = row.original;
-          const isDraft = content.status === "DRAFT" || content.status === "IDEA" || content.status === "CLIENT_APPROVAL_PENDING";
+          const isDraft = content.status === "DRAFT" || content.status === "IDEA";
           const isPending = content.status === "CLIENT_APPROVAL_PENDING";
           const isApproved = content.status === "APPROVED";
 
@@ -205,54 +235,53 @@ export default function ContentListView({
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
-                  <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-zinc-800">
-                    <span className="sr-only">Open menu</span>
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+                  <button className="flex items-center justify-center w-8 h-8 rounded-lg border border-[#ECECF4] text-[#9CA3AF] hover:text-[#111827] hover:border-[#C5F135] bg-white transition-all">
+                    <MoreHorizontal className="w-3.5 h-3.5" />
+                  </button>
                 }
               />
-              <DropdownMenuContent align="end" className="w-44 border-border bg-popover text-popover-foreground">
-                <DropdownMenuItem onClick={() => onViewDetails(content.id)} className="flex items-center cursor-pointer">
-                  <Eye className="w-4 h-4 mr-2" />
+              <DropdownMenuContent align="end" className="w-44 border-[#ECECF4] bg-white text-[#111827] rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+                <DropdownMenuItem onClick={() => onViewDetails(content.id)} className="flex items-center cursor-pointer text-[13px]">
+                  <Eye className="w-3.5 h-3.5 mr-2 text-[#6B7280]" />
                   View Details
                 </DropdownMenuItem>
 
                 {onEdit && isDraft && (
-                  <DropdownMenuItem onClick={() => onEdit(content.id)} className="flex items-center cursor-pointer">
-                    <Edit className="w-4 h-4 mr-2" />
+                  <DropdownMenuItem onClick={() => onEdit(content.id)} className="flex items-center cursor-pointer text-[13px]">
+                    <Edit className="w-3.5 h-3.5 mr-2 text-[#6B7280]" />
                     Edit Details
                   </DropdownMenuItem>
                 )}
 
                 {onSubmitApproval && content.status === "DRAFT" && isAdmin && (
-                  <DropdownMenuItem onClick={() => onSubmitApproval(content.id)} className="flex items-center text-amber-400 focus:text-amber-300 focus:bg-amber-950/20 cursor-pointer">
-                    <Send className="w-4 h-4 mr-2" />
+                  <DropdownMenuItem onClick={() => onSubmitApproval(content.id)} className="flex items-center text-amber-600 focus:text-amber-700 focus:bg-amber-50 cursor-pointer text-[13px]">
+                    <Send className="w-3.5 h-3.5 mr-2" />
                     Submit Approval
                   </DropdownMenuItem>
                 )}
 
                 {onApprove && isPending && (
-                  <DropdownMenuItem onClick={() => onApprove(content.id)} className="flex items-center text-emerald-400 focus:text-emerald-300 focus:bg-emerald-950/20 cursor-pointer">
-                    <CheckCircle className="w-4 h-4 mr-2" />
+                  <DropdownMenuItem onClick={() => onApprove(content.id)} className="flex items-center text-emerald-600 focus:text-emerald-700 focus:bg-emerald-50 cursor-pointer text-[13px]">
+                    <CheckCircle className="w-3.5 h-3.5 mr-2" />
                     Approve Content
                   </DropdownMenuItem>
                 )}
 
                 {onSchedule && isApproved && isAdmin && (
-                  <DropdownMenuItem onClick={() => onSchedule(content.id)} className="flex items-center text-blue-400 focus:text-blue-300 focus:bg-blue-950/20 cursor-pointer">
-                    <CalendarDays className="w-4 h-4 mr-2" />
+                  <DropdownMenuItem onClick={() => onSchedule(content.id)} className="flex items-center text-blue-600 focus:text-blue-700 focus:bg-blue-50 cursor-pointer text-[13px]">
+                    <CalendarDays className="w-3.5 h-3.5 mr-2" />
                     Schedule Post
                   </DropdownMenuItem>
                 )}
 
                 {onDelete && (content.status === "IDEA" || content.status === "DRAFT") && isAdmin && (
                   <>
-                    <DropdownMenuSeparator className="bg-border" />
+                    <DropdownMenuSeparator className="bg-[#ECECF4]" />
                     <DropdownMenuItem
                       onClick={() => onDelete(content.id)}
-                      className="flex items-center text-rose-500 focus:text-rose-400 focus:bg-rose-950/20 cursor-pointer"
+                      className="flex items-center text-rose-500 focus:text-rose-600 focus:bg-rose-50 cursor-pointer text-[13px]"
                     >
-                      <Trash2 className="w-4 h-4 mr-2" />
+                      <Trash2 className="w-3.5 h-3.5 mr-2" />
                       Delete Item
                     </DropdownMenuItem>
                   </>
@@ -270,9 +299,7 @@ export default function ContentListView({
   const table = useReactTable({
     data,
     columns,
-    state: {
-      sorting,
-    },
+    state: { sorting },
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -280,26 +307,30 @@ export default function ContentListView({
 
   if (loading) {
     return (
-      <div className="border border-border rounded-xl bg-card/25 overflow-hidden">
-        <div className="bg-zinc-950/40 p-4 border-b border-border">
-          <div className="grid grid-cols-6 gap-4">
-            <Skeleton className="h-4 w-32 bg-muted" />
-            <Skeleton className="h-4 w-20 bg-muted" />
-            <Skeleton className="h-4 w-16 bg-muted" />
-            <Skeleton className="h-4 w-24 bg-muted" />
-            <Skeleton className="h-4 w-24 bg-muted" />
-            <Skeleton className="h-4.w-8 bg-muted" />
+      <div className="bg-white border border-[#ECECF4] rounded-[24px] p-6">
+        <div className="bg-[#FAFAFC] rounded-[14px] p-4 border border-[#ECECF4]">
+          <div className="grid grid-cols-8 gap-4">
+            <Skeleton className="h-4 w-10 bg-[#E5E7EB]" />
+            <Skeleton className="h-4 w-32 bg-[#E5E7EB]" />
+            <Skeleton className="h-4 w-20 bg-[#E5E7EB]" />
+            <Skeleton className="h-4 w-16 bg-[#E5E7EB]" />
+            <Skeleton className="h-4 w-24 bg-[#E5E7EB]" />
+            <Skeleton className="h-4 w-24 bg-[#E5E7EB]" />
+            <Skeleton className="h-4 w-24 bg-[#E5E7EB]" />
+            <Skeleton className="h-4 w-8 bg-[#E5E7EB]" />
           </div>
         </div>
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="p-4 border-b border-border last:border-0">
-            <div className="grid grid-cols-6 gap-4 items-center">
-              <Skeleton className="h-4 w-48 bg-muted" />
-              <Skeleton className="h-4 w-16 bg-muted" />
-              <Skeleton className="h-4.5 w-12 bg-muted rounded" />
-              <Skeleton className="h-5 w-20 bg-muted rounded-full" />
-              <Skeleton className="h-4.w-24 bg-muted" />
-              <Skeleton className="h-8 w-8 bg-muted rounded-md" />
+          <div key={i} className="py-4 border-b border-[#F0F1F5] last:border-0">
+            <div className="grid grid-cols-8 gap-4 items-center">
+              <Skeleton className="w-10 h-10 rounded-lg bg-[#F5F5F5]" />
+              <Skeleton className="h-4 w-48 bg-[#F5F5F5]" />
+              <Skeleton className="h-4 w-16 bg-[#F5F5F5]" />
+              <Skeleton className="h-5 w-12 bg-[#F5F5F5] rounded" />
+              <Skeleton className="h-7 w-24 bg-[#F5F5F5] rounded-full" />
+              <Skeleton className="h-4 w-24 bg-[#F5F5F5]" />
+              <Skeleton className="h-4 w-16 bg-[#F5F5F5]" />
+              <Skeleton className="h-8 w-8 bg-[#F5F5F5] rounded-lg" />
             </div>
           </div>
         ))}
@@ -307,48 +338,78 @@ export default function ContentListView({
     );
   }
 
+  if (data.length === 0) {
+    return (
+      <div className="bg-white border border-[#ECECF4] rounded-[24px] p-6">
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="w-16 h-16 rounded-full bg-[#F4F4FA] flex items-center justify-center mb-4">
+            <FileText className="w-7 h-7 text-[#9CA3AF]" />
+          </div>
+          <h3 className="text-lg font-bold text-[#111827]">No content items found</h3>
+          <p className="text-sm text-[#6B7280] mt-1 mb-5 max-w-sm">
+            Create your first content item to start managing campaigns.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="border border-border rounded-xl bg-zinc-950/20 backdrop-blur-sm overflow-hidden">
-      <Table>
-        <TableHeader className="bg-zinc-950/50 border-b border-border">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="border-b border-border hover:bg-transparent">
-              {headerGroup.headers.map((header) => (
-                <TableHead
-                  key={header.id}
-                  className="text-zinc-400 font-semibold text-xs py-4.px-6"
-                >
-                  {header.isPlaceholder
-                    ? null
-                    : flexRender(header.column.columnDef.header, header.getContext())}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
+    <div className="bg-white border border-[#ECECF4] rounded-[24px] p-6">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <h2 className="text-[24px] font-bold text-[#111827] leading-tight tracking-tight">
+            Content Registry
+          </h2>
+          <p className="text-[14px] text-[#6B7280] mt-0.5">
+            Track content production across all clients.
+          </p>
+        </div>
+      </div>
+      <div className="overflow-hidden">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="border-0 hover:bg-transparent">
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className="bg-[#FAFAFC] text-[#6B7280] font-semibold text-[11px] uppercase tracking-wider h-[52px] first:rounded-l-[14px] last:rounded-r-[14px] px-4"
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(header.column.columnDef.header, header.getContext())}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
-                className="border-b border-border last:border-0 hover:bg-zinc-900/20 transition-colors"
+                className="border-b border-[#F0F1F5] last:border-0 hover:bg-[#FAFAFC] transition-colors"
+                style={{ height: 72 }}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-4.5 px-6 align-middle text-sm text-zinc-300">
+                  <TableCell key={cell.id} className="py-0 px-4 align-middle">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-28 text-center text-zinc-500">
-                No content items found.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
+
+const PLATFORM_LABELS: Record<string, string> = {
+  INSTAGRAM: "Instagram",
+  FACEBOOK: "Facebook",
+  LINKEDIN: "LinkedIn",
+  TIKTOK: "TikTok",
+  YOUTUBE: "YouTube",
+  X: "X",
+};

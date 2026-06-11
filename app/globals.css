@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: Arial, Helvetica, sans-serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -39,13 +39,15 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-positive-trend: var(--color-positive-trend);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
 
   /* Contour Platform Colors */
   --color-instagram: #e1306c;
@@ -69,82 +71,64 @@
    Near-black surfaces, cool-white text, electric indigo accent
    ═══════════════════════════════════════════════════════════════════════════════ */
 :root {
-  --background: #0a0a0b;
-  --foreground: #f2f2f5;
-  --card: #111113;
-  --card-foreground: #f2f2f5;
-  --popover: #111113;
-  --popover-foreground: #f2f2f5;
-  --primary: #6366f1;
-  --primary-foreground: #ffffff;
-  --secondary: #18181c;
-  --secondary-foreground: #f2f2f5;
-  --muted: #18181c;
-  --muted-foreground: #9898a6;
-  --accent: #6366f1;
-  --accent-foreground: #ffffff;
+  /* Canvas / Main Content (Light Theme) */
+  --background: #F4F4FA;
+  --foreground: #1A1A2E;
+  --card: #FFFFFF;
+  --card-foreground: #1A1A2E;
+  --popover: #FFFFFF;
+  --popover-foreground: #1A1A2E;
+  --primary: #C5F135;
+  --primary-foreground: #1A1A2E;
+  --secondary: #ECECF4;
+  --secondary-foreground: #6B6B80;
+  --muted: #ECECF4;
+  --muted-foreground: #6B6B80;
+  --accent: #C5F135;
+  --accent-foreground: #1A1A2E;
   --destructive: #ef4444;
-  --border: #2a2a32;
-  --input: #222228;
-  --ring: #6366f1;
-  --radius: 0.5rem;
+  --border: #ECECF4;
+  --input: #ECECF4;
+  --ring: #C5F135;
+  --radius: 0.75rem;
 
-  /* Chart colors (indigo spectrum + complementary) */
-  --chart-1: #6366f1;
+  /* Chart colors (Lime primary + complementary) */
+  --chart-1: #C5F135;
   --chart-2: #8b5cf6;
   --chart-3: #22c55e;
   --chart-4: #f59e0b;
   --chart-5: #ef4444;
 
-  /* Sidebar */
-  --sidebar: #0e0e10;
-  --sidebar-foreground: #f2f2f5;
-  --sidebar-primary: #6366f1;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #18181c;
-  --sidebar-accent-foreground: #f2f2f5;
-  --sidebar-border: #1e1e24;
-  --sidebar-ring: #6366f1;
+  /* Sidebar (Dark Navy Theme) */
+  --sidebar: #1E1E2E;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #C5F135;
+  --sidebar-primary-foreground: #1E1E2E;
+  --sidebar-accent: #2A2A3D;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #2A2A3D;
+  --sidebar-ring: #C5F135;
+
+  /* Design Guideline Tokens */
+  --color-accent-hover: #B8E620;
+  --color-accent-dark: #8FBF00;
+  --color-text-secondary: #6B6B80;
+  --color-text-muted: #A0A0B0;
+  --color-positive-trend: #4ADE80;
+  --sidebar-muted: #A0A0B8;
+  
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  
+  --shadow-card: 0 2px 12px rgba(0,0,0,0.06);
+  --shadow-card-hover: 0 4px 20px rgba(0,0,0,0.10);
+  --shadow-dropdown: 0 8px 24px rgba(0,0,0,0.12);
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   LIGHT MODE — Clean light surfaces
-   ═══════════════════════════════════════════════════════════════════════════════ */
-.light {
-  --background: #fafafa;
-  --foreground: #0a0a0b;
-  --card: #ffffff;
-  --card-foreground: #0a0a0b;
-  --popover: #ffffff;
-  --popover-foreground: #0a0a0b;
-  --primary: #6366f1;
-  --primary-foreground: #ffffff;
-  --secondary: #f4f4f6;
-  --secondary-foreground: #0a0a0b;
-  --muted: #f4f4f6;
-  --muted-foreground: #5a5a6e;
-  --accent: #6366f1;
-  --accent-foreground: #ffffff;
-  --destructive: #ef4444;
-  --border: #e2e2e8;
-  --input: #ebebef;
-  --ring: #6366f1;
-
-  --chart-1: #6366f1;
-  --chart-2: #8b5cf6;
-  --chart-3: #22c55e;
-  --chart-4: #f59e0b;
-  --chart-5: #ef4444;
-
-  --sidebar: #ffffff;
-  --sidebar-foreground: #0a0a0b;
-  --sidebar-primary: #6366f1;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f4f4f6;
-  --sidebar-accent-foreground: #0a0a0b;
-  --sidebar-border: #e2e2e8;
-  --sidebar-ring: #6366f1;
-}
+/* Remove the old .light and dark mode overrides as we are implementing a hybrid theme by default */
 
 /* ═══════════════════════════════════════════════════════════════════════════════
    BASE LAYER
@@ -164,7 +148,7 @@
   /* Focus ring */
   :focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
+    box-shadow: 0 0 0 3px rgba(197, 241, 53, 0.4);
     border-radius: 4px;
   }
 

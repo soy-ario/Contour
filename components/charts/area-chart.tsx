@@ -44,34 +44,37 @@ export default function AreaChart({
               y2="1"
             >
               <stop offset="5%" stopColor={area.color} stopOpacity={0.2} />
-              <stop offset="95%" stopColor={area.color} stopOpacity={0} />
+              <stop offset="95%" stopColor={area.color} stopOpacity={0.02} />
             </linearGradient>
           ))}
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#E0E0E8" vertical={false} />
         <XAxis
           dataKey={xKey}
-          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-          axisLine={{ stroke: "hsl(var(--border))" }}
+          tick={{ fill: "#A0A0B0", fontSize: 12 }}
+          axisLine={{ stroke: "#E0E0E8" }}
           tickLine={false}
         />
         <YAxis
-          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+          tick={{ fill: "#A0A0B0", fontSize: 12 }}
           axisLine={false}
           tickLine={false}
           width={48}
         />
         <Tooltip
           contentStyle={{
-            backgroundColor: "hsl(var(--card))",
-            border: "1px solid hsl(var(--border))",
-            borderRadius: "8px",
-            color: "hsl(var(--foreground))",
+            backgroundColor: "#1E1E2E",
+            border: "none",
+            borderRadius: "12px",
+            color: "#FFFFFF",
             fontSize: 13,
+            padding: "10px 14px",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
           }}
+          cursor={{ stroke: "#E0E0E8", strokeDasharray: "3 3" }}
         />
         <Legend
-          wrapperStyle={{ fontSize: 12, color: "hsl(var(--muted-foreground))" }}
+          wrapperStyle={{ fontSize: 12, color: "#6B6B80" }}
         />
         {areas.map((area) => (
           <Area
@@ -83,7 +86,7 @@ export default function AreaChart({
             strokeWidth={2}
             fill={`url(#gradient-${area.key})`}
             dot={false}
-            activeDot={{ r: 4, strokeWidth: 0 }}
+            activeDot={{ r: 4, strokeWidth: 0, fill: area.color }}
           />
         ))}
       </RechartsAreaChart>

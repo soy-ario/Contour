@@ -36,10 +36,12 @@ export default async function ClientLayout({
     contractStart: client.contractStart,
     contractEnd: client.contractEnd,
     industry: client.industry,
+    contactName: client.contactName,
+    contactEmail: client.contactEmail,
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-[#F9FAFB]">
       <ClientHeader client={formattedClient} />
       <ClientTabs clientId={client.id} />
       <div className="flex-1 overflow-y-auto">

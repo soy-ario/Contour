@@ -5,7 +5,7 @@ import { Plus, Briefcase, Activity, UserPlus, PauseCircle, Filter, Download } fr
 import { Button } from "@/components/ui/button";
 import PageShell from "@/components/layout/page-shell";
 import ClientListTable from "@/components/features/admin/client-list-table";
-import CreateClientSheet from "@/components/features/admin/create-client-sheet";
+import CreateClientDialog from "@/components/features/admin/create-client-sheet";
 import { updateClientStatusAction } from "@/lib/actions/client.actions";
 import { toast } from "sonner";
 import type { ClientStatus } from "@prisma/client";
@@ -240,7 +240,7 @@ export default function ClientsPageContent({
         </div>
       </div>
 
-      <CreateClientSheet
+      <CreateClientDialog
         open={isSheetOpen}
         onOpenChange={setIsSheetOpen}
         client={selectedClient}

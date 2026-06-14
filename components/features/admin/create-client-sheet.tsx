@@ -3,18 +3,18 @@
 import * as React from "react";
 import { useForm } from "react-hook-form";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { CreateClientInput } from "@/lib/validations/client";
-import { createClientAction, updateClientAction } from "@/lib/actions/client.actions";
+import { createClientAction, createClientUserAction, updateClientAction } from "@/lib/actions/client.actions";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
@@ -38,10 +38,10 @@ interface ClientData {
   marketingTheme: string | null;
 }
 
-interface CreateClientSheetProps {
+interface CreateClientDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  client?: ClientData; // If passed, we are in edit mode
+  client?: ClientData;
   onSuccess?: () => void;
 }
 
@@ -60,14 +60,16 @@ interface ClientFormValues {
   contractEnd: string;
 }
 
-export default function CreateClientSheet({
+export default function CreateClientDialog({
   open,
   onOpenChange,
   client,
   onSuccess,
-}: CreateClientSheetProps) {
+}: CreateClientDialogProps) {
   const [isPending, startTransition] = React.useTransition();
   const [serverError, setServerError] = React.useState<string | null>(null);
+  const [username, setUsername] = React.useState("");
+  const [password, setPassword] = React.useState("");
 
   const isEditMode = !!client;
 
@@ -117,7 +119,7 @@ export default function CreateClientSheet({
     reset,
     formState: { errors },
   } = useForm<ClientFormValues>({
-    values: defaultValues, // dynamic values update when client changes
+    values: defaultValues,
   });
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -130,7 +132,6 @@ export default function CreateClientSheet({
   const onSubmit = async (data: ClientFormValues) => {
     setServerError(null);
     startTransition(async () => {
-      // Map empty strings to undefined to fit Zod schemas
       const payload: CreateClientInput = {
         ...data,
         website: data.website || undefined,
@@ -147,6 +148,13 @@ export default function CreateClientSheet({
         : await createClientAction(payload);
 
       if (result.success) {
+        const newClientId = result.data?.id;
+        if (!isEditMode && username && password && newClientId) {
+          const userResult = await createClientUserAction(newClientId, username, password);
+          if (!userResult.success) {
+            toast.error("Client created but user account failed: " + userResult.error);
+          }
+        }
         toast.success(isEditMode ? "Client updated successfully" : "Client created successfully");
         reset();
         handleOpenChange(false);
@@ -158,36 +166,56 @@ export default function CreateClientSheet({
   };
 
   return (
-    <Sheet open={open} onOpenChange={handleOpenChange}>
-      <SheetContent className="sm:max-w-xl overflow-y-auto bg-zinc-950 border-zinc-800 text-foreground">
-        <SheetHeader className="mb-6">
-          <SheetTitle className="text-xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
-            {isEditMode ? "Edit Client Profile" : "Create New Client"}
-          </SheetTitle>
-          <SheetDescription className="text-muted-foreground text-sm">
-            {isEditMode
-              ? "Modify the business details and contact parameters of the client record."
-              : "Register a new client account. Fill out business details, billing configurations, and onboarding settings."}
-          </SheetDescription>
-        </SheetHeader>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 pb-8">
-          {serverError && (
-            <div className="p-3 bg-red-950/30 border border-red-500/20 rounded-md text-sm text-red-400">
-              {serverError}
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent
+        className="sm:max-w-2xl max-h-[90vh] p-0 gap-0 flex flex-col overflow-hidden rounded-2xl border-[#ECECF4]"
+        showCloseButton={false}
+      >
+        <div className="shrink-0 px-6 pt-6 pb-4 border-b border-[#ECECF4]">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle className="text-lg font-bold text-[#111827]">
+                  {isEditMode ? "Edit Client Profile" : "New Client Onboarding"}
+                </DialogTitle>
+                <DialogDescription className="text-sm text-[#6B7280] mt-1">
+                  {isEditMode
+                    ? "Modify the business details and contact parameters of the client record."
+                    : "Register a new client account. Fill out business details, billing configurations, and onboarding settings."}
+                </DialogDescription>
+              </div>
+              <button
+                type="button"
+                onClick={() => onOpenChange(false)}
+                className="flex items-center justify-center w-8 h-8 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] bg-white transition-all shrink-0"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              </button>
             </div>
-          )}
+          </DialogHeader>
+        </div>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
+          <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+            {serverError && (
+              <div className="p-3 bg-rose-50 border border-rose-200 rounded-[14px] text-sm text-rose-600">
+                {serverError}
+              </div>
+            )}
 
           {/* Section 1: Business Details */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">Business Details</h3>
+            <h3 className="text-sm font-semibold text-[#111827] uppercase tracking-wider">Business Details</h3>
             
             <div className="space-y-1.5">
-              <Label htmlFor="brandName">Brand Name *</Label>
+              <Label htmlFor="brandName" className="text-sm font-semibold text-[#111827]">Brand Name *</Label>
               <Input
                 id="brandName"
                 {...register("brandName")}
-                className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
+                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
                 placeholder="e.g. Acme Corp"
               />
               {errors.brandName && (
@@ -197,11 +225,11 @@ export default function CreateClientSheet({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="industry">Industry</Label>
+                <Label htmlFor="industry" className="text-sm font-semibold text-[#111827]">Industry</Label>
                 <Input
                   id="industry"
                   {...register("industry")}
-                  className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
                   placeholder="e.g. E-Commerce"
                 />
                 {errors.industry && (
@@ -210,11 +238,11 @@ export default function CreateClientSheet({
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="website">Website URL</Label>
+                <Label htmlFor="website" className="text-sm font-semibold text-[#111827]">Website URL</Label>
                 <Input
                   id="website"
                   {...register("website")}
-                  className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
                   placeholder="https://example.com"
                 />
                 {errors.website && (
@@ -224,11 +252,11 @@ export default function CreateClientSheet({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description" className="text-sm font-semibold text-[#111827]">Description</Label>
               <Textarea
                 id="description"
                 {...register("description")}
-                className="bg-zinc-900 border-zinc-800 text-sm min-h-[80px] focus-visible:ring-1 focus-visible:ring-zinc-700"
+                className="flex w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135] min-h-[80px]"
                 placeholder="Brief summary of agency scope or brand focus..."
               />
               {errors.description && (
@@ -238,15 +266,15 @@ export default function CreateClientSheet({
           </div>
 
           {/* Section 2: Contact Details */}
-          <div className="space-y-4 pt-4 border-t border-zinc-800/60">
-            <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">Contact Details</h3>
+          <div className="space-y-4 pt-4 border-t border-[#ECECF4]">
+            <h3 className="text-sm font-semibold text-[#111827] uppercase tracking-wider">Contact Details</h3>
             
             <div className="space-y-1.5">
-              <Label htmlFor="contactName">Primary Contact Name *</Label>
+              <Label htmlFor="contactName" className="text-sm font-semibold text-[#111827]">Primary Contact Name *</Label>
               <Input
                 id="contactName"
                 {...register("contactName")}
-                className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
+                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
                 placeholder="Jane Smith"
               />
               {errors.contactName && (
@@ -256,12 +284,12 @@ export default function CreateClientSheet({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="contactEmail">Contact Email *</Label>
+                <Label htmlFor="contactEmail" className="text-sm font-semibold text-[#111827]">Contact Email *</Label>
                 <Input
                   id="contactEmail"
                   type="email"
                   {...register("contactEmail")}
-                  className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
                   placeholder="jane@acme.com"
                 />
                 {errors.contactEmail && (
@@ -270,11 +298,11 @@ export default function CreateClientSheet({
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="contactPhone">Contact Phone</Label>
+                <Label htmlFor="contactPhone" className="text-sm font-semibold text-[#111827]">Contact Phone</Label>
                 <Input
                   id="contactPhone"
                   {...register("contactPhone")}
-                  className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
                   placeholder="+1 (555) 000-0000"
                 />
                 {errors.contactPhone && (
@@ -284,19 +312,50 @@ export default function CreateClientSheet({
             </div>
           </div>
 
-          {/* Section 3: Billing & Contract details */}
-          <div className="space-y-4 pt-4 border-t border-zinc-800/60">
-            <h3 className="text-sm font-semibold text-primary uppercase tracking-wider">Billing & Contract</h3>
+          {/* Section 3: Portal Login (new clients only) */}
+          {!isEditMode && (
+            <div className="space-y-4 pt-4 border-t border-[#ECECF4]">
+              <h3 className="text-sm font-semibold text-[#111827] uppercase tracking-wider">Portal Login</h3>
+              <p className="text-xs text-[#6B7280]">Create a username and password for the client portal. Skip to do this later.</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label htmlFor="username" className="text-sm font-semibold text-[#111827]">Username</Label>
+                  <Input
+                    id="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                    placeholder="e.g. acme_admin"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="password" className="text-sm font-semibold text-[#111827]">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                    placeholder="Min. 8 characters"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Section 4: Billing & Contract details */}
+          <div className="space-y-4 pt-4 border-t border-[#ECECF4]">
+            <h3 className="text-sm font-semibold text-[#111827] uppercase tracking-wider">Billing & Contract</h3>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="monthlyRetainer">Monthly Retainer ($USD) *</Label>
+                <Label htmlFor="monthlyRetainer" className="text-sm font-semibold text-[#111827]">Monthly Retainer ($USD) *</Label>
                 <Input
                   id="monthlyRetainer"
                   type="number"
                   step="0.01"
                   {...register("monthlyRetainer")}
-                  className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
                 />
                 {errors.monthlyRetainer && (
                   <p className="text-xs text-rose-500">{errors.monthlyRetainer.message}</p>
@@ -304,13 +363,13 @@ export default function CreateClientSheet({
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="monthlyBudget">Monthly Ad Spend Budget ($USD)</Label>
+                <Label htmlFor="monthlyBudget" className="text-sm font-semibold text-[#111827]">Monthly Ad Spend Budget ($USD)</Label>
                 <Input
                   id="monthlyBudget"
                   type="number"
                   step="0.01"
                   {...register("monthlyBudget")}
-                  className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
                   placeholder="e.g. 5000"
                 />
                 {errors.monthlyBudget && (
@@ -321,12 +380,12 @@ export default function CreateClientSheet({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="contractStart">Contract Start Date</Label>
+                <Label htmlFor="contractStart" className="text-sm font-semibold text-[#111827]">Contract Start Date</Label>
                 <Input
                   id="contractStart"
                   type="date"
                   {...register("contractStart")}
-                  className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
                 />
                 {errors.contractStart && (
                   <p className="text-xs text-rose-500">{errors.contractStart.message}</p>
@@ -334,12 +393,12 @@ export default function CreateClientSheet({
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="contractEnd">Contract End Date</Label>
+                <Label htmlFor="contractEnd" className="text-sm font-semibold text-[#111827]">Contract End Date</Label>
                 <Input
                   id="contractEnd"
                   type="date"
                   {...register("contractEnd")}
-                  className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
                 />
                 {errors.contractEnd && (
                   <p className="text-xs text-rose-500">{errors.contractEnd.message}</p>
@@ -348,11 +407,11 @@ export default function CreateClientSheet({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="marketingTheme">Marketing Brand Theme / Focus</Label>
+              <Label htmlFor="marketingTheme" className="text-sm font-semibold text-[#111827]">Marketing Brand Theme / Focus</Label>
               <Input
                 id="marketingTheme"
                 {...register("marketingTheme")}
-                className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
+                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
                 placeholder="e.g. Wellness, High Performance, Luxury"
               />
               {errors.marketingTheme && (
@@ -361,16 +420,26 @@ export default function CreateClientSheet({
             </div>
           </div>
 
-          {/* Form Actions */}
-          <div className="flex items-center space-x-3 pt-6 border-t border-zinc-800">
+          </div>
+
+          <div className="shrink-0 px-6 pb-6 pt-4 border-t border-[#ECECF4] flex items-center justify-end gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isPending}
+              onClick={() => onOpenChange(false)}
+              className="h-11 px-5 border border-[#E5E7EB] rounded-[14px] text-sm font-semibold text-[#6B7280] bg-white hover:bg-[#F9FAFB] transition-colors"
+            >
+              Cancel
+            </Button>
             <Button
               type="submit"
               disabled={isPending}
-              className="flex-1 bg-primary text-primary-foreground hover:bg-primary/95 text-sm"
+              className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold flex items-center gap-2 hover:brightness-95 transition-all disabled:opacity-50"
             >
               {isPending ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   Saving Profile...
                 </>
               ) : isEditMode ? (
@@ -379,18 +448,9 @@ export default function CreateClientSheet({
                 "Create Client Record"
               )}
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={isPending}
-              onClick={() => onOpenChange(false)}
-              className="bg-transparent border-zinc-800 hover:bg-zinc-900 text-foreground text-sm"
-            >
-              Cancel
-            </Button>
           </div>
         </form>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }

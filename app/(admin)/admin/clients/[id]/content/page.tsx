@@ -26,7 +26,6 @@ export default async function ClientContentPage({ params, searchParams }: PagePr
   const { id: clientId } = await params;
   const urlParams = await searchParams;
 
-  // 1. Verify client exists
   const client = await prisma.client.findUnique({
     where: { id: clientId },
     select: { brandName: true },
@@ -42,7 +41,6 @@ export default async function ClientContentPage({ params, searchParams }: PagePr
   const filterStatus = urlParams.filterStatus || "all";
   const month = urlParams.month || "";
 
-  // 2. Build Query Filters scoped to this clientId
   const where: Prisma.ContentWhereInput = {
     clientId,
   };
@@ -63,7 +61,6 @@ export default async function ClientContentPage({ params, searchParams }: PagePr
     ];
   }
 
-  // If calendar view is selected, restrict content to the active month
   if (view === "calendar") {
     let year: number;
     let monthIdx: number;
@@ -81,7 +78,6 @@ export default async function ClientContentPage({ params, searchParams }: PagePr
     const startOfMonth = new Date(Date.UTC(year, monthIdx, 1, 0, 0, 0, 0));
     const endOfMonth = new Date(Date.UTC(year, monthIdx + 1, 0, 23, 59, 59, 999));
 
-    // Combine previous where criteria with the month boundaries
     where.OR = [
       {
         scheduledAt: {
@@ -98,8 +94,7 @@ export default async function ClientContentPage({ params, searchParams }: PagePr
     ];
   }
 
-  // 3. Query Client Content and Pending Content
-  const [contents, pendingContents] = await Promise.all([
+  const [contents, allClientContents] = await Promise.all([
     prisma.content.findMany({
       where,
       orderBy: {
@@ -112,33 +107,42 @@ export default async function ClientContentPage({ params, searchParams }: PagePr
             logoUrl: true,
           },
         },
+        analytics: true,
       },
     }),
     prisma.content.findMany({
-      where: {
-        clientId,
-        status: ContentStatus.CLIENT_APPROVAL_PENDING,
-      },
-      orderBy: {
-        updatedAt: "asc",
-      },
-      include: {
-        client: {
-          select: {
-            brandName: true,
-          },
-        },
-      },
+      where: { clientId },
+      select: { status: true },
     }),
   ]);
 
-  // 4. Map DB models to serializable objects
+  // Status summary
+  const totalItems = allClientContents.length;
+  const published = allClientContents.filter(c => c.status === "POSTED").length;
+  const scheduled = allClientContents.filter(c => c.status === "SCHEDULED" || c.status === "APPROVED").length;
+  const drafts = allClientContents.filter(c => c.status === "DRAFT" || c.status === "IDEA").length;
+  const needsReview = allClientContents.filter(c => c.status === "CLIENT_APPROVAL_PENDING").length;
+
+  const statusSummary = {
+    total: totalItems,
+    published,
+    publishedPct: totalItems > 0 ? (published / totalItems) * 100 : 0,
+    scheduled,
+    scheduledPct: totalItems > 0 ? (scheduled / totalItems) * 100 : 0,
+    drafts,
+    draftsPct: totalItems > 0 ? (drafts / totalItems) * 100 : 0,
+    needsReview,
+    needsReviewPct: totalItems > 0 ? (needsReview / totalItems) * 100 : 0,
+  };
+
   const formattedContents = contents.map((c) => ({
     id: c.id,
     title: c.title,
+    topic: c.topic || "",
     platform: c.platform,
     contentType: c.contentType,
     status: c.status,
+    hashtags: c.hashtags,
     scheduledAt: c.scheduledAt ? c.scheduledAt.toISOString() : null,
     publishDate: c.publishDate ? c.publishDate.toISOString() : null,
     adSpend: c.adSpend ? Number(c.adSpend) : null,
@@ -146,21 +150,12 @@ export default async function ClientContentPage({ params, searchParams }: PagePr
     clientId: c.clientId,
     assetUrls: c.assetUrls,
     updatedAt: c.updatedAt.toISOString(),
-  }));
-
-  const formattedPending = pendingContents.map((c) => ({
-    id: c.id,
-    title: c.title,
-    platform: c.platform,
-    contentType: c.contentType,
-    status: c.status,
-    scheduledAt: c.scheduledAt ? c.scheduledAt.toISOString() : null,
-    publishDate: c.publishDate ? c.publishDate.toISOString() : null,
-    adSpend: c.adSpend ? Number(c.adSpend) : null,
-    clientBrandName: c.client.brandName,
-    clientId: c.clientId,
-    assetUrls: c.assetUrls,
-    updatedAt: c.updatedAt.toISOString(),
+    views: Number(c.analytics?.views || 0),
+    reach: Number(c.analytics?.reach || 0),
+    likes: c.analytics?.likes || 0,
+    comments: c.analytics?.comments || 0,
+    shares: c.analytics?.shares || 0,
+    engagementRate: c.analytics ? Number(c.analytics.engagementRate) : 0,
   }));
 
   const sessionUser = {
@@ -172,8 +167,7 @@ export default async function ClientContentPage({ params, searchParams }: PagePr
   return (
     <ContentPageContent
       initialContents={formattedContents}
-      pendingContents={formattedPending}
-      clients={[]} // Scoped to client page, client selector not needed
+      statusSummary={statusSummary}
       clientId={clientId}
       user={sessionUser}
     />

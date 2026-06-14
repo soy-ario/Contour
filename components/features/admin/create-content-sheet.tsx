@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import type { Platform, ContentType } from "@prisma/client";
 import {
   Sheet,
@@ -16,10 +15,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { createContentSchema } from "@/lib/validations/content";
 import { createContentAction, updateContentAction } from "@/lib/actions/content.actions";
 import { toast } from "sonner";
-import { Loader2, Plus, X, Package } from "lucide-react";
+import { Loader2, Package } from "lucide-react";
 import { PLATFORM_LABELS, CONTENT_TYPE_LABELS } from "@/types";
 
 interface ClientListItem {
@@ -33,14 +31,13 @@ interface Product {
 }
 
 interface CreateContentSheetProps {
-  clientId?: string | null; // Pre-filled if scoped to client page
-  contentIdToEdit?: string | null; // If editing an existing item
+  clientId?: string | null;
+  contentIdToEdit?: string | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }
 
-// Form values schema on client side (keeping dates and spend as string/number for form inputs)
 interface ContentFormValues {
   clientId: string;
   title: string;
@@ -100,7 +97,6 @@ export default function CreateContentSheet({
   const selectedContentType = watch("contentType");
   const selectedProducts = watch("productIds") || [];
 
-  // Fetch clients if no clientId is provided (Global Admin Mode)
   React.useEffect(() => {
     if (open && !clientId && !isEditMode) {
       setLoadingClients(true);
@@ -116,7 +112,6 @@ export default function CreateContentSheet({
     }
   }, [open, clientId, isEditMode]);
 
-  // Fetch products when selectedClientId changes
   React.useEffect(() => {
     if (open && selectedClientId) {
       setLoadingProducts(true);
@@ -126,11 +121,10 @@ export default function CreateContentSheet({
           if (res.success) {
             setProducts(res.data || []);
           } else {
-            setProducts([]); // Fallback
+            setProducts([]);
           }
         })
         .catch(() => {
-          // If product api doesn't exist yet in development, swallow error gracefully
           setProducts([]);
         })
         .finally(() => setLoadingProducts(false));
@@ -139,7 +133,6 @@ export default function CreateContentSheet({
     }
   }, [open, selectedClientId]);
 
-  // Fetch content details for Editing Mode
   React.useEffect(() => {
     if (open && isEditMode && contentIdToEdit && selectedClientId) {
       fetch(`/api/clients/${selectedClientId}/content/${contentIdToEdit}`)
@@ -167,7 +160,6 @@ export default function CreateContentSheet({
     }
   }, [open, isEditMode, contentIdToEdit, selectedClientId, reset]);
 
-  // Reset form when sheet opens/closes
   React.useEffect(() => {
     if (!open) {
       reset({
@@ -234,7 +226,6 @@ export default function CreateContentSheet({
       if (isEditMode && contentIdToEdit) {
         result = await updateContentAction(contentIdToEdit, formattedData);
       } else {
-        // Create content action takes prevState and formData as argument because of useActionState signatures
         result = await createContentAction({}, formattedData);
       }
 
@@ -253,14 +244,18 @@ export default function CreateContentSheet({
     }
   };
 
+  function FormLabel({ children }: { children: React.ReactNode }) {
+    return <label className="text-xs font-bold uppercase tracking-wider text-[#6B7280]">{children}</label>;
+  }
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-md md:max-w-lg overflow-y-auto bg-zinc-950 border-l border-zinc-800 text-zinc-300 p-0 flex flex-col h-full scrollbar-thin">
-        <SheetHeader className="p-6 pb-4 border-b border-zinc-850 bg-zinc-900/30">
-          <SheetTitle className="text-lg font-bold text-white">
+      <SheetContent className="sm:max-w-md md:max-w-lg overflow-y-auto bg-white text-[#111827] p-0 flex flex-col h-full scrollbar-thin">
+        <SheetHeader className="p-6 pb-4 border-b border-[#ECECF4] bg-[#FAFAFD]">
+          <SheetTitle className="text-lg font-bold text-[#111827]">
             {isEditMode ? "Edit Content Details" : "Create Content Idea"}
           </SheetTitle>
-          <SheetDescription className="text-xs text-zinc-500">
+          <SheetDescription className="text-xs text-[#6B7280]">
             {isEditMode
               ? "Update description, assets, and metadata for this content item."
               : "Draft a new content item. Created items will start in the 'Idea' stage."}
@@ -269,12 +264,12 @@ export default function CreateContentSheet({
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 p-6 space-y-5 overflow-y-auto">
-            {/* Client Selector (Global mode only, disabled in edit mode) */}
+            {/* Client Selector */}
             {!clientId && !isEditMode && (
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Client / Brand</label>
+                <FormLabel>Client / Brand</FormLabel>
                 {loadingClients ? (
-                  <div className="flex items-center space-x-2 text-zinc-500 text-xs py-2">
+                  <div className="flex items-center gap-2 text-[#6B7280] text-xs py-2">
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
                     <span>Loading clients...</span>
                   </div>
@@ -283,10 +278,10 @@ export default function CreateContentSheet({
                     value={selectedClientId}
                     onValueChange={(val) => setValue("clientId", val || "")}
                   >
-                    <SelectTrigger className="w-full bg-zinc-900 border-zinc-800 focus:ring-zinc-700 text-sm text-zinc-200">
+                    <SelectTrigger className="w-full border-[#ECECF4] bg-white text-sm text-[#111827] focus:ring-[#C5F135] rounded-xl h-10">
                       <SelectValue placeholder="Select a Client Brand" />
                     </SelectTrigger>
-                    <SelectContent className="bg-zinc-900 border-zinc-800 text-zinc-200">
+                    <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
                       {clients.map((c) => (
                         <SelectItem key={c.id} value={c.id}>
                           {c.brandName}
@@ -303,39 +298,39 @@ export default function CreateContentSheet({
 
             {/* Title */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Working Title</label>
+              <FormLabel>Working Title</FormLabel>
               <Input
                 placeholder="e.g. Summer Collection Launch Reel"
                 {...register("title", { required: "Title is required" })}
-                className="bg-zinc-900 border-zinc-850 text-sm focus-visible:ring-zinc-700 placeholder:text-zinc-600"
+                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] rounded-xl h-10"
               />
               {errors.title && (
                 <span className="text-[10px] text-rose-500">{errors.title.message}</span>
               )}
             </div>
 
-            {/* Concept / Topic */}
+            {/* Topic */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Topic / Concept Theme</label>
+              <FormLabel>Topic / Concept Theme</FormLabel>
               <Input
                 placeholder="e.g. Fashion, Behind the scenes, Q&A"
                 {...register("topic")}
-                className="bg-zinc-900 border-zinc-850 text-sm focus-visible:ring-zinc-700 placeholder:text-zinc-600"
+                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] rounded-xl h-10"
               />
             </div>
 
-            {/* Platform & Content Type (Grid) */}
+            {/* Platform & Content Type */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Platform</label>
+                <FormLabel>Platform</FormLabel>
                 <Select
                   value={selectedPlatform}
                   onValueChange={(val) => setValue("platform", val as Platform)}
                 >
-                  <SelectTrigger className="w-full bg-zinc-900 border-zinc-850 focus:ring-zinc-700 text-sm text-zinc-200">
+                  <SelectTrigger className="w-full border-[#ECECF4] bg-white text-sm text-[#111827] focus:ring-[#C5F135] rounded-xl h-10">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-900 border-zinc-850 text-zinc-200">
+                  <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
                     {Object.entries(PLATFORM_LABELS).map(([k, v]) => (
                       <SelectItem key={k} value={k}>
                         {v}
@@ -346,15 +341,15 @@ export default function CreateContentSheet({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Content Type</label>
+                <FormLabel>Content Type</FormLabel>
                 <Select
                   value={selectedContentType}
                   onValueChange={(val) => setValue("contentType", val as ContentType)}
                 >
-                  <SelectTrigger className="w-full bg-zinc-900 border-zinc-850 focus:ring-zinc-700 text-sm text-zinc-200">
+                  <SelectTrigger className="w-full border-[#ECECF4] bg-white text-sm text-[#111827] focus:ring-[#C5F135] rounded-xl h-10">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-900 border-zinc-850 text-zinc-200">
+                  <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
                     {Object.entries(CONTENT_TYPE_LABELS).map(([k, v]) => (
                       <SelectItem key={k} value={k}>
                         {v}
@@ -367,83 +362,81 @@ export default function CreateContentSheet({
 
             {/* Caption */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Caption / Copy</label>
+              <FormLabel>Caption / Copy</FormLabel>
               <Textarea
                 placeholder="Write caption copy, call to actions, etc..."
                 {...register("caption")}
-                className="bg-zinc-900 border-zinc-850 text-sm focus-visible:ring-zinc-700 placeholder:text-zinc-600 min-h-[100px]"
+                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] min-h-[100px] rounded-xl"
               />
             </div>
 
-            {/* Video Script */}
+            {/* Script */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Video Script / Hook / Notes</label>
+              <FormLabel>Video Script / Hook / Notes</FormLabel>
               <Textarea
                 placeholder="Hook: [text]\nBody: [text]\nCTA: [text]"
                 {...register("script")}
-                className="bg-zinc-900 border-zinc-850 text-sm font-mono focus-visible:ring-zinc-700 placeholder:text-zinc-600 min-h-[120px]"
+                className="border-[#ECECF4] bg-white text-sm font-mono placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] min-h-[120px] rounded-xl"
               />
             </div>
 
-            {/* Hashtags (Comma-separated) */}
+            {/* Hashtags */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Hashtags (comma separated)</label>
+              <FormLabel>Hashtags (comma separated)</FormLabel>
               <Input
                 placeholder="e.g. summerfashion, stylingtips, agency"
                 {...register("hashtagsString")}
-                className="bg-zinc-900 border-zinc-850 text-sm focus-visible:ring-zinc-700 placeholder:text-zinc-600"
+                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] rounded-xl h-10"
               />
             </div>
 
-            {/* Asset URLs (Comma-separated or presigned file upload fallback) */}
+            {/* Asset URLs */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Asset URLs (comma separated)</label>
+              <FormLabel>Asset URLs (comma separated)</FormLabel>
               <Input
                 placeholder="e.g. https://images.unsplash.com/photo-1, https://..."
                 {...register("assetUrlsString")}
-                className="bg-zinc-900 border-zinc-850 text-sm focus-visible:ring-zinc-700 placeholder:text-zinc-600"
+                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] rounded-xl h-10"
               />
-              <span className="text-[10px] text-zinc-500 block">
+              <span className="text-[10px] text-[#9CA3AF] block mt-1">
                 Enter comma-separated public URLs. Full upload directly to R2 bucket will be integrated in Phase 9.
               </span>
             </div>
 
-            {/* Ad Spend & Budget Allocations */}
+            {/* Ad Spend */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Allocated Ad Spend Budget ($)</label>
+              <FormLabel>Allocated Ad Spend Budget ($)</FormLabel>
               <Input
                 type="number"
                 min="0"
                 placeholder="0"
                 {...register("adSpend")}
-                className="bg-zinc-900 border-zinc-850 text-sm focus-visible:ring-zinc-700 placeholder:text-zinc-600"
+                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] rounded-xl h-10"
               />
             </div>
 
-            {/* Team Notes (Admin notes) */}
+            {/* Internal Notes */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">Internal Team Notes</label>
+              <FormLabel>Internal Team Notes</FormLabel>
               <Textarea
                 placeholder="Enter notes visible only to the agency team..."
                 {...register("notes")}
-                className="bg-zinc-900 border-zinc-850 text-sm focus-visible:ring-zinc-700 placeholder:text-zinc-600 min-h-[70px]"
+                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] min-h-[70px] rounded-xl"
               />
             </div>
 
-            {/* Product Mapping List */}
+            {/* Product Mapping */}
             {selectedClientId && (
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center gap-1.5">
-                  <Package className="w-4 h-4 text-zinc-500" /> Link Catalog Products
-                </label>
+                <FormLabel><Package className="w-3 h-3 inline mr-1" />Link Catalog Products</FormLabel>
                 {loadingProducts ? (
-                  <div className="text-zinc-500 text-xs py-1">Loading client catalog...</div>
+                  <div className="text-[#6B7280] text-xs py-1">Loading client catalog...</div>
                 ) : products.length === 0 ? (
-                  <span className="text-zinc-600 text-xs block bg-zinc-950 p-2.5 rounded-lg border border-zinc-900">
+                  <span className="text-[#9CA3AF] text-xs block bg-white border border-[#ECECF4] p-2.5 rounded-lg">
                     No active catalog products found for this client. Create catalog items under Products first.
                   </span>
                 ) : (
-                  <div className="max-h-40 overflow-y-auto divide-y divide-zinc-900 bg-zinc-950 border border-zinc-850 rounded-lg p-2 space-y-1 scrollbar-thin">
+                  <div className="max-h-40 overflow-y-auto divide-y divide-[#ECECF4] bg-white border border-[#ECECF4] rounded-xl p-2 space-y-1 scrollbar-thin">
                     {products.map((p) => {
                       const isLinked = selectedProducts.includes(p.id);
                       return (
@@ -451,14 +444,14 @@ export default function CreateContentSheet({
                           type="button"
                           key={p.id}
                           onClick={() => handleProductToggle(p.id)}
-                          className="w-full flex items-center justify-between p-2 hover:bg-zinc-900 rounded-md text-xs font-medium text-zinc-300 transition-colors"
+                          className="w-full flex items-center justify-between p-2 hover:bg-[#FAFAFD] rounded-lg text-xs font-medium text-[#374151] transition-colors"
                         >
                           <span>{p.name}</span>
                           <span
                             className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide border ${
                               isLinked
-                                ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/25"
-                                : "bg-zinc-900 text-zinc-500 border-zinc-800"
+                                ? "bg-emerald-50 text-emerald-600 border-emerald-200"
+                                : "bg-white text-[#6B7280] border-[#ECECF4]"
                             }`}
                           >
                             {isLinked ? "Linked" : "Link"}
@@ -472,20 +465,19 @@ export default function CreateContentSheet({
             )}
           </div>
 
-          {/* Form Action Buttons */}
-          <SheetFooter className="p-4 bg-zinc-950 border-t border-zinc-850 flex items-center justify-end gap-2 shrink-0">
+          <SheetFooter className="p-4 bg-[#FAFAFD] border-t border-[#ECECF4] flex items-center justify-end gap-2 shrink-0">
             <Button
               type="button"
               variant="ghost"
               onClick={() => onOpenChange(false)}
-              className="text-xs font-semibold text-zinc-400 hover:text-white"
+              className="text-xs font-semibold text-[#6B7280] hover:text-[#111827]"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={saving}
-              className="bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-bold text-xs px-4 h-9 shadow-lg shadow-emerald-500/10 flex items-center gap-1.5"
+              className="bg-[#1E1E2E] hover:bg-[#0E0E1E] text-white font-bold text-xs px-4 h-9 rounded-xl flex items-center gap-1.5"
             >
               {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               <span>{isEditMode ? "Save Changes" : "Create Item"}</span>

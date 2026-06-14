@@ -255,6 +255,9 @@ model Client {
   marketingTheme String?  @map("marketing_theme")
   monthlyBudget  Decimal? @db.Decimal(12, 2) @map("monthly_budget")
 
+  // Admin
+  portalPassword String? @map("portal_password")
+
   // Status
   status      ClientStatus @default(LEAD)
   healthScore Int?         @map("health_score")

@@ -5,9 +5,7 @@ import ClientSettingsForm from "@/components/features/admin/client-settings-form
 export const dynamic = "force-dynamic";
 
 interface SettingsPageProps {
-  params: Promise<{
-    id: string;
-  }>;
+  params: Promise<{ id: string }>;
 }
 
 export default async function ClientSettingsPage({ params }: SettingsPageProps) {
@@ -23,12 +21,13 @@ export default async function ClientSettingsPage({ params }: SettingsPageProps) 
           email: true,
         },
       },
+      socialAccounts: {
+        orderBy: { platform: "asc" },
+      },
     },
   });
 
-  if (!client) {
-    notFound();
-  }
+  if (!client) notFound();
 
   return <ClientSettingsForm client={client} />;
 }

@@ -2,7 +2,6 @@ import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
 import ContentPageContent from "@/components/features/admin/content-page-content";
 import { ContentStatus, Platform, ClientStatus, Prisma } from "@prisma/client";
-import { format } from "date-fns";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +29,6 @@ export default async function ContentPage({ searchParams }: PageProps) {
   const filterStatus = params.filterStatus || "all";
   const month = params.month || "";
 
-  // 1. Build Query Filters
   const where: Prisma.ContentWhereInput = {};
 
   if (filterClient !== "all") {
@@ -53,7 +51,6 @@ export default async function ContentPage({ searchParams }: PageProps) {
     ];
   }
 
-  // If calendar view is selected, restrict content to the active month
   if (view === "calendar") {
     let year: number;
     let monthIdx: number;
@@ -73,77 +70,67 @@ export default async function ContentPage({ searchParams }: PageProps) {
 
     where.OR = [
       {
-        scheduledAt: {
-          gte: startOfMonth,
-          lte: endOfMonth,
-        },
+        scheduledAt: { gte: startOfMonth, lte: endOfMonth },
       },
       {
-        publishDate: {
-          gte: startOfMonth,
-          lte: endOfMonth,
-        },
+        publishDate: { gte: startOfMonth, lte: endOfMonth },
       },
     ];
   }
 
-  // 2. Execute Data Queries
-  const [contents, pendingContents, clients] = await Promise.all([
-    // Main content listing query
+  const [contents, pendingContents, clients, allContents] = await Promise.all([
     prisma.content.findMany({
       where,
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: { createdAt: "desc" },
       include: {
-        client: {
-          select: {
-            brandName: true,
-            logoUrl: true,
-          },
-        },
+        client: { select: { brandName: true, logoUrl: true } },
+        analytics: true,
       },
     }),
-    // Pending approvals listing (oldest first)
     prisma.content.findMany({
-      where: {
-        status: ContentStatus.CLIENT_APPROVAL_PENDING,
-      },
-      orderBy: {
-        updatedAt: "asc",
-      },
+      where: { status: ContentStatus.CLIENT_APPROVAL_PENDING },
+      orderBy: { updatedAt: "asc" },
       include: {
-        client: {
-          select: {
-            brandName: true,
-          },
-        },
+        client: { select: { brandName: true } },
       },
     }),
-    // Clients list for filter dropdown
     prisma.client.findMany({
-      where: {
-        status: {
-          not: ClientStatus.ARCHIVED,
-        },
-      },
-      select: {
-        id: true,
-        brandName: true,
-      },
-      orderBy: {
-        brandName: "asc",
-      },
+      where: { status: { not: ClientStatus.ARCHIVED } },
+      select: { id: true, brandName: true },
+      orderBy: { brandName: "asc" },
+    }),
+    prisma.content.findMany({
+      select: { status: true },
     }),
   ]);
 
-  // 3. Format Data for Client Component serialization
+  // Status summary
+  const totalItems = allContents.length;
+  const published = allContents.filter(c => c.status === "POSTED").length;
+  const scheduled = allContents.filter(c => c.status === "SCHEDULED" || c.status === "APPROVED").length;
+  const drafts = allContents.filter(c => c.status === "DRAFT" || c.status === "IDEA").length;
+  const needsReview = allContents.filter(c => c.status === "CLIENT_APPROVAL_PENDING").length;
+
+  const statusSummary = {
+    total: totalItems,
+    published,
+    publishedPct: totalItems > 0 ? (published / totalItems) * 100 : 0,
+    scheduled,
+    scheduledPct: totalItems > 0 ? (scheduled / totalItems) * 100 : 0,
+    drafts,
+    draftsPct: totalItems > 0 ? (drafts / totalItems) * 100 : 0,
+    needsReview,
+    needsReviewPct: totalItems > 0 ? (needsReview / totalItems) * 100 : 0,
+  };
+
   const formattedContents = contents.map((c) => ({
     id: c.id,
     title: c.title,
+    topic: c.topic || "",
     platform: c.platform,
     contentType: c.contentType,
     status: c.status,
+    hashtags: c.hashtags,
     scheduledAt: c.scheduledAt ? c.scheduledAt.toISOString() : null,
     publishDate: c.publishDate ? c.publishDate.toISOString() : null,
     adSpend: c.adSpend ? Number(c.adSpend) : null,
@@ -151,14 +138,22 @@ export default async function ContentPage({ searchParams }: PageProps) {
     clientId: c.clientId,
     assetUrls: c.assetUrls,
     updatedAt: c.updatedAt.toISOString(),
+    views: Number(c.analytics?.views || 0),
+    reach: Number(c.analytics?.reach || 0),
+    likes: c.analytics?.likes || 0,
+    comments: c.analytics?.comments || 0,
+    shares: c.analytics?.shares || 0,
+    engagementRate: c.analytics ? Number(c.analytics.engagementRate) : 0,
   }));
 
   const formattedPending = pendingContents.map((c) => ({
     id: c.id,
     title: c.title,
+    topic: c.topic || "",
     platform: c.platform,
     contentType: c.contentType,
     status: c.status,
+    hashtags: c.hashtags,
     scheduledAt: c.scheduledAt ? c.scheduledAt.toISOString() : null,
     publishDate: c.publishDate ? c.publishDate.toISOString() : null,
     adSpend: c.adSpend ? Number(c.adSpend) : null,
@@ -166,6 +161,12 @@ export default async function ContentPage({ searchParams }: PageProps) {
     clientId: c.clientId,
     assetUrls: c.assetUrls,
     updatedAt: c.updatedAt.toISOString(),
+    views: 0,
+    reach: 0,
+    likes: 0,
+    comments: 0,
+    shares: 0,
+    engagementRate: 0,
   }));
 
   const sessionUser = {
@@ -179,6 +180,7 @@ export default async function ContentPage({ searchParams }: PageProps) {
       initialContents={formattedContents}
       pendingContents={formattedPending}
       clients={clients}
+      statusSummary={statusSummary}
       user={sessionUser}
     />
   );

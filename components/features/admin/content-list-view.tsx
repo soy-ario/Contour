@@ -2,61 +2,41 @@
 
 import * as React from "react";
 import type { Platform, ContentStatus, ContentType } from "@prisma/client";
-import {
-  ColumnDef,
-  SortingState,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Skeleton } from "@/components/ui/skeleton";
+import { cn, formatDate } from "@/lib/utils";
+import { PLATFORM_LABELS, CONTENT_TYPE_LABELS, CONTENT_STATUS_LABELS } from "@/types";
 import { PlatformIcon } from "@/components/shared/social-icons";
-import { formatCurrency, formatDate } from "@/lib/utils";
-import { CONTENT_TYPE_LABELS, CONTENT_STATUS_LABELS } from "@/types";
 import {
   MoreHorizontal,
-  Eye,
-  Edit,
-  Send,
-  CheckCircle,
-  CalendarDays,
-  Trash2,
+  BarChart3,
   FileText,
 } from "lucide-react";
 
 interface ContentItem {
   id: string;
   title: string;
+  topic: string;
   platform: Platform;
   contentType: ContentType;
   status: ContentStatus;
-  scheduledAt: string | Date | null;
-  publishDate: string | Date | null;
+  hashtags: string[];
+  scheduledAt: string | null;
+  publishDate: string | null;
   adSpend: number | null;
   clientBrandName?: string;
   clientId: string;
+  assetUrls: string[];
+  updatedAt: string;
+  views: number;
+  reach: number;
+  likes: number;
+  comments: number;
+  shares: number;
+  engagementRate: number;
 }
 
 interface ContentListViewProps {
   data: ContentItem[];
   loading?: boolean;
-  showClient?: boolean;
   onViewDetails: (contentId: string) => void;
   onEdit?: (contentId: string) => void;
   onSubmitApproval?: (contentId: string) => void;
@@ -66,43 +46,58 @@ interface ContentListViewProps {
   isAdmin?: boolean;
 }
 
-const STATUS_VARIANTS: Record<string, { bg: string; text: string }> = {
-  DRAFT: { bg: "bg-[#F5F5F5]", text: "text-[#6B6B80]" },
-  IDEA: { bg: "bg-[#F5F5F5]", text: "text-[#6B6B80]" },
-  CLIENT_APPROVAL_PENDING: { bg: "bg-[#FFF4EC]", text: "text-[#E07A2F]" },
-  APPROVED: { bg: "bg-[#EEF0FF]", text: "text-[#5B5EEF]" },
-  SCHEDULED: { bg: "bg-[#F0EEFF]", text: "text-[#7C5BEF]" },
-  POSTED: { bg: "bg-[#EEFAF3]", text: "text-[#27AE60]" },
-  REJECTED: { bg: "bg-rose-50", text: "text-rose-500" },
+// ─── Status Styles ───────────────────────────────────────────────────────────
+
+const STATUS_STYLES: Record<string, { dot: string; bg: string; text: string }> = {
+  POSTED: { dot: "bg-[#16A34A]", bg: "bg-emerald-50 text-emerald-700 border-emerald-200", text: "Published" },
+  SCHEDULED: { dot: "bg-[#2563EB]", bg: "bg-blue-50 text-blue-700 border-blue-200", text: "Scheduled" },
+  APPROVED: { dot: "bg-[#2563EB]", bg: "bg-blue-50 text-blue-700 border-blue-200", text: "Approved" },
+  DRAFT: { dot: "bg-[#F59E0B]", bg: "bg-amber-50 text-amber-700 border-amber-200", text: "Draft" },
+  IDEA: { dot: "bg-[#F59E0B]", bg: "bg-amber-50 text-amber-700 border-amber-200", text: "Idea" },
+  CLIENT_APPROVAL_PENDING: { dot: "bg-[#EC4899]", bg: "bg-pink-50 text-pink-700 border-pink-200", text: "Needs Review" },
+  REJECTED: { dot: "bg-[#EF4444]", bg: "bg-red-50 text-red-700 border-red-200", text: "Rejected" },
 };
 
 function StatusPill({ status }: { status: ContentStatus }) {
-  const variant = STATUS_VARIANTS[status] || STATUS_VARIANTS.DRAFT;
-  const label = CONTENT_STATUS_LABELS[status] || status.replace(/_/g, " ");
+  const style = STATUS_STYLES[status] || STATUS_STYLES.DRAFT;
   return (
-    <span
-      className={`inline-flex items-center h-7 px-2.5 rounded-full text-[11px] font-semibold ${variant.bg} ${variant.text}`}
-    >
-      {label}
+    <span className={`inline-flex items-center gap-1.5 h-7 px-2.5 rounded-full text-xs font-semibold ${style.bg}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${style.dot}`} />
+      {style.text}
     </span>
   );
 }
 
-const CONTENT_TYPE_COLORS: Record<string, { bg: string; text: string }> = {
-  REEL: { bg: "bg-purple-50", text: "text-purple-700" },
-  POST: { bg: "bg-blue-50", text: "text-blue-700" },
-  STORY: { bg: "bg-orange-50", text: "text-orange-700" },
-  VIDEO: { bg: "bg-emerald-50", text: "text-emerald-700" },
-  CAROUSEL: { bg: "bg-pink-50", text: "text-pink-700" },
-  THREAD: { bg: "bg-indigo-50", text: "text-indigo-700" },
-  SHORT: { bg: "bg-amber-50", text: "text-amber-700" },
-  LIVE: { bg: "bg-red-50", text: "text-red-700" },
+// ─── Content Type Colors ─────────────────────────────────────────────────────
+
+const TYPE_STYLES: Record<string, { bg: string; text: string; icon: string }> = {
+  REEL: { bg: "bg-purple-50", text: "text-purple-700", icon: "▶" },
+  POST: { bg: "bg-blue-50", text: "text-blue-700", icon: "□" },
+  STORY: { bg: "bg-orange-50", text: "text-orange-700", icon: "◎" },
+  VIDEO: { bg: "bg-emerald-50", text: "text-emerald-700", icon: "▶" },
+  CAROUSEL: { bg: "bg-pink-50", text: "text-pink-700", icon: "▤" },
+  THREAD: { bg: "bg-indigo-50", text: "text-indigo-700", icon: "≡" },
+  SHORT: { bg: "bg-amber-50", text: "text-amber-700", icon: "▶" },
+  LIVE: { bg: "bg-red-50", text: "text-red-700", icon: "●" },
 };
+
+// ─── Platform icon only (no text) ───────────────────────────────────────────
+
+// ─── Number formatting ──────────────────────────────────────────────────────
+
+function fmtShort(n: number): string {
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
+  if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
+  return String(n);
+}
+
+// ─── Pagination ─────────────────────────────────────────────────────────────
+
+const PAGE_SIZE = 20;
 
 export default function ContentListView({
   data,
   loading = false,
-  showClient = false,
   onViewDetails,
   onEdit,
   onSubmitApproval,
@@ -111,227 +106,26 @@ export default function ContentListView({
   onDelete,
   isAdmin = true,
 }: ContentListViewProps) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [page, setPage] = React.useState(0);
+  const totalPages = Math.max(1, Math.ceil(data.length / PAGE_SIZE));
+  const pagedData = data.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
-  const columns = React.useMemo<ColumnDef<ContentItem>[]>(() => {
-    const cols: ColumnDef<ContentItem>[] = [
-      {
-        id: "thumbnail",
-        size: 60,
-        header: "",
-        cell: ({ row }) => {
-          const type = row.original.contentType;
-          const color = CONTENT_TYPE_COLORS[type] || { bg: "bg-[#F5F5F5]", text: "text-[#6B6B80]" };
-          return (
-            <div className={`w-10 h-10 rounded-lg ${color.bg} flex items-center justify-center`}>
-              <FileText className={`w-4 h-4 ${color.text}`} />
-            </div>
-          );
-        },
-      },
-      {
-        accessorKey: "title",
-        header: "Content",
-        cell: ({ row }) => {
-          const content = row.original;
-          return (
-            <div className="flex flex-col min-w-0">
-              <button
-                onClick={() => onViewDetails(content.id)}
-                className="text-sm font-semibold text-[#111827] hover:text-[#5B7A1A] transition-colors truncate text-left focus:outline-none"
-              >
-                {content.title}
-              </button>
-              <span className="text-[12px] text-[#9CA3AF] mt-0.5">
-                {PLATFORM_LABELS[content.platform] || content.platform.toLowerCase()}
-              </span>
-            </div>
-          );
-        },
-      },
-      {
-        accessorKey: "platform",
-        header: "Platform",
-        cell: ({ row }) => {
-          const platform = row.getValue("platform") as Platform;
-          return (
-            <div className="flex items-center gap-2">
-              <PlatformIcon platform={platform} className="w-4 h-4 shrink-0" />
-              <span className="text-[13px] text-[#6B7280] font-medium">
-                {PLATFORM_LABELS[platform] || platform.toLowerCase()}
-              </span>
-            </div>
-          );
-        },
-      },
-      {
-        accessorKey: "contentType",
-        header: "Type",
-        cell: ({ row }) => {
-          const type = row.getValue("contentType") as ContentType;
-          const color = CONTENT_TYPE_COLORS[type] || { bg: "bg-[#F5F5F5]", text: "text-[#6B6B80]" };
-          return (
-            <span className={`inline-flex items-center h-6 px-2 rounded text-[11px] font-semibold ${color.bg} ${color.text}`}>
-              {CONTENT_TYPE_LABELS[type] || type}
-            </span>
-          );
-        },
-      },
-    ];
-
-    if (showClient) {
-      cols.push({
-        accessorKey: "clientBrandName",
-        header: "Client",
-        cell: ({ row }) => (
-          <span className="text-[13px] font-semibold text-[#6B7280]">
-            {row.original.clientBrandName || "—"}
-          </span>
-        ),
-      });
-    }
-
-    cols.push(
-      {
-        accessorKey: "status",
-        header: "Status",
-        cell: ({ row }) => <StatusPill status={row.getValue("status") as ContentStatus} />,
-      },
-      {
-        accessorKey: "scheduledAt",
-        header: "Publish Date",
-        cell: ({ row }) => {
-          const date = row.original.scheduledAt || row.original.publishDate;
-          if (!date) return <span className="text-[13px] text-[#9CA3AF]">Unscheduled</span>;
-          return (
-            <span className="text-[13px] text-[#6B7280] whitespace-nowrap">
-              {formatDate(date, "MMM dd, yyyy")}
-            </span>
-          );
-        },
-      },
-      {
-        accessorKey: "adSpend",
-        header: "Ad Spend",
-        cell: ({ row }) => {
-          const spend = row.getValue("adSpend") as number | null;
-          if (spend === null || spend === 0) return <span className="text-[13px] text-[#9CA3AF]">—</span>;
-          return (
-            <span className="text-[13px] font-semibold text-[#111827]">
-              {formatCurrency(spend)}
-            </span>
-          );
-        },
-      },
-      {
-        id: "actions",
-        cell: ({ row }) => {
-          const content = row.original;
-          const isDraft = content.status === "DRAFT" || content.status === "IDEA";
-          const isPending = content.status === "CLIENT_APPROVAL_PENDING";
-          const isApproved = content.status === "APPROVED";
-
-          return (
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={
-                  <button className="flex items-center justify-center w-8 h-8 rounded-lg border border-[#ECECF4] text-[#9CA3AF] hover:text-[#111827] hover:border-[#C5F135] bg-white transition-all">
-                    <MoreHorizontal className="w-3.5 h-3.5" />
-                  </button>
-                }
-              />
-              <DropdownMenuContent align="end" className="w-44 border-[#ECECF4] bg-white text-[#111827] rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
-                <DropdownMenuItem onClick={() => onViewDetails(content.id)} className="flex items-center cursor-pointer text-[13px]">
-                  <Eye className="w-3.5 h-3.5 mr-2 text-[#6B7280]" />
-                  View Details
-                </DropdownMenuItem>
-
-                {onEdit && isDraft && (
-                  <DropdownMenuItem onClick={() => onEdit(content.id)} className="flex items-center cursor-pointer text-[13px]">
-                    <Edit className="w-3.5 h-3.5 mr-2 text-[#6B7280]" />
-                    Edit Details
-                  </DropdownMenuItem>
-                )}
-
-                {onSubmitApproval && content.status === "DRAFT" && isAdmin && (
-                  <DropdownMenuItem onClick={() => onSubmitApproval(content.id)} className="flex items-center text-amber-600 focus:text-amber-700 focus:bg-amber-50 cursor-pointer text-[13px]">
-                    <Send className="w-3.5 h-3.5 mr-2" />
-                    Submit Approval
-                  </DropdownMenuItem>
-                )}
-
-                {onApprove && isPending && (
-                  <DropdownMenuItem onClick={() => onApprove(content.id)} className="flex items-center text-emerald-600 focus:text-emerald-700 focus:bg-emerald-50 cursor-pointer text-[13px]">
-                    <CheckCircle className="w-3.5 h-3.5 mr-2" />
-                    Approve Content
-                  </DropdownMenuItem>
-                )}
-
-                {onSchedule && isApproved && isAdmin && (
-                  <DropdownMenuItem onClick={() => onSchedule(content.id)} className="flex items-center text-blue-600 focus:text-blue-700 focus:bg-blue-50 cursor-pointer text-[13px]">
-                    <CalendarDays className="w-3.5 h-3.5 mr-2" />
-                    Schedule Post
-                  </DropdownMenuItem>
-                )}
-
-                {onDelete && (content.status === "IDEA" || content.status === "DRAFT") && isAdmin && (
-                  <>
-                    <DropdownMenuSeparator className="bg-[#ECECF4]" />
-                    <DropdownMenuItem
-                      onClick={() => onDelete(content.id)}
-                      className="flex items-center text-rose-500 focus:text-rose-600 focus:bg-rose-50 cursor-pointer text-[13px]"
-                    >
-                      <Trash2 className="w-3.5 h-3.5 mr-2" />
-                      Delete Item
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          );
-        },
-      }
-    );
-
-    return cols;
-  }, [showClient, onViewDetails, onEdit, onSubmitApproval, onApprove, onSchedule, onDelete, isAdmin]);
-
-  const table = useReactTable({
-    data,
-    columns,
-    state: { sorting },
-    onSortingChange: setSorting,
-    getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-  });
+  // Reset page when data changes
+  React.useEffect(() => { setPage(0); }, [data.length]);
 
   if (loading) {
     return (
-      <div className="bg-white border border-[#ECECF4] rounded-[24px] p-6">
-        <div className="bg-[#FAFAFC] rounded-[14px] p-4 border border-[#ECECF4]">
-          <div className="grid grid-cols-8 gap-4">
-            <Skeleton className="h-4 w-10 bg-[#E5E7EB]" />
-            <Skeleton className="h-4 w-32 bg-[#E5E7EB]" />
-            <Skeleton className="h-4 w-20 bg-[#E5E7EB]" />
-            <Skeleton className="h-4 w-16 bg-[#E5E7EB]" />
-            <Skeleton className="h-4 w-24 bg-[#E5E7EB]" />
-            <Skeleton className="h-4 w-24 bg-[#E5E7EB]" />
-            <Skeleton className="h-4 w-24 bg-[#E5E7EB]" />
-            <Skeleton className="h-4 w-8 bg-[#E5E7EB]" />
-          </div>
+      <div className="bg-white border border-[#ECECF4] rounded-[20px] overflow-hidden">
+        <div className="h-14 bg-[#FAFAFC] border-b border-[#ECECF4] flex items-center px-5 gap-6">
+          {[...Array(9)].map((_, i) => (
+            <div key={i} className="h-3 bg-gray-200 rounded" style={{ width: i === 0 ? 280 : i === 8 ? 100 : 80 }} />
+          ))}
         </div>
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="py-4 border-b border-[#F0F1F5] last:border-0">
-            <div className="grid grid-cols-8 gap-4 items-center">
-              <Skeleton className="w-10 h-10 rounded-lg bg-[#F5F5F5]" />
-              <Skeleton className="h-4 w-48 bg-[#F5F5F5]" />
-              <Skeleton className="h-4 w-16 bg-[#F5F5F5]" />
-              <Skeleton className="h-5 w-12 bg-[#F5F5F5] rounded" />
-              <Skeleton className="h-7 w-24 bg-[#F5F5F5] rounded-full" />
-              <Skeleton className="h-4 w-24 bg-[#F5F5F5]" />
-              <Skeleton className="h-4 w-16 bg-[#F5F5F5]" />
-              <Skeleton className="h-8 w-8 bg-[#F5F5F5] rounded-lg" />
-            </div>
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="h-20 border-b border-[#F1F5F9] flex items-center px-5 gap-6 last:border-b-0">
+            <div className="w-14 h-14 rounded-xl bg-gray-100 shrink-0" />
+            <div className="w-40 h-4 bg-gray-100 rounded" />
+            <div className="w-8 h-8 bg-gray-100 rounded-full ml-auto" />
           </div>
         ))}
       </div>
@@ -340,76 +134,227 @@ export default function ContentListView({
 
   if (data.length === 0) {
     return (
-      <div className="bg-white border border-[#ECECF4] rounded-[24px] p-6">
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="w-16 h-16 rounded-full bg-[#F4F4FA] flex items-center justify-center mb-4">
-            <FileText className="w-7 h-7 text-[#9CA3AF]" />
+      <div className="bg-white border border-[#ECECF4] rounded-[20px] overflow-hidden">
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="w-14 h-14 rounded-full bg-[#F4F4FA] flex items-center justify-center mb-4">
+            <FileText className="w-6 h-6 text-[#9CA3AF]" />
           </div>
-          <h3 className="text-lg font-bold text-[#111827]">No content items found</h3>
-          <p className="text-sm text-[#6B7280] mt-1 mb-5 max-w-sm">
-            Create your first content item to start managing campaigns.
-          </p>
+          <h3 className="text-base font-bold text-[#111827]">No content items found</h3>
+          <p className="text-sm text-[#6B7280] mt-1">Create your first content item to get started.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white border border-[#ECECF4] rounded-[24px] p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h2 className="text-[24px] font-bold text-[#111827] leading-tight tracking-tight">
-            Content Registry
-          </h2>
-          <p className="text-[14px] text-[#6B7280] mt-0.5">
-            Track content production across all clients.
-          </p>
-        </div>
+    <div className="bg-white border border-[#ECECF4] rounded-[20px] overflow-hidden">
+      {/* ─── Table ──────────────────────────────────────────────────────── */}
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          {/* Header */}
+          <thead>
+            <tr className="h-14 bg-[#FAFAFC] border-b border-[#ECECF4]">
+              <th className="text-[12px] font-semibold text-[#6B7280] uppercase tracking-wider text-left px-5 py-0 w-[280px]">Content</th>
+              <th className="text-[12px] font-semibold text-[#6B7280] uppercase tracking-wider text-center px-4 py-0 w-[80px]">Platform</th>
+              <th className="text-[12px] font-semibold text-[#6B7280] uppercase tracking-wider text-left px-4 py-0 w-[110px]">Type</th>
+              <th className="text-[12px] font-semibold text-[#6B7280] uppercase tracking-wider text-left px-4 py-0 w-[150px]">Campaign</th>
+              <th className="text-[12px] font-semibold text-[#6B7280] uppercase tracking-wider text-left px-4 py-0 w-[130px]">Status</th>
+              <th className="text-[12px] font-semibold text-[#6B7280] uppercase tracking-wider text-left px-4 py-0 w-[150px]">Published / Scheduled</th>
+              <th className="text-[12px] font-semibold text-[#6B7280] uppercase tracking-wider text-right px-4 py-0 w-[110px]">Engagement</th>
+              <th className="text-[12px] font-semibold text-[#6B7280] uppercase tracking-wider text-right px-4 py-0 w-[90px]">Reach</th>
+              <th className="text-[12px] font-semibold text-[#6B7280] uppercase tracking-wider text-center px-4 py-0 w-[100px]">Actions</th>
+            </tr>
+          </thead>
+          {/* Body */}
+          <tbody>
+            {pagedData.map((item, idx) => {
+              const thumbnail = item.assetUrls?.[0] || null;
+              const typeStyle = TYPE_STYLES[item.contentType] || TYPE_STYLES.POST;
+              const hasPendingAction = item.status === "DRAFT" || item.status === "IDEA";
+              const hasApproveAction = item.status === "CLIENT_APPROVAL_PENDING";
+              const dateVal = item.publishDate || item.scheduledAt;
+              const dateObj = dateVal ? new Date(dateVal) : null;
+              const totalEngagements = item.likes + item.comments + item.shares;
+              const engagementPct = item.engagementRate * 100;
+
+              return (
+                <tr
+                  key={item.id}
+                  className={cn(
+                    "h-20 border-b border-[#F1F5F9] hover:bg-[#FAFAFC] transition-colors cursor-pointer",
+                    idx === pagedData.length - 1 && "border-b-0"
+                  )}
+                  onClick={() => onViewDetails(item.id)}
+                >
+                  {/* Content */}
+                  <td className="px-5 py-0">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {/* Thumbnail */}
+                      <div className="w-14 h-14 rounded-xl bg-[#F4F4FA] overflow-hidden shrink-0 border border-[#ECECF4]">
+                        {thumbnail ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={thumbnail} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <div className={`w-full h-full flex items-center justify-center ${typeStyle.bg}`}>
+                            <FileText className={`w-5 h-5 ${typeStyle.text}`} />
+                          </div>
+                        )}
+                      </div>
+                      {/* Title + metadata */}
+                      <div className="min-w-0">
+                        <span className="text-sm font-semibold text-[#111827] block truncate">
+                          {item.title}
+                        </span>
+                        {item.hashtags && item.hashtags.length > 0 && (
+                          <span className="text-[11px] text-[#9CA3AF] block mt-0.5 truncate">
+                            #{item.hashtags.slice(0, 3).join("  #")}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </td>
+
+                  {/* Platform */}
+                  <td className="px-4 py-0 text-center">
+                    <PlatformIcon platform={item.platform} className="w-5 h-5 mx-auto text-[#6B7280]" />
+                  </td>
+
+                  {/* Type */}
+                  <td className="px-4 py-0">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-6 h-6 rounded-md ${typeStyle.bg} flex items-center justify-center`}>
+                        <span className={`text-[10px] font-bold ${typeStyle.text}`}>{typeStyle.icon}</span>
+                      </div>
+                      <span className="text-sm font-medium text-[#6B7280]">
+                        {CONTENT_TYPE_LABELS[item.contentType] || item.contentType}
+                      </span>
+                    </div>
+                  </td>
+
+                  {/* Campaign */}
+                  <td className="px-4 py-0">
+                    <span className="text-sm font-medium text-[#6B7280]">
+                      {item.topic || "—"}
+                    </span>
+                  </td>
+
+                  {/* Status */}
+                  <td className="px-4 py-0">
+                    <StatusPill status={item.status} />
+                  </td>
+
+                  {/* Date */}
+                  <td className="px-4 py-0">
+                    {dateObj ? (
+                      <div>
+                        <span className="text-sm font-semibold text-[#111827] block leading-tight">
+                          {dateObj.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                        </span>
+                        <span className="text-[12px] text-[#9CA3AF] block mt-0.5">
+                          {dateObj.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-[#9CA3AF]">Unscheduled</span>
+                    )}
+                  </td>
+
+                  {/* Engagement */}
+                  <td className="px-4 py-0 text-right">
+                    <span className="text-sm font-semibold text-[#111827] block leading-tight">
+                      {engagementPct > 0 ? `${engagementPct.toFixed(1)}%` : "—"}
+                    </span>
+                    {totalEngagements > 0 && (
+                      <span className="text-[12px] text-[#9CA3AF] block mt-0.5">
+                        {fmtShort(totalEngagements)}
+                      </span>
+                    )}
+                  </td>
+
+                  {/* Reach */}
+                  <td className="px-4 py-0 text-right">
+                    <span className="text-sm font-semibold text-[#111827]">
+                      {item.reach > 0 ? fmtShort(item.reach) : "—"}
+                    </span>
+                  </td>
+
+                  {/* Actions */}
+                  <td className="px-4 py-0 text-center">
+                    <div className="flex items-center justify-center gap-1">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onViewDetails(item.id); }}
+                        className="w-10 h-10 flex items-center justify-center rounded-lg text-[#9CA3AF] hover:text-[#6B7280] hover:bg-[#F4F4FA] transition-all"
+                        title="View analytics"
+                      >
+                        <BarChart3 className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); }}
+                        className="w-10 h-10 flex items-center justify-center rounded-lg text-[#9CA3AF] hover:text-[#6B7280] hover:bg-[#F4F4FA] transition-all"
+                        title="More actions"
+                      >
+                        <MoreHorizontal className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
-      <div className="overflow-hidden">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="border-0 hover:bg-transparent">
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    className="bg-[#FAFAFC] text-[#6B7280] font-semibold text-[11px] uppercase tracking-wider h-[52px] first:rounded-l-[14px] last:rounded-r-[14px] px-4"
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                className="border-b border-[#F0F1F5] last:border-0 hover:bg-[#FAFAFC] transition-colors"
-                style={{ height: 72 }}
+
+      {/* ─── Footer ──────────────────────────────────────────────────────── */}
+      <div className="h-14 bg-white border-t border-[#ECECF4] flex items-center justify-between px-5">
+        <span className="text-xs text-[#6B7280]">
+          Showing {page * PAGE_SIZE + 1} to {Math.min((page + 1) * PAGE_SIZE, data.length)} of {data.length} content items
+        </span>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setPage(Math.max(0, page - 1))}
+            disabled={page === 0}
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold text-[#6B7280] hover:bg-[#F4F4FA] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          >
+            &lt;
+          </button>
+          {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+            const pageNum = i;
+            return (
+              <button
+                key={pageNum}
+                onClick={() => setPage(pageNum)}
+                className={cn(
+                  "w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold transition-all",
+                  page === pageNum ? "bg-[#C5F135] text-[#111827]" : "text-[#6B7280] hover:bg-[#F4F4FA]"
+                )}
               >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="py-0 px-4 align-middle">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                {pageNum + 1}
+              </button>
+            );
+          })}
+          {totalPages > 5 && (
+            <>
+              <span className="w-8 h-8 flex items-center justify-center text-xs text-[#9CA3AF]">...</span>
+              <button
+                onClick={() => setPage(totalPages - 1)}
+                className={cn(
+                  "w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold transition-all",
+                  page === totalPages - 1 ? "bg-[#C5F135] text-[#111827]" : "text-[#6B7280] hover:bg-[#F4F4FA]"
+                )}
+              >
+                {totalPages}
+              </button>
+            </>
+          )}
+          <button
+            onClick={() => setPage(Math.min(totalPages - 1, page + 1))}
+            disabled={page >= totalPages - 1}
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold text-[#6B7280] hover:bg-[#F4F4FA] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          >
+            &gt;
+          </button>
+        </div>
       </div>
     </div>
   );
 }
-
-const PLATFORM_LABELS: Record<string, string> = {
-  INSTAGRAM: "Instagram",
-  FACEBOOK: "Facebook",
-  LINKEDIN: "LinkedIn",
-  TIKTOK: "TikTok",
-  YOUTUBE: "YouTube",
-  X: "X",
-};

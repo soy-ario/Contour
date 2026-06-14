@@ -229,8 +229,12 @@ export default function ClientListTable({
                 </DropdownMenuItem>
                 {onEdit && (
                   <DropdownMenuItem
-                    onClick={() => onEdit(client)}
-                    className="flex items-center cursor-pointer"
+                    render={
+                      <Link
+                        href={`/admin/clients/${client.id}/settings`}
+                        className="flex items-center cursor-pointer"
+                      />
+                    }
                   >
                     <Edit className="w-4 h-4 mr-2" />
                     Edit Client

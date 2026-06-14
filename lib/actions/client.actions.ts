@@ -292,6 +292,11 @@ export async function createClientUserAction(clientId: string, username: string,
       },
     });
 
+    await prisma.client.update({
+      where: { id: clientId },
+      data: { portalPassword: password },
+    });
+
     await createAuditLog({
       actorId: user.id,
       action: "CLIENT_USER_CREATED",
@@ -312,5 +317,72 @@ export async function createClientUserAction(clientId: string, username: string,
     console.error("[createClientUserAction] Error:", error);
     const msg = error instanceof Error ? error.message : "An unexpected error occurred.";
     return { success: false, error: msg };
+  }
+}
+
+export async function resetClientPasswordAction(clientId: string) {
+  try {
+    const user = await requireAdmin();
+
+    const client = await prisma.client.findUnique({ where: { id: clientId } });
+    if (!client) return { success: false, error: "Client not found." };
+
+    const clientUser = await prisma.user.findFirst({ where: { clientId } });
+    if (!clientUser) return { success: false, error: "No portal user exists for this client." };
+
+    const newPassword = `Contour#${String(Date.now()).slice(-6)}!X8`;
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: clientUser.id },
+        data: { passwordHash },
+      }),
+      prisma.account.updateMany({
+        where: { userId: clientUser.id, providerId: "credential" },
+        data: { password: passwordHash },
+      }),
+      prisma.client.update({
+        where: { id: clientId },
+        data: { portalPassword: newPassword },
+      }),
+    ]);
+
+    await createAuditLog({
+      actorId: user.id,
+      action: "CLIENT_USER_PASSWORD_RESET",
+      entityType: "User",
+      entityId: clientUser.id,
+      afterSnapshot: { username: clientUser.username, clientId },
+    });
+
+    return { success: true, password: newPassword, username: clientUser.username };
+  } catch (error) {
+    console.error("[resetClientPasswordAction] Error:", error);
+    return { success: false, error: "Failed to reset password." };
+  }
+}
+
+export async function deleteClientAction(clientId: string) {
+  try {
+    const admin = await requireAdmin();
+
+    const client = await prisma.client.findUnique({ where: { id: clientId } });
+    if (!client) return { success: false, error: "Client not found." };
+
+    await prisma.client.delete({ where: { id: clientId } });
+
+    await createAuditLog({
+      actorId: admin.id,
+      action: "CLIENT_DELETED",
+      entityType: "Client",
+      entityId: clientId,
+      beforeSnapshot: { brandName: client.brandName },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("[deleteClientAction] Error:", error);
+    return { success: false, error: "Failed to delete client." };
   }
 }

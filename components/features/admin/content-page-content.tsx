@@ -4,15 +4,12 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import type { Platform, ContentStatus, ContentType } from "@prisma/client";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ContentListView from "@/components/features/admin/content-list-view";
 import ContentCalendarView from "@/components/features/admin/content-calendar-view";
-import ApprovalQueuePanel from "@/components/features/admin/approval-queue-panel";
 import ContentDetailSheet from "@/components/features/admin/content-detail-sheet";
 import CreateContentSheet from "@/components/features/admin/create-content-sheet";
-import PageShell from "@/components/layout/page-shell";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import {
@@ -20,34 +17,61 @@ import {
   CalendarDays,
   Plus,
   Search,
+  FileText,
+  CheckCircle2,
+  Clock,
+  FileEdit,
+  AlertCircle,
+  ChevronDown,
 } from "lucide-react";
 import { PLATFORM_LABELS, CONTENT_STATUS_LABELS } from "@/types";
+
+interface ContentItem {
+  id: string;
+  title: string;
+  topic: string;
+  platform: Platform;
+  contentType: ContentType;
+  status: ContentStatus;
+  hashtags: string[];
+  scheduledAt: string | null;
+  publishDate: string | null;
+  adSpend: number | null;
+  clientBrandName?: string;
+  clientId: string;
+  assetUrls: string[];
+  updatedAt: string;
+  views: number;
+  reach: number;
+  likes: number;
+  comments: number;
+  shares: number;
+  engagementRate: number;
+}
+
+interface StatusSummary {
+  total: number;
+  published: number;
+  publishedPct: number;
+  scheduled: number;
+  scheduledPct: number;
+  drafts: number;
+  draftsPct: number;
+  needsReview: number;
+  needsReviewPct: number;
+}
 
 interface ClientOption {
   id: string;
   brandName: string;
 }
 
-interface ContentItem {
-  id: string;
-  title: string;
-  platform: Platform;
-  contentType: ContentType;
-  status: ContentStatus;
-  scheduledAt: string | Date | null;
-  publishDate: string | Date | null;
-  adSpend: number | null;
-  clientBrandName?: string;
-  clientId: string;
-  assetUrls: string[];
-  updatedAt: string | Date;
-}
-
 interface ContentPageContentProps {
   initialContents: ContentItem[];
-  pendingContents: ContentItem[];
-  clients: ClientOption[];
+  statusSummary?: StatusSummary;
   clientId?: string | null;
+  clients?: ClientOption[];
+  pendingContents?: ContentItem[];
   user: {
     name: string;
     email: string;
@@ -55,11 +79,20 @@ interface ContentPageContentProps {
   };
 }
 
+const STATUS_SUMMARY_CARDS = [
+  { key: "total", label: "Total Content", icon: FileText, value: (s: StatusSummary) => s.total, subtext: (s: StatusSummary) => `↑ ${s.published + s.scheduled} active` },
+  { key: "published", label: "Published", icon: CheckCircle2, value: (s: StatusSummary) => s.published, subtext: (s: StatusSummary) => `${s.publishedPct.toFixed(1)}% of total` },
+  { key: "scheduled", label: "Scheduled", icon: Clock, value: (s: StatusSummary) => s.scheduled, subtext: (s: StatusSummary) => `${s.scheduledPct.toFixed(1)}% of total` },
+  { key: "drafts", label: "Drafts", icon: FileEdit, value: (s: StatusSummary) => s.drafts, subtext: (s: StatusSummary) => `${s.draftsPct.toFixed(1)}% of total` },
+  { key: "needsReview", label: "Needs Review", icon: AlertCircle, value: (s: StatusSummary) => s.needsReview, subtext: (s: StatusSummary) => `${s.needsReviewPct.toFixed(1)}% of total` },
+];
+
 export default function ContentPageContent({
   initialContents,
-  pendingContents,
-  clients,
+  statusSummary,
   clientId = null,
+  clients = [],
+  pendingContents = [],
   user,
 }: ContentPageContentProps) {
   const router = useRouter();
@@ -69,13 +102,25 @@ export default function ContentPageContent({
   const [filterClient, setFilterClient] = useQueryState("filterClient", { defaultValue: "all" });
   const [filterPlatform, setFilterPlatform] = useQueryState("filterPlatform", { defaultValue: "all" });
   const [filterStatus, setFilterStatus] = useQueryState("filterStatus", { defaultValue: "all" });
+  const [filterType, setFilterType] = useQueryState("filterType", { defaultValue: "all" });
+
+  const activeClientId = clientId || (filterClient !== "all" ? filterClient : null);
+  const summary: StatusSummary = statusSummary || {
+    total: initialContents.length,
+    published: initialContents.filter(c => c.status === "POSTED").length,
+    publishedPct: 0,
+    scheduled: initialContents.filter(c => c.status === "SCHEDULED" || c.status === "APPROVED").length,
+    scheduledPct: 0,
+    drafts: initialContents.filter(c => c.status === "DRAFT" || c.status === "IDEA").length,
+    draftsPct: 0,
+    needsReview: initialContents.filter(c => c.status === "CLIENT_APPROVAL_PENDING").length,
+    needsReviewPct: 0,
+  };
 
   const [selectedContentId, setSelectedContentId] = React.useState<string | null>(null);
   const [isDetailOpen, setIsDetailOpen] = React.useState(false);
   const [createSheetOpen, setCreateSheetOpen] = React.useState(false);
   const [editContentId, setEditContentId] = React.useState<string | null>(null);
-
-  const activeClientId = clientId || (filterClient !== "all" ? filterClient : null);
 
   const handleViewDetails = (id: string) => {
     setSelectedContentId(id);
@@ -167,153 +212,176 @@ export default function ContentPageContent({
     }
   };
 
-  const breadcrumbs = [{ label: "Content", href: "/admin/content" }];
-
   return (
-    <PageShell
-      title="Content"
-      breadcrumbs={breadcrumbs}
-      user={user}
-      actions={
-        <Button
-          onClick={handleCreateContent}
-          className="h-11 px-[18px] rounded-xl bg-[#C5F135] hover:bg-[#B8E620] active:bg-[#8FBF00] text-[#111827] text-sm font-semibold flex items-center gap-2 shadow-sm"
-        >
-          <Plus className="w-4 h-4" />
-          Create Content
-        </Button>
-      }
-    >
-      <div className="max-w-[1440px] mx-auto space-y-5">
-        {/* Filter Card */}
-        <div className="bg-white rounded-[20px] border border-[#ECECF4] p-5">
-          <div className="flex items-center gap-3">
-            <div className="relative flex-1 max-w-[280px]">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#9CA3AF] pointer-events-none" />
-              <Input
-                placeholder="Search titles, concepts..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full h-[42px] pl-10 pr-4 rounded-xl border border-[#ECECF4] text-sm text-[#111827] placeholder:text-[#9CA3AF] bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135] focus-visible:border-transparent"
-              />
-            </div>
+    <>
+      {/* ─── Page Canvas ─────────────────────────────────────────────────── */}
+      <div className="bg-[#F6F7FB] min-h-0">
+        <div className="mx-auto w-full max-w-[1600px] px-6 py-5 space-y-4">
 
-            {!clientId && (
-              <Select value={filterClient} onValueChange={(val) => setFilterClient(val)}>
-                <SelectTrigger className="w-[220px] h-[42px] rounded-xl border border-[#ECECF4] text-sm text-[#111827] bg-white focus:ring-[#C5F135] px-3.5">
-                  <SelectValue placeholder="All Clients" />
+          {/* ─── Top Toolbar ──────────────────────────────────────────────── */}
+          <div className="h-[72px] bg-white border border-[#ECECF4] rounded-[20px] px-6 flex items-center justify-between">
+            {/* Left: Filters */}
+            <div className="flex items-center gap-3">
+              {/* Search */}
+              <div className="relative w-[320px]">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF] pointer-events-none" />
+                <input
+                  placeholder="Search titles, concepts, hashtags..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="w-full h-11 pl-10 pr-4 rounded-[14px] border border-[#E5E7EB] text-sm text-[#111827] placeholder:text-[#9CA3AF] bg-white focus:outline-none focus:ring-2 focus:ring-[#C5F135]/40 focus:border-transparent transition-all"
+                />
+              </div>
+
+              {/* Client Filter (global mode) */}
+              {!clientId && (
+                <Select value={filterClient} onValueChange={(val) => setFilterClient(val)}>
+                  <SelectTrigger className="w-[180px] h-11 rounded-[14px] border border-[#E5E7EB] text-sm text-[#111827] bg-white focus:ring-[#C5F135]/40 px-3.5">
+                    <SelectValue placeholder="All Clients" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
+                    <SelectItem value="all">All Clients</SelectItem>
+                    {clients.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.brandName}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+
+              {/* Platform Filter */}
+              <Select value={filterPlatform} onValueChange={(val) => setFilterPlatform(val)}>
+                <SelectTrigger className="w-[220px] h-11 rounded-[14px] border border-[#E5E7EB] text-sm text-[#111827] bg-white focus:ring-[#C5F135]/40 px-3.5">
+                  <SelectValue placeholder="All Platforms" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
-                  <SelectItem value="all">All Clients</SelectItem>
-                  {clients.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.brandName}
+                  <SelectItem value="all">All Platforms</SelectItem>
+                  {Object.entries(PLATFORM_LABELS).map(([k, v]) => (
+                    <SelectItem key={k} value={k}>{v}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {/* Content Type Filter */}
+              <Select value={filterType} onValueChange={(val) => setFilterType(val)}>
+                <SelectTrigger className="w-[220px] h-11 rounded-[14px] border border-[#E5E7EB] text-sm text-[#111827] bg-white focus:ring-[#C5F135]/40 px-3.5">
+                  <SelectValue placeholder="All Content Types" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
+                  <SelectItem value="all">All Content Types</SelectItem>
+                  {["REEL", "POST", "STORY", "VIDEO", "CAROUSEL", "THREAD", "SHORT", "LIVE"].map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {t.charAt(0) + t.slice(1).toLowerCase()}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            )}
 
-            <Select value={filterPlatform} onValueChange={(val) => setFilterPlatform(val)}>
-              <SelectTrigger className="w-[220px] h-[42px] rounded-xl border border-[#ECECF4] text-sm text-[#111827] bg-white focus:ring-[#C5F135] px-3.5">
-                <SelectValue placeholder="All Platforms" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
-                <SelectItem value="all">All Platforms</SelectItem>
-                {Object.entries(PLATFORM_LABELS).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>
-                    {v}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              {/* Status Filter */}
+              <Select value={filterStatus} onValueChange={(val) => setFilterStatus(val)}>
+                <SelectTrigger className="w-[180px] h-11 rounded-[14px] border border-[#E5E7EB] text-sm text-[#111827] bg-white focus:ring-[#C5F135]/40 px-3.5">
+                  <SelectValue placeholder="All Statuses" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
+                  <SelectItem value="all">All Statuses</SelectItem>
+                  {Object.entries(CONTENT_STATUS_LABELS).map(([k, v]) => (
+                    <SelectItem key={k} value={k}>{v}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Select value={filterStatus} onValueChange={(val) => setFilterStatus(val)}>
-              <SelectTrigger className="w-[180px] h-[42px] rounded-xl border border-[#ECECF4] text-sm text-[#111827] bg-white focus:ring-[#C5F135] px-3.5">
-                <SelectValue placeholder="All Statuses" />
-              </SelectTrigger>
-              <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
-                <SelectItem value="all">All Statuses</SelectItem>
-                {Object.entries(CONTENT_STATUS_LABELS).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>
-                    {v}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {/* Right: View Switcher + Create */}
+            <div className="flex items-center gap-3">
+              {/* View Switcher */}
+              <div className="w-[140px] h-10 rounded-lg border border-[#ECECF4] p-0.5 bg-white flex items-center">
+                <button
+                  onClick={() => setView("list")}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-1.5 h-full rounded-md text-xs font-medium transition-all",
+                    view === "list" ? "bg-[#F2F8D7] text-[#111827]" : "text-[#9CA3AF] hover:text-[#6B7280]"
+                  )}
+                >
+                  <List className="w-3.5 h-3.5" />
+                  List
+                </button>
+                <button
+                  onClick={() => setView("calendar")}
+                  className={cn(
+                    "flex-1 flex items-center justify-center gap-1.5 h-full rounded-md text-xs font-medium transition-all",
+                    view === "calendar" ? "bg-[#F2F8D7] text-[#111827]" : "text-[#9CA3AF] hover:text-[#6B7280]"
+                  )}
+                >
+                  <CalendarDays className="w-3.5 h-3.5" />
+                  Calendar
+                </button>
+              </div>
 
-            <div className="ml-auto flex items-center rounded-lg border border-[#ECECF4] p-0.5 bg-white">
+              {/* Create Button */}
               <button
-                onClick={() => setView("list")}
-                className={cn(
-                  "flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium transition-all",
-                  view === "list"
-                    ? "bg-[#F2F8D7] text-[#111827]"
-                    : "text-[#9CA3AF] hover:text-[#6B7280] bg-white"
-                )}
+                onClick={handleCreateContent}
+                className="h-11 px-5 rounded-[14px] bg-[#C5F135] hover:bg-[#B8E620] active:bg-[#8FBF00] text-[#111827] text-sm font-semibold flex items-center gap-2 transition-colors"
               >
-                <List className="w-3.5 h-3.5" />
-                List
-              </button>
-              <button
-                onClick={() => setView("calendar")}
-                className={cn(
-                  "flex items-center gap-1.5 h-8 px-3 rounded-md text-xs font-medium transition-all",
-                  view === "calendar"
-                    ? "bg-[#F2F8D7] text-[#111827]"
-                    : "text-[#9CA3AF] hover:text-[#6B7280] bg-white"
-                )}
-              >
-                <CalendarDays className="w-3.5 h-3.5" />
-                Calendar
+                <Plus className="w-4 h-4" />
+                Create Content
+                <ChevronDown className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
-        </div>
 
-        {/* Main Content Layout */}
-        <div className="flex gap-5">
-          <div className="flex-1 min-w-0">
-            {view === "list" ? (
-              <ContentListView
-                data={initialContents}
-                showClient={!clientId}
-                onViewDetails={handleViewDetails}
-                onEdit={handleEditContent}
-                onSubmitApproval={handleSubmitApproval}
-                onApprove={handleApprove}
-                onDelete={handleDelete}
-                onSchedule={handleViewDetails}
-              />
-            ) : (
-              <ContentCalendarView
-                data={initialContents}
-                onViewDetails={handleViewDetails}
-                onCreateContent={handleCreateContent}
-              />
-            )}
+          {/* ─── Status Summary Row ────────────────────────────────────────── */}
+          <div className="grid grid-cols-5 gap-4">
+            {STATUS_SUMMARY_CARDS.map((card) => {
+              const Icon = card.icon;
+              return (
+                <div
+                  key={card.key}
+                  className="bg-white border border-[#ECECF4] rounded-2xl p-5 flex flex-col justify-between"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-9 h-9 rounded-full bg-[#F2F8D7] flex items-center justify-center shrink-0">
+                        <Icon className="w-4 h-4 text-gray-500" />
+                      </div>
+                      <span className="text-xs font-medium text-gray-500 truncate">{card.label}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[32px] font-black text-[#111827] leading-none tracking-tight mt-1">
+                      {card.value(summary)}
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      <span className="text-xs font-bold text-[#16A34A]">
+                        {card.subtext(summary)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          {!clientId && view === "list" && (
-            <div className="w-[300px] shrink-0">
-              <ApprovalQueuePanel
-                items={pendingContents.map((c) => ({
-                  id: c.id,
-                  title: c.title,
-                  platform: c.platform,
-                  contentType: c.contentType,
-                  clientBrandName: c.clientBrandName || "Brand",
-                  clientId: c.clientId,
-                  updatedAt: c.updatedAt,
-                }))}
-                onView={handleViewDetails}
-                onApproveSuccess={handleSuccess}
-              />
-            </div>
+          {/* ─── Content Table / Calendar ─────────────────────────────────── */}
+          {view === "list" ? (
+            <ContentListView
+              data={initialContents}
+              onViewDetails={handleViewDetails}
+              onEdit={handleEditContent}
+              onSubmitApproval={handleSubmitApproval}
+              onApprove={handleApprove}
+              onDelete={handleDelete}
+              onSchedule={handleViewDetails}
+            />
+          ) : (
+            <ContentCalendarView
+              data={initialContents}
+              onViewDetails={handleViewDetails}
+              onCreateContent={handleCreateContent}
+            />
           )}
         </div>
       </div>
 
+      {/* ─── Sheets ───────────────────────────────────────────────────────── */}
       <ContentDetailSheet
         contentId={selectedContentId}
         clientId={
@@ -334,6 +402,6 @@ export default function ContentPageContent({
         onOpenChange={setCreateSheetOpen}
         onSuccess={handleSuccess}
       />
-    </PageShell>
+    </>
   );
 }

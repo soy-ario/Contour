@@ -1,67 +1,420 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import OnboardingProgress from "@/components/features/admin/onboarding-progress";
+import type { ClientStatus, Platform, ConnectionStatus } from "@prisma/client";
+import { cn, formatCurrency, formatNumber, formatPercent, formatDate, formatRelativeDate } from "@/lib/utils";
+import { Check, ChevronRight, Globe, User, Mail, Phone, DollarSign, Clock, FileText, Eye, Users as UsersIcon, Heart, MessageSquare, Share2, BarChart3, Plus, FileEdit, ArrowUpRight, UserPlus, Settings } from "lucide-react";
+import { InstagramIcon, FacebookIcon, LinkedinIcon, TiktokIcon } from "@/components/shared/social-icons";
 import InternalNotes from "@/components/features/admin/internal-notes";
-import StatCard from "@/components/shared/stat-card";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import StatusBadge from "@/components/shared/status-badge";
-import { formatCurrency, formatDate, formatNumber, formatPercent } from "@/lib/utils";
-import {
-  Globe,
-  Mail,
-  Phone,
-  User,
-  Calendar,
-  DollarSign,
-  Share2,
-} from "lucide-react";
-import { Platform, ClientStatus } from "@prisma/client";
-import { cn } from "@/lib/utils";
-
-// Custom inline SVGs for social platforms since they are missing from lucide-react in this environment
-const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-  </svg>
-);
-
-const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
-  </svg>
-);
-
-const LinkedinIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
-    <rect x="2" y="9" width="4" height="12"></rect>
-    <circle cx="4" cy="4" r="2"></circle>
-  </svg>
-);
-
-const YoutubeIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"></path>
-    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon>
-  </svg>
-);
-
-const TwitterIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"></path>
-  </svg>
-);
 
 export const dynamic = "force-dynamic";
 
 interface OverviewPageProps {
-  params: Promise<{
-    id: string;
-  }>;
+  params: Promise<{ id: string }>;
 }
 
+// ─── Onboarding Progress ───────────────────────────────────────────────
+function OnboardingProgressSection({ status, socialCount, productCount }: { status: ClientStatus; socialCount: number; productCount: number }) {
+  const statusOrder: ClientStatus[] = ["LEAD", "DISCOVERY", "PROPOSAL_SENT", "CONTRACT_SIGNED", "SETUP", "DASHBOARD_READY", "ACTIVE"];
+  const currentIndex = statusOrder.indexOf(status);
+  const isPausedOrArchived = status === "PAUSED" || status === "ARCHIVED";
+
+  const steps = [
+    { label: "Lead" },
+    { label: "Discovery" },
+    { label: "Proposal Sent" },
+    { label: "Contract Signed" },
+    { label: "Social Link" },
+    { label: "Products Added" },
+    { label: "Dashboard Ready" },
+    { label: "Active" },
+  ];
+
+  const completedCount = isPausedOrArchived
+    ? steps.length
+    : Math.max(0, Math.min(currentIndex, steps.length));
+
+  const isAllComplete = completedCount >= steps.length;
+
+  return (
+    <div className="bg-white border border-[#ECECF4] rounded-[24px] p-7">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h2 className="text-lg font-bold text-[#111827]">Onboarding Progress</h2>
+          {isAllComplete ? (
+            <p className="text-xs font-semibold text-[#16A34A] mt-1">All steps completed</p>
+          ) : (
+            <p className="text-xs font-semibold text-[#6B7280] mt-1">
+              Step {completedCount} of {steps.length} — {steps[completedCount]?.label}
+            </p>
+          )}
+        </div>
+        <button className="text-xs font-semibold border border-gray-200 text-gray-700 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition-colors">
+          View Onboarding Details &gt;
+        </button>
+      </div>
+
+      <div className="overflow-x-auto -mx-7 px-7">
+        <div className="relative min-w-[680px]">
+          <div className="absolute left-0 right-0 top-[14px] h-[2px] bg-[#ECECF4] rounded-full z-0" />
+          <div
+            className="absolute left-0 top-[14px] h-[2px] bg-[#C5F135] rounded-full transition-all duration-500 z-0"
+            style={{ width: `${Math.max(0, completedCount) / (steps.length - 1) * 100}%` }}
+          />
+
+          <div className="flex items-start justify-between">
+            {steps.map((step, idx) => {
+              const isCompleted = idx < completedCount;
+              const isCurrent = idx === completedCount;
+
+              return (
+                <div key={idx} className="flex flex-col items-center relative z-10">
+                  <div
+                    className={cn(
+                      "w-7 h-7 rounded-full flex items-center justify-center border-2 transition-all duration-300",
+                      isCompleted || (isAllComplete && isCurrent)
+                        ? "bg-[#C5F135] border-[#C5F135]"
+                        : isCurrent
+                        ? "bg-white border-[#C5F135]"
+                        : "bg-white border-[#ECECF4]"
+                    )}
+                  >
+                    {isCompleted || (isAllComplete && isCurrent) ? (
+                      <Check className="w-3.5 h-3.5 text-[#111827] stroke-[3]" />
+                    ) : (
+                      <span className={cn("text-[11px] font-bold", isCurrent ? "text-[#C5F135]" : "text-[#9CA3AF]")}>
+                        {idx + 1}
+                      </span>
+                    )}
+                  </div>
+                  <span
+                    className={cn(
+                      "text-xs font-semibold mt-2.5 text-center whitespace-nowrap",
+                      isCompleted || (isAllComplete && isCurrent) ? "text-[#111827]" : isCurrent ? "text-[#C5F135]" : "text-[#9CA3AF]"
+                    )}
+                  >
+                    {step.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Sparkline ─────────────────────────────────────────────────────────
+function Sparkline({ data }: { data: number[] }) {
+  if (data.length < 2) return null;
+  const max = Math.max(...data);
+  const min = Math.min(...data);
+  const range = max - min === 0 ? 1 : max - min;
+  const w = 56; const h = 28;
+  const points = data.map((v, i) => `${(i / (data.length - 1)) * w},${h - ((v - min) / range) * h}`);
+  return (
+    <svg width={w} height={h} className="overflow-visible shrink-0">
+      <polyline fill="none" stroke="#C5F135" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" points={points.join(" ")} />
+    </svg>
+  );
+}
+
+// ─── KPI Row ───────────────────────────────────────────────────────────
+function KPIRow({ metrics }: {
+  metrics: {
+    views: { value: number; delta: number; sparkline: number[] };
+    reach: { value: number; delta: number; sparkline: number[] };
+    engagement: { value: number; delta: number; sparkline: number[] };
+    followers: { value: number; delta: number; sparkline: number[] };
+  };
+}) {
+  const items = [
+    { label: "Total Monthly Views", value: metrics.views, icon: Eye },
+    { label: "Estimated Monthly Reach", value: metrics.reach, icon: UsersIcon },
+    { label: "Avg Engagement Rate", value: metrics.engagement, icon: Heart, isPercent: true },
+    { label: "Net Followers Gained", value: metrics.followers, icon: UserPlus },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {items.map((item) => {
+        const Icon = item.icon;
+        const isUp = item.value.delta > 0;
+        const displayValue = item.isPercent ? formatPercent(item.value.value) : formatNumber(item.value.value);
+
+        return (
+          <div key={item.label} className="bg-white border border-[#ECECF4] rounded-[20px] p-5 h-[150px] flex flex-col justify-between transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-9 h-9 rounded-full bg-[#F2F8D7] flex items-center justify-center shrink-0">
+                  <Icon className="w-4 h-4 text-[#6B7280]" />
+                </div>
+                <span className="text-xs font-medium text-gray-500 truncate">{item.label}</span>
+              </div>
+              <Sparkline data={item.value.sparkline} />
+            </div>
+            <div>
+              <div className="text-[32px] font-extrabold text-[#111827] leading-none tracking-tight">
+                {displayValue}
+              </div>
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <span className={cn("text-[13px] font-semibold", isUp ? "text-[#16A34A]" : "text-rose-500")}>
+                  {isUp ? "↑" : "↓"} {Math.abs(item.value.delta).toFixed(1)}%
+                </span>
+                <span className="text-[13px] text-[#6B7280]">vs last month</span>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Profile Details ───────────────────────────────────────────────────
+function PaymentStatusBadge({ status }: { status: string }) {
+  const dotColor = status === "PAID" ? "#16A34A" : status === "OVERDUE" ? "#EF4444" : "#F59E0B";
+  return (
+    <span className="flex items-center gap-1.5 text-sm font-semibold" style={{ color: dotColor }}>
+      <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: dotColor }} />
+      {status === "PAID" ? "Paid" : status === "OVERDUE" ? "Overdue" : "Pending"}
+    </span>
+  );
+}
+
+function ProfileDetails({ client }: { client: any }) {
+  return (
+    <div className="bg-white border border-[#ECECF4] rounded-[24px] p-7">
+      <h2 className="text-xl font-bold text-[#111827] mb-6">Client Profile Details</h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Business Details */}
+        <div className="space-y-5 flex flex-col">
+          <div className="flex items-center gap-2.5">
+            <div className="w-1 h-5 rounded-full bg-[#C5F135]" />
+            <h3 className="text-xs font-semibold text-[#6B7280] tracking-[0.08em] uppercase">Business Details</h3>
+          </div>
+          <div className="flex-1 space-y-4">
+            <DetailRow icon={User} sublabel="Primary Contact" value={client.contactName} />
+            <DetailRow icon={Mail} sublabel="Email" value={client.contactEmail} />
+            {client.industry && <DetailRow icon={Globe} sublabel="Industry" value={client.industry} />}
+          </div>
+          <button className="inline-flex items-center gap-2 text-xs font-semibold text-gray-700 border border-gray-200 px-3.5 py-2 rounded-lg hover:bg-gray-50 transition-colors self-start">
+            <FileEdit className="w-3.5 h-3.5" />
+            Edit Profile
+          </button>
+        </div>
+
+        {/* Financial & Contract */}
+        <div className="space-y-5 flex flex-col md:border-l md:border-[#ECECF4] md:pl-8">
+          <div className="flex items-center gap-2.5">
+            <div className="w-1 h-5 rounded-full bg-[#C5F135]" />
+            <h3 className="text-xs font-semibold text-[#6B7280] tracking-[0.08em] uppercase">Financial & Contract</h3>
+          </div>
+          <div className="flex-1 space-y-0">
+            <FinanceRow label="Monthly Retainer" value={formatCurrency(Number(client.monthlyRetainer))} bold />
+            <FinanceRow label="Contract Start" value={client.contractStart ? formatDate(client.contractStart, "MMM d, yyyy") : "—"} />
+            <FinanceRow label="Contract End" value={client.contractEnd ? formatDate(client.contractEnd, "MMM d, yyyy") : "—"} />
+            <FinanceRow label="Payment Status" value={<PaymentStatusBadge status={client.paymentStatus} />} />
+            <FinanceRow label="Last Payment" value="—" />
+            <FinanceRow label="Next Invoice" value="—" />
+          </div>
+          <Link
+            href={`/admin/clients/${client.id}/settings`}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#C5F135] hover:text-[#B8E52F] transition-colors self-end"
+          >
+            View Billing
+            <ArrowUpRight className="w-3 h-3" />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DetailRow({ icon: Icon, sublabel, value }: { icon: any; sublabel: string; value: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className="w-8 h-8 rounded-lg bg-[#F6F7FB] flex items-center justify-center shrink-0">
+        <Icon className="w-3.5 h-3.5 text-[#6B7280]" />
+      </div>
+      <div className="min-w-0">
+        <span className="text-xs font-medium text-[#9CA3AF] block">{sublabel}</span>
+        <span className="text-[15px] font-semibold text-[#111827]">{value}</span>
+      </div>
+    </div>
+  );
+}
+
+function DescriptionRow({ text }: { text: string }) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="w-8 h-8 rounded-lg bg-[#F6F7FB] flex items-center justify-center shrink-0 mt-0.5">
+        <FileText className="w-3.5 h-3.5 text-[#6B7280]" />
+      </div>
+      <div className="min-w-0">
+        <span className="text-xs font-medium text-[#9CA3AF] block">About</span>
+        <span className="text-[15px] text-[#6B7280] leading-relaxed">{text}</span>
+      </div>
+    </div>
+  );
+}
+
+function FinanceRow({ label, value, bold }: { label: string; value: React.ReactNode; bold?: boolean }) {
+  return (
+    <div className="flex items-center justify-between py-3 border-b border-[#ECECF4] last:border-b-0">
+      <span className="text-[15px] text-[#6B7280]">{label}</span>
+      <span className={cn("text-[15px]", bold ? "font-bold text-[#111827]" : "font-semibold text-[#111827]")}>{value}</span>
+    </div>
+  );
+}
+
+// ─── Social Connections ────────────────────────────────────────────────
+function SocialConnections({ socialAccounts }: { socialAccounts: Array<{ platform: Platform; status: ConnectionStatus; accountName: string | null; lastSyncAt: Date | null }> }) {
+  const platforms: Array<{ key: Platform; label: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }> = [
+    { key: "INSTAGRAM", label: "Instagram", icon: InstagramIcon },
+    { key: "FACEBOOK", label: "Facebook", icon: FacebookIcon },
+    { key: "TIKTOK", label: "TikTok", icon: TiktokIcon },
+    { key: "LINKEDIN", label: "LinkedIn", icon: LinkedinIcon },
+  ];
+
+  const connectionMap = new Map(socialAccounts.map((a) => [a.platform, a]));
+
+  return (
+    <div className="bg-white border border-[#ECECF4] rounded-[24px] p-7">
+      <h2 className="text-2xl font-bold text-[#111827] mb-1">Connected Social Channels</h2>
+      <p className="text-[15px] text-[#6B7280] mb-6 leading-relaxed">
+        Active API sync streams used to pull automated data views.
+      </p>
+
+      <div className="space-y-1">
+        {platforms.map(({ key, label, icon: Icon }) => {
+          const match = connectionMap.get(key);
+
+          return (
+            <div key={key} className="flex items-center justify-between py-3.5 border-b border-[#ECECF4] last:border-b-0">
+              <div className="flex items-center gap-3">
+                <Icon className="w-5 h-5 shrink-0" />
+                <div>
+                  <span className="text-[15px] font-semibold text-[#111827]">{label}</span>
+                  {match?.accountName && (
+                    <span className="text-xs text-[#6B7280] block">@{match.accountName}</span>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="text-right">
+                  <span className={cn(
+                    "text-xs font-semibold",
+                    match?.status === "CONNECTED" ? "text-[#16A34A]" : "text-[#9CA3AF]"
+                  )}>
+                    {match?.status === "CONNECTED" ? "Connected" : match?.status === "DISCONNECTED" ? "Inactive" : match?.status || "Inactive"}
+                  </span>
+                  {match?.lastSyncAt && (
+                    <span className="text-xs text-[#9CA3AF] block">Synced {formatDate(match.lastSyncAt, "MMM dd")}</span>
+                  )}
+                </div>
+                <ChevronRight className="w-4 h-4 text-[#9CA3AF]" />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Footer */}
+      <button className="inline-flex items-center gap-2 text-xs font-semibold text-gray-700 border border-gray-200 px-3.5 py-2 rounded-lg hover:bg-gray-50 transition-colors mt-4">
+        <Settings className="w-3.5 h-3.5" />
+        Manage Connections
+      </button>
+    </div>
+  );
+}
+
+// ─── Recent Activity ───────────────────────────────────────────────────
+function RecentActivity({ items, clientId }: { items: ActivityItem[]; clientId: string }) {
+  const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+    content_approved: Check,
+    content_rejected: FileEdit,
+    content_review: MessageSquare,
+    content_posted: Share2,
+    client_updated: BarChart3,
+    note_added: Plus,
+    sync_completed: Clock,
+  };
+
+  if (items.length === 0) {
+    return (
+      <div className="bg-white border border-[#ECECF4] rounded-[24px] p-7">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-[#111827]">Recent Activity</h2>
+        </div>
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <Clock className="w-12 h-12 text-[#D1D5DB] mb-3" />
+          <p className="text-[15px] font-medium text-[#6B7280]">No recent activity yet.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white border border-[#ECECF4] rounded-[24px] p-7">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-[#111827]">Recent Activity</h2>
+        <Link
+          href={`/admin/clients/${clientId}/analytics`}
+          className="text-xs font-semibold text-[#C5F135] hover:text-[#B8E52F] transition-colors flex items-center gap-1"
+        >
+          View All
+          <ArrowUpRight className="w-3 h-3" />
+        </Link>
+      </div>
+      <div className="space-y-1">
+        {items.slice(0, 8).map((item) => {
+          const Icon = iconMap[item.type] || Clock;
+
+          return (
+            <div key={item.id} className="flex items-center gap-3 py-3.5 border-b border-[#ECECF4] last:border-b-0">
+              <div className="w-8 h-8 rounded-full bg-[#F6F7FB] flex items-center justify-center shrink-0">
+                <Icon className="w-3.5 h-3.5 text-[#6B7280]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[15px] text-[#111827] leading-snug">{item.description}</p>
+                <span className="text-xs text-gray-400">
+                  {item.actorName ? `Approved by ${item.actorName} • ${formatDate(item.timestamp, "MMM d, yyyy 'at' h:mm a")}` : formatRelativeDate(item.timestamp)}
+                </span>
+              </div>
+              {item.badge && item.badge.label === "Approved" ? (
+                <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full shrink-0 bg-[#EFEEFC] text-[#16A34A]">
+                  {item.badge.label}
+                </span>
+              ) : item.badge ? (
+                <span
+                  className="text-xs font-semibold px-2.5 py-0.5 rounded-full shrink-0"
+                  style={{ backgroundColor: item.badge.color + "15", color: item.badge.color }}
+                >
+                  {item.badge.label}
+                </span>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+interface ActivityItem {
+  id: string;
+  type: "content_approved" | "content_rejected" | "content_review" | "content_posted" | "client_updated" | "note_added" | "sync_completed";
+  description: string;
+  timestamp: Date;
+  actorName?: string;
+  badge?: { label: string; color: string };
+}
+
+// ─── Main Page ─────────────────────────────────────────────────────────
 export default async function ClientOverviewPage({ params }: OverviewPageProps) {
   const { id } = await params;
 
@@ -70,32 +423,16 @@ export default async function ClientOverviewPage({ params }: OverviewPageProps) 
     include: {
       socialAccounts: true,
       internalNotes: {
-        include: {
-          creator: {
-            select: {
-              name: true,
-            },
-          },
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
+        include: { creator: { select: { name: true } } },
+        orderBy: { createdAt: "desc" },
       },
-      _count: {
-        select: {
-          contents: true,
-          products: true,
-          requests: true,
-        },
-      },
+      _count: { select: { contents: true, products: true, requests: true } },
     },
   });
 
-  if (!client) {
-    notFound();
-  }
+  if (!client) notFound();
 
-  // Calculate current month date ranges
+  // ── Analytics ──
   const startOfThisMonth = new Date();
   startOfThisMonth.setDate(1);
   startOfThisMonth.setHours(0, 0, 0, 0);
@@ -105,251 +442,91 @@ export default async function ClientOverviewPage({ params }: OverviewPageProps) 
   startOfLastMonth.setDate(1);
   startOfLastMonth.setHours(0, 0, 0, 0);
 
-  // Fetch current month snapshots
-  const thisMonthSnapshots = await prisma.analyticsSnapshot.findMany({
-    where: {
-      clientId: id,
-      periodStart: {
-        gte: startOfThisMonth,
-      },
-    },
+  const [thisMonthSnapshots, lastMonthSnapshots] = await Promise.all([
+    prisma.analyticsSnapshot.findMany({ where: { clientId: id, periodStart: { gte: startOfThisMonth } } }),
+    prisma.analyticsSnapshot.findMany({ where: { clientId: id, periodStart: { gte: startOfLastMonth, lt: startOfThisMonth } } }),
+  ]);
+
+  const viewsTM = thisMonthSnapshots.reduce((a, s) => a + Number(s.totalViews), 0);
+  const reachTM = thisMonthSnapshots.reduce((a, s) => a + Number(s.totalReach), 0);
+  const engTM = thisMonthSnapshots.length > 0
+    ? thisMonthSnapshots.reduce((a, s) => a + Number(s.avgEngagementRate || 0), 0) / thisMonthSnapshots.length
+    : 0;
+  const follTM = thisMonthSnapshots.reduce((a, s) => a + s.followerGrowth, 0);
+
+  const viewsLM = lastMonthSnapshots.reduce((a, s) => a + Number(s.totalViews), 0);
+  const reachLM = lastMonthSnapshots.reduce((a, s) => a + Number(s.totalReach), 0);
+  const engLM = lastMonthSnapshots.length > 0
+    ? lastMonthSnapshots.reduce((a, s) => a + Number(s.avgEngagementRate || 0), 0) / lastMonthSnapshots.length
+    : 0;
+  const follLM = lastMonthSnapshots.reduce((a, s) => a + s.followerGrowth, 0);
+
+  const delta = (curr: number, prev: number) => prev > 0 ? ((curr - prev) / prev) * 100 : curr > 0 ? 100 : 0;
+
+  const allSnapshots = [...thisMonthSnapshots].sort((a, b) => new Date(a.periodStart).getTime() - new Date(b.periodStart).getTime());
+
+  const metrics = {
+    views: { value: viewsTM, delta: delta(viewsTM, viewsLM), sparkline: allSnapshots.map(s => Number(s.totalViews)) },
+    reach: { value: reachTM, delta: delta(reachTM, reachLM), sparkline: allSnapshots.map(s => Number(s.totalReach)) },
+    engagement: { value: engTM, delta: delta(engTM, engLM), sparkline: allSnapshots.map(s => Number(s.avgEngagementRate || 0)) },
+    followers: { value: follTM, delta: delta(follTM, follLM), sparkline: allSnapshots.map(s => s.followerGrowth) },
+  };
+
+  // ── Recent Activity ──
+  const approvalEvents = await prisma.approvalEvent.findMany({
+    where: { content: { clientId: id } },
+    orderBy: { createdAt: "desc" },
+    take: 15,
+    include: { content: { select: { title: true } }, actor: { select: { name: true } } },
   });
 
-  // Fetch last month snapshots for deltas
-  const lastMonthSnapshots = await prisma.analyticsSnapshot.findMany({
-    where: {
-      clientId: id,
-      periodStart: {
-        gte: startOfLastMonth,
-        lt: startOfThisMonth,
-      },
-    },
-  });
-
-  // Aggregate stats
-  const viewsThisMonth = thisMonthSnapshots.reduce((acc, s) => acc + Number(s.totalViews), 0);
-  const reachThisMonth = thisMonthSnapshots.reduce((acc, s) => acc + Number(s.totalReach), 0);
-  const followersThisMonth = thisMonthSnapshots.reduce((acc, s) => acc + Number(s.followerGrowth), 0);
-  const engRateThisMonth =
-    thisMonthSnapshots.length > 0
-      ? thisMonthSnapshots.reduce((acc, s) => acc + Number(s.avgEngagementRate || 0), 0) /
-        thisMonthSnapshots.length
-      : 0;
-
-  const viewsLastMonth = lastMonthSnapshots.reduce((acc, s) => acc + Number(s.totalViews), 0);
-  const reachLastMonth = lastMonthSnapshots.reduce((acc, s) => acc + Number(s.totalReach), 0);
-  const followersLastMonth = lastMonthSnapshots.reduce((acc, s) => acc + Number(s.followerGrowth), 0);
-  const engRateLastMonth =
-    lastMonthSnapshots.length > 0
-      ? lastMonthSnapshots.reduce((acc, s) => acc + Number(s.avgEngagementRate || 0), 0) /
-        lastMonthSnapshots.length
-      : 0;
-
-  // Calculate deltas
-  const viewsDelta = viewsLastMonth > 0 ? (viewsThisMonth - viewsLastMonth) / viewsLastMonth : 0;
-  const reachDelta = lastMonthSnapshots.length > 0 ? (reachThisMonth - reachLastMonth) / reachLastMonth : 0;
-  const followersDelta =
-    followersLastMonth > 0 ? (followersThisMonth - followersLastMonth) / followersLastMonth : 0;
-  const engDelta = engRateLastMonth > 0 ? (engRateThisMonth - engRateLastMonth) / engRateLastMonth : 0;
-
-  // Social account connection mapping
-  const platforms = [
-    { name: "INSTAGRAM", label: "Instagram", icon: InstagramIcon, color: "text-pink-500" },
-    { name: "FACEBOOK", label: "Facebook", icon: FacebookIcon, color: "text-blue-600" },
-    { name: "TIKTOK", label: "TikTok", icon: Share2, color: "text-cyan-400" }, // tiktok brand fallback
-    { name: "LINKEDIN", label: "LinkedIn", icon: LinkedinIcon, color: "text-blue-500" },
-    { name: "YOUTUBE", label: "YouTube", icon: YoutubeIcon, color: "text-red-500" },
-    { name: "X", label: "X (Twitter)", icon: TwitterIcon, color: "text-zinc-200" },
-  ];
-
-  const socialConnectionStatus = platforms.map((p) => {
-    const matched = client.socialAccounts.find((sa) => sa.platform === p.name as Platform);
+  const recentActivity: ActivityItem[] = approvalEvents.map((e) => {
+    let badge: { label: string; color: string };
+    switch (e.action) {
+      case "APPROVED": badge = { label: "Approved", color: "#16A34A" }; break;
+      case "REJECTED": badge = { label: "Rejected", color: "#EF4444" }; break;
+      case "CHANGES_REQUESTED": badge = { label: "Changes", color: "#F59E0B" }; break;
+      default: badge = { label: "Review", color: "#6B7280" };
+    }
     return {
-      ...p,
-      connected: !!matched,
-      accountName: matched?.accountName || null,
-      status: matched?.status || "DISCONNECTED",
-      lastSyncAt: matched?.lastSyncAt || null,
+      id: e.id,
+      type: (e.action === "APPROVED" ? "content_approved" : "content_review") as ActivityItem["type"],
+      description: `"${e.content.title}" was approved`,
+      timestamp: e.createdAt,
+      actorName: e.actor?.name,
+      badge,
     };
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-8 space-y-8">
-      {/* Onboarding Pipeline */}
-      <OnboardingProgress
-        status={client.status}
-        socialCount={client.socialAccounts.length}
-        productCount={client._count.products}
-      />
-
-      {/* Monthly Performance Quick Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          label="Total Monthly Views"
-          value={formatNumber(viewsThisMonth)}
-          delta={viewsDelta}
-          deltaLabel="vs last month"
+    <div className="py-8 px-8 mx-auto" style={{ maxWidth: 1440 }}>
+      <div className="space-y-6">
+        <OnboardingProgressSection
+          status={client.status}
+          socialCount={client.socialAccounts.length}
+          productCount={client._count.products}
         />
-        <StatCard
-          label="Estimated Monthly Reach"
-          value={formatNumber(reachThisMonth)}
-          delta={reachDelta}
-          deltaLabel="vs last month"
-        />
-        <StatCard
-          label="Avg Engagement Rate"
-          value={formatPercent(engRateThisMonth)}
-          delta={engDelta}
-          deltaLabel="vs last month"
-        />
-        <StatCard
-          label="Net Followers Gained"
-          value={formatNumber(followersThisMonth)}
-          delta={followersDelta}
-          deltaLabel="vs last month"
-        />
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Business & Contact Info (Span 2) */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Client Profile Details */}
-          <Card className="bg-card border-border/60 shadow-sm">
-            <CardHeader className="border-b border-border/40 py-4 px-6">
-              <CardTitle className="text-base font-bold text-foreground">
-                Client Profile details
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Business Section */}
-              <div className="space-y-4">
-                <h4 className="text-xs font-bold text-primary uppercase tracking-wider">Business Details</h4>
-                <div className="space-y-3">
-                  {client.website && (
-                    <div className="flex items-center text-sm text-foreground/80 space-x-2.5">
-                      <Globe className="w-4 h-4 text-muted-foreground shrink-0" />
-                      <a
-                        href={client.website}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="hover:text-primary transition-colors truncate"
-                      >
-                        {client.website}
-                      </a>
-                    </div>
-                  )}
-                  <div className="flex items-center text-sm text-foreground/80 space-x-2.5">
-                    <User className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <span className="truncate">{client.contactName}</span>
-                  </div>
-                  <div className="flex items-center text-sm text-foreground/80 space-x-2.5">
-                    <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <span className="truncate">{client.contactEmail}</span>
-                  </div>
-                  {client.contactPhone && (
-                    <div className="flex items-center text-sm text-foreground/80 space-x-2.5">
-                      <Phone className="w-4 h-4 text-muted-foreground shrink-0" />
-                      <span>{client.contactPhone}</span>
-                    </div>
-                  )}
-                </div>
-                {client.description && (
-                  <div className="pt-2">
-                    <p className="text-xs font-medium text-muted-foreground">About the Brand</p>
-                    <p className="text-sm text-foreground/70 mt-1 leading-relaxed">
-                      {client.description}
-                    </p>
-                  </div>
-                )}
-              </div>
+        <KPIRow metrics={metrics} />
 
-              {/* Billing Section */}
-              <div className="space-y-4 border-t md:border-t-0 md:border-l border-border/60 pt-4 md:pt-0 md:pl-8">
-                <h4 className="text-xs font-bold text-primary uppercase tracking-wider">Financial & Contract</h4>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Monthly Retainer:</span>
-                    <span className="font-bold text-foreground">
-                      {formatCurrency(Number(client.monthlyRetainer))}
-                    </span>
-                  </div>
-                  {client.monthlyBudget && (
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="text-muted-foreground">Monthly Ad Budget:</span>
-                      <span className="font-semibold text-foreground">
-                        {formatCurrency(Number(client.monthlyBudget))}
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Contract Start:</span>
-                    <span className="text-foreground">
-                      {client.contractStart ? formatDate(client.contractStart, "PP") : "N/A"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Contract End:</span>
-                    <span className="text-foreground">
-                      {client.contractEnd ? formatDate(client.contractEnd, "PP") : "N/A"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Payment Status:</span>
-                    <StatusBadge status={client.paymentStatus} />
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Internal Notes Section */}
-          <InternalNotes clientId={client.id} initialNotes={client.internalNotes} />
+        {/* Profile (7 cols) + Social (5 cols) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-7">
+            <ProfileDetails client={client} />
+          </div>
+          <div className="lg:col-span-5">
+            <SocialConnections socialAccounts={client.socialAccounts} />
+          </div>
         </div>
 
-        {/* Right Column: Integration Connection Status */}
-        <div className="space-y-8">
-          <Card className="bg-card border-border/60 shadow-sm h-full">
-            <CardHeader className="border-b border-border/40 py-4 px-6">
-              <CardTitle className="text-base font-bold text-foreground">
-                Connected Social Channels
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-4">
-              <p className="text-xs text-muted-foreground leading-normal mb-2">
-                Connections represent active API sync streams used to pull automated data views.
-              </p>
-              
-              <div className="divide-y divide-border/40">
-                {socialConnectionStatus.map((sa) => {
-                  const PlatformIcon = sa.icon;
-                  return (
-                    <div key={sa.name} className="py-3 flex items-center justify-between first:pt-0 last:pb-0">
-                      <div className="flex items-center space-x-3 min-w-0">
-                        <PlatformIcon className={cn("w-5 h-5 shrink-0", sa.color)} />
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-sm font-semibold text-foreground">
-                            {sa.label}
-                          </span>
-                          <span className="text-xs text-muted-foreground truncate">
-                            {sa.connected && sa.accountName ? `@${sa.accountName}` : "Not Connected"}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col items-end shrink-0">
-                        <StatusBadge status={sa.connected ? "ACTIVE" : "INACTIVE"} size="sm" />
-                        {sa.connected && sa.lastSyncAt && (
-                          <span className="text-[9px] text-zinc-500 mt-1">
-                            Synced {formatDate(sa.lastSyncAt, "MMM dd")}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+        {/* Recent Activity (6 cols) + Internal Notes (6 cols) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="lg:col-span-6">
+            <RecentActivity items={recentActivity} clientId={id} />
+          </div>
+          <div className="lg:col-span-6">
+            <InternalNotes clientId={client.id} initialNotes={client.internalNotes} />
+          </div>
         </div>
       </div>
     </div>

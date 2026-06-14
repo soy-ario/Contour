@@ -12,7 +12,7 @@ import {
   deleteNoteAction,
 } from "@/lib/actions/note.actions";
 import { toast } from "sonner";
-import { Edit2, Trash2, Plus, Save, X, Loader2 } from "lucide-react";
+import { Edit2, Trash2, Plus, Save, X, Loader2, FileText } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 interface Note {
@@ -107,38 +107,38 @@ export default function InternalNotes({ clientId, initialNotes }: InternalNotesP
   };
 
   return (
-    <Card className="bg-card border-border/60 shadow-sm">
-      <CardHeader className="flex flex-row items-center justify-between border-b border-border/40 py-4 px-6">
-        <CardTitle className="text-base font-bold text-foreground">
+    <Card className="bg-white border border-[#ECECF4] rounded-[24px] shadow-sm">
+      <CardHeader className="flex flex-row items-center justify-between border-b border-[#ECECF4] py-4 px-7">
+        <CardTitle className="text-xl font-bold text-[#111827]">
           Internal Notes (Admin Only)
         </CardTitle>
         {!isAdding && (
           <Button
             size="sm"
             onClick={() => setIsAdding(true)}
-            className="h-8 text-xs font-semibold bg-zinc-900 border border-border text-foreground hover:bg-zinc-800 flex items-center space-x-1"
+            className="h-8 text-xs font-semibold border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 flex items-center gap-1.5 rounded-lg"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Note</span>
           </Button>
         )}
       </CardHeader>
-      <CardContent className="p-6 space-y-6">
+      <CardContent className="p-7 space-y-6">
         {/* Create Note Input Area */}
         {isAdding && (
-          <div className="space-y-3 p-4 bg-zinc-900/40 border border-border/40 rounded-lg animate-in fade-in duration-200">
+          <div className="space-y-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
             <Textarea
               value={newContent}
               onChange={(e) => setNewContent(e.target.value)}
               placeholder="Type your operational internal notes here..."
-              className="bg-zinc-950 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700 min-h-[90px]"
+              className="border-gray-200 text-sm focus-visible:ring-1 focus-visible:ring-[#C5F135] min-h-[90px]"
             />
-            <div className="flex items-center space-x-2 justify-end">
+            <div className="flex items-center gap-2 justify-end">
               <Button
                 size="sm"
                 onClick={handleCreate}
                 disabled={isPending}
-                className="bg-primary text-primary-foreground hover:bg-primary/95 text-xs font-semibold"
+                className="bg-[#090D16] text-white hover:bg-gray-800 text-xs font-semibold rounded-lg h-8"
               >
                 {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Save Note"}
               </Button>
@@ -150,7 +150,7 @@ export default function InternalNotes({ clientId, initialNotes }: InternalNotesP
                   setNewContent("");
                 }}
                 disabled={isPending}
-                className="hover:bg-zinc-800 text-muted-foreground hover:text-foreground text-xs"
+                className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 text-xs h-8"
               >
                 Cancel
               </Button>
@@ -174,27 +174,27 @@ export default function InternalNotes({ clientId, initialNotes }: InternalNotesP
               return (
                 <div
                   key={note.id}
-                  className="flex space-x-3 p-4 border border-border/40 hover:border-zinc-800/80 rounded-lg bg-zinc-950/20 group/note transition-all duration-200"
+                  className="flex gap-3 p-4 border border-gray-100 hover:border-gray-200 rounded-xl bg-white group/note transition-all duration-200"
                 >
-                  <Avatar className="w-8 h-8 border border-border bg-zinc-800 text-zinc-300">
+                  <Avatar className="w-8 h-8 border border-gray-200 bg-gray-100 text-gray-600">
                     <AvatarFallback className="text-[10px] font-bold">{initials}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 space-y-1.5 min-w-0">
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2 text-xs">
-                        <span className="font-bold text-foreground/90">{creatorName}</span>
-                        <span className="text-zinc-500">•</span>
-                        <span className="text-muted-foreground">{formatDate(note.createdAt, "PPp")}</span>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="font-bold text-gray-800">{creatorName}</span>
+                        <span className="text-gray-300">•</span>
+                        <span className="text-gray-400">{formatDate(note.createdAt, "MMM d, yyyy 'at' h:mm a")}</span>
                       </div>
                       
                       {/* Action buttons */}
                       {!isEditing && (
-                        <div className="flex items-center space-x-1 opacity-0 group-hover/note:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-1 opacity-0 group-hover/note:opacity-100 transition-opacity">
                           <Button
                             size="icon"
                             variant="ghost"
                             onClick={() => startEditing(note)}
-                            className="w-7 h-7 text-muted-foreground hover:text-foreground hover:bg-zinc-800"
+                            className="w-7 h-7 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
                           >
                             <Edit2 className="w-3.5 h-3.5" />
                           </Button>
@@ -202,7 +202,7 @@ export default function InternalNotes({ clientId, initialNotes }: InternalNotesP
                             size="icon"
                             variant="ghost"
                             onClick={() => handleDelete(note.id)}
-                            className="w-7 h-7 text-rose-500 hover:text-rose-400 hover:bg-rose-950/20"
+                            className="w-7 h-7 text-rose-400 hover:text-rose-600 hover:bg-rose-50"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </Button>
@@ -215,14 +215,14 @@ export default function InternalNotes({ clientId, initialNotes }: InternalNotesP
                         <Textarea
                           value={editingContent}
                           onChange={(e) => setEditingContent(e.target.value)}
-                          className="bg-zinc-950 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700 min-h-[70px]"
+                          className="border-gray-200 text-sm focus-visible:ring-1 focus-visible:ring-[#C5F135] min-h-[70px]"
                         />
-                        <div className="flex items-center space-x-2 justify-end">
+                        <div className="flex items-center gap-2 justify-end">
                           <Button
                             size="sm"
                             onClick={() => handleUpdate(note.id)}
                             disabled={isPending}
-                            className="bg-primary text-primary-foreground hover:bg-primary/95 text-xs font-semibold h-7"
+                            className="bg-[#090D16] text-white hover:bg-gray-800 text-xs font-semibold rounded-lg h-8"
                           >
                             {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Save"}
                           </Button>
@@ -231,14 +231,14 @@ export default function InternalNotes({ clientId, initialNotes }: InternalNotesP
                             variant="ghost"
                             onClick={() => setEditingId(null)}
                             disabled={isPending}
-                            className="hover:bg-zinc-800 text-muted-foreground hover:text-foreground text-xs h-7"
+                            className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 text-xs h-8"
                           >
                             Cancel
                           </Button>
                         </div>
                       </div>
                     ) : (
-                      <p className="text-sm text-foreground/80 leading-relaxed break-words whitespace-pre-line">
+                      <p className="text-sm text-gray-700 leading-relaxed break-words whitespace-pre-line">
                         {note.content}
                       </p>
                     )}
@@ -247,8 +247,10 @@ export default function InternalNotes({ clientId, initialNotes }: InternalNotesP
               );
             })
           ) : (
-            <div className="text-center py-6 text-xs text-muted-foreground border border-dashed border-border/40 rounded-lg">
-              No internal notes recorded for this client.
+            <div className="flex flex-col items-center justify-center py-12 text-center bg-[#FAFAFB] border border-dashed border-gray-200 rounded-2xl">
+              <FileText className="w-10 h-10 text-gray-300 mb-3" />
+              <p className="text-sm font-semibold text-gray-700">No internal notes added yet.</p>
+              <p className="text-xs text-gray-400 mt-1">Add notes to keep important client context in one place.</p>
             </div>
           )}
         </div>

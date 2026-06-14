@@ -1,8 +1,7 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import StatusBadge from "@/components/shared/status-badge";
-import HealthScoreRing from "@/components/shared/health-score-ring";
-import { formatCurrency, formatDate } from "@/lib/utils";
-import { Calendar, DollarSign, Briefcase } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
+import { Mail, User, DollarSign, Calendar, Minus, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import type { ClientStatus } from "@prisma/client";
 
 interface ClientHeaderProps {
@@ -16,6 +15,8 @@ interface ClientHeaderProps {
     contractStart: string | Date | null;
     contractEnd: string | Date | null;
     industry: string | null;
+    contactName: string;
+    contactEmail: string;
   };
 }
 
@@ -27,83 +28,88 @@ export default function ClientHeader({ client }: ClientHeaderProps) {
     .slice(0, 2)
     .toUpperCase();
 
-  const start = client.contractStart;
-  const end = client.contractEnd;
+  const hasContract = client.contractStart && client.contractEnd;
 
   return (
-    <div className="bg-zinc-950/20 border-b border-border/80 px-8 py-6">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-        {/* Left Side: Brand Logo, Name, Industry, Status */}
-        <div className="flex items-center space-x-4">
-          <Avatar className="w-16 h-16 border-2 border-border/80 bg-zinc-900 text-zinc-100 text-lg font-bold shadow-md">
-            <AvatarFallback className="text-xl">{initials}</AvatarFallback>
-          </Avatar>
-          <div className="space-y-1.5">
-            <div className="flex items-center space-x-3 flex-wrap gap-y-2">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent leading-none">
-                {client.brandName}
-              </h1>
-              <StatusBadge status={client.status} size="md" />
-            </div>
-            {client.industry && (
-              <div className="flex items-center text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                <Briefcase className="w-3.5 h-3.5 mr-1" />
-                {client.industry}
+    <div className="bg-white border-b border-[#ECECF4]">
+      <div className="mx-auto" style={{ maxWidth: 1440 }}>
+        <div className="px-8 pt-6 pb-5">
+          {/* Breadcrumbs */}
+          <div className="text-xs font-medium text-gray-400 mb-4">
+            <Link href="/admin/clients" className="hover:text-gray-600 transition-colors">Clients</Link>
+            <ChevronRight className="w-3 h-3 inline mx-0.5 -mt-0.5" />
+            <span>{client.brandName}</span>
+          </div>
+
+          {/* Main header row */}
+          <div className="flex items-center justify-between">
+            {/* Left: Avatar + Name + Status + Metadata */}
+            <div className="flex items-center gap-4 min-w-0">
+              <Avatar className="w-14 h-14 rounded-[16px] bg-[#EBF7C1] shrink-0">
+                <AvatarFallback className="text-lg font-bold text-[#111827] bg-transparent">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <div className="flex items-center gap-3 flex-wrap">
+                  <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                    {client.brandName}
+                  </h1>
+                  <div className="bg-[#ECFDF5] text-[#10B981] text-xs font-semibold px-2.5 py-0.5 rounded-full border border-[#D1FAE5]">
+                    {client.status === "ACTIVE" ? "Active" : client.status.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 mt-1.5 text-sm text-gray-500 font-medium">
+                  <div className="flex items-center gap-1.5">
+                    <Mail className="w-3.5 h-3.5" />
+                    <span>{client.contactEmail}</span>
+                  </div>
+                  <span className="text-gray-300">|</span>
+                  <div className="flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5" />
+                    <span>{client.contactName || client.industry}</span>
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
-        </div>
+            </div>
 
-        {/* Right Side: Financial, Contract, Health Ring */}
-        <div className="flex flex-wrap items-center gap-6 md:gap-8">
-          {/* Monthly Retainer */}
-          <div className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 rounded-lg bg-zinc-900 border border-border/40 flex items-center justify-center text-primary shrink-0">
-              <DollarSign className="w-4 h-4" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] text-muted-foreground uppercase font-semibold tracking-wider">
-                Monthly Retainer
-              </span>
-              <span className="text-base font-bold text-foreground">
-                {formatCurrency(client.monthlyRetainer)}
-              </span>
-            </div>
-          </div>
+            {/* Right: Metric Capsules */}
+            <div className="flex items-center gap-6 shrink-0">
+              {/* Monthly Retainer */}
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-full bg-[#F2F8D7] flex items-center justify-center shrink-0">
+                  <DollarSign className="w-4 h-4 text-gray-900" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-semibold text-gray-400 uppercase block leading-none">Monthly Retainer</span>
+                  <span className="text-sm font-bold text-gray-900 leading-none mt-1 block">{formatCurrency(client.monthlyRetainer)}</span>
+                </div>
+              </div>
 
-          {/* Contract Period */}
-          <div className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 rounded-lg bg-zinc-900 border border-border/40 flex items-center justify-center text-zinc-400 shrink-0">
-              <Calendar className="w-4 h-4" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] text-muted-foreground uppercase font-semibold tracking-wider">
-                Contract Period
-              </span>
-              <span className="text-xs font-semibold text-foreground whitespace-nowrap">
-                {start ? (
-                  <>
-                    {formatDate(start, "MMM yyyy")}
-                    {end && ` - ${formatDate(end, "MMM yyyy")}`}
-                  </>
-                ) : (
-                  "No Active Contract"
-                )}
-              </span>
-            </div>
-          </div>
+              {/* Contract Period */}
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                  <Calendar className="w-4 h-4 text-gray-500" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-semibold text-gray-400 uppercase block leading-none">Contract Period</span>
+                  <span className="text-sm font-bold text-gray-900 leading-none mt-1 block whitespace-nowrap">
+                    {hasContract ? "Active" : "No Active Contract"}
+                  </span>
+                </div>
+              </div>
 
-          {/* Health Score Ring */}
-          <div className="flex items-center space-x-3 border-l border-border/60 pl-6 shrink-0">
-            <div className="flex flex-col text-right hidden sm:flex">
-              <span className="text-[10px] text-muted-foreground uppercase font-semibold tracking-wider">
-                Health Status
-              </span>
-              <span className="text-xs font-bold text-foreground/90 mt-0.5">
-                Portfolio Vitality
-              </span>
+              {/* Health Status */}
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                  <Minus className="w-4 h-4 text-gray-500" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-semibold text-gray-400 uppercase block leading-none">Health Status</span>
+                  <span className="text-sm font-bold text-gray-900 leading-none mt-1 block">Portfolio Vitality</span>
+                </div>
+              </div>
             </div>
-            <HealthScoreRing score={client.healthScore} size={56} strokeWidth={3} />
           </div>
         </div>
       </div>

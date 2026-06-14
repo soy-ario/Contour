@@ -28,6 +28,7 @@ import {
   AlertTriangle,
   ArrowRight,
   Package,
+  Save,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
@@ -104,6 +105,27 @@ interface ContentDetailSheetProps {
   isAdmin?: boolean;
 }
 
+function DetailBlock({ children, className }: { children: React.ReactNode; className?: string }) {
+  return (
+    <div className={cn("bg-[#FAFAFD] border border-[#ECECF4] rounded-xl p-4", className)}>
+      {children}
+    </div>
+  );
+}
+
+function DetailLabel({ children }: { children: React.ReactNode }) {
+  return <span className="text-[10px] uppercase tracking-wider font-bold text-[#9CA3AF] block mb-1.5">{children}</span>;
+}
+
+function SectionTitle({ icon: Icon, children }: { icon?: React.ComponentType<{ className?: string }> | null; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-1.5 mb-2">
+      {Icon ? <Icon className="w-3.5 h-3.5 text-[#9CA3AF]" /> : null}
+      <span className="text-[10px] uppercase tracking-wider font-bold text-[#9CA3AF]">{children}</span>
+    </div>
+  );
+}
+
 export default function ContentDetailSheet({
   contentId,
   clientId,
@@ -117,14 +139,12 @@ export default function ContentDetailSheet({
   const [submitting, setSubmitting] = React.useState(false);
   const [content, setContent] = React.useState<ContentDetail | null>(null);
 
-  // Form states for schedule, comments, approval
   const [scheduleDate, setScheduleDate] = React.useState("");
   const [showScheduleInput, setShowScheduleInput] = React.useState(false);
   const [commentText, setCommentText] = React.useState("");
   const [notesText, setNotesText] = React.useState("");
   const [copiedField, setCopiedField] = React.useState<"caption" | "script" | null>(null);
 
-  // Fetch detailed content on contentId change
   const fetchContentDetail = React.useCallback(async () => {
     if (!contentId || !clientId) return;
     setLoading(true);
@@ -137,7 +157,7 @@ export default function ContentDetailSheet({
       } else {
         toast.error("Failed to load content details");
       }
-    } catch (e) {
+    } catch {
       toast.error("An error occurred loading content details");
     } finally {
       setLoading(false);
@@ -182,7 +202,7 @@ export default function ContentDetailSheet({
       } else {
         toast.error(result.error?.message || result.error || "Operation failed");
       }
-    } catch (e) {
+    } catch {
       toast.error("Network error. Please try again.");
     } finally {
       setSubmitting(false);
@@ -206,7 +226,7 @@ export default function ContentDetailSheet({
       } else {
         toast.error(result.error?.message || result.error || "Failed to update notes");
       }
-    } catch (e) {
+    } catch {
       toast.error("Network error saving notes");
     } finally {
       setSubmitting(false);
@@ -226,48 +246,46 @@ export default function ContentDetailSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-md md:max-w-lg overflow-y-auto bg-zinc-950 border-l border-zinc-800 text-zinc-300 p-0 flex flex-col h-full scrollbar-thin">
+      <SheetContent className="sm:max-w-md md:max-w-lg overflow-y-auto bg-white text-[#111827] p-0 flex flex-col h-full scrollbar-thin">
         {loading ? (
           <div className="flex-1 flex items-center justify-center h-full">
-            <div className="w-8 h-8 border-2 border-t-transparent border-emerald-500 rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-t-transparent border-[#C5F135] rounded-full animate-spin" />
           </div>
         ) : !content ? (
-          <div className="flex-1 flex items-center justify-center p-6 text-zinc-500 h-full">
+          <div className="flex-1 flex items-center justify-center p-6 text-[#9CA3AF] h-full">
             No content details available.
           </div>
         ) : (
           <>
-            {/* Sheet Header */}
-            <SheetHeader className="p-6 pb-4 border-b border-zinc-850 bg-zinc-900/30 flex flex-col gap-1.5">
+            <SheetHeader className="p-6 pb-4 border-b border-[#ECECF4] bg-[#FAFAFD]">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <PlatformIcon platform={content.platform} className="w-5 h-5 shrink-0" />
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-zinc-500 bg-zinc-900 border border-zinc-850 px-2 py-0.5 rounded">
+                <div className="flex items-center gap-2">
+                  <PlatformIcon platform={content.platform} className="w-4 h-4 shrink-0 text-[#6B7280]" />
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-[#6B7280] bg-white border border-[#ECECF4] px-2 py-0.5 rounded">
                     {CONTENT_TYPE_LABELS[content.contentType]}
                   </span>
                 </div>
                 <StatusBadge status={content.status} size="sm" />
               </div>
-              <SheetTitle className="text-lg font-bold text-white mt-1 leading-snug">
+              <SheetTitle className="text-lg font-bold text-[#111827] mt-2 leading-snug">
                 {content.title}
               </SheetTitle>
-              <SheetDescription className="text-xs text-zinc-500">
-                Created by @{content.creator?.username || "system"} • Client:{" "}
-                <span className="text-emerald-400 font-semibold uppercase">{content.client.brandName}</span>
+              <SheetDescription className="text-xs text-[#6B7280]">
+                Created by @{content.creator?.username || "system"} &middot; Client:{" "}
+                <span className="text-[#111827] font-semibold">{content.client.brandName}</span>
               </SheetDescription>
             </SheetHeader>
 
-            {/* Content Body */}
-            <div className="flex-1 p-6 space-y-6 overflow-y-auto">
-              {/* Asset Preview Carousel */}
+            <div className="flex-1 p-6 space-y-5 overflow-y-auto">
+              {/* Asset Gallery */}
               {content.assetUrls.length > 0 && (
-                <div className="space-y-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Asset Gallery</span>
-                  <div className="flex space-x-3 overflow-x-auto pb-2 scrollbar-thin">
+                <div>
+                  <SectionTitle icon={null}>Asset Gallery</SectionTitle>
+                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
                     {content.assetUrls.map((url, i) => (
                       <div
                         key={i}
-                        className="relative w-32 h-32 rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900 shrink-0 group/asset"
+                        className="relative w-32 h-32 rounded-xl overflow-hidden border border-[#ECECF4] bg-[#FAFAFD] shrink-0 group/asset"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
@@ -281,71 +299,100 @@ export default function ContentDetailSheet({
                 </div>
               )}
 
-              {/* Topic & Budget Details */}
-              <div className="grid grid-cols-2 gap-4 bg-zinc-900/40 p-4 border border-zinc-850 rounded-xl">
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-zinc-500 block">Topic / Concept</span>
-                  <span className="text-sm font-semibold text-zinc-200 mt-1 block">
-                    {content.topic || "General"}
-                  </span>
+              {/* Topic & Budget */}
+              <DetailBlock>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <DetailLabel>Topic / Concept</DetailLabel>
+                    <span className="text-sm font-semibold text-[#111827] block">
+                      {content.topic || "General"}
+                    </span>
+                  </div>
+                  <div>
+                    <DetailLabel>Ad Spend Allocated</DetailLabel>
+                    <span className="text-sm font-semibold text-[#111827] block flex items-center gap-1.5">
+                      <CircleDollarSign className="w-3.5 h-3.5 text-[#6B7280]" />
+                      {content.adSpend ? formatCurrency(content.adSpend) : "$0.00"}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-zinc-500 block">Ad Spend Allocated</span>
-                  <span className="text-sm font-semibold text-emerald-400 mt-1 block flex items-center gap-1">
-                    <CircleDollarSign className="w-4 h-4 shrink-0" />
-                    {content.adSpend ? formatCurrency(content.adSpend) : "$0.00"}
-                  </span>
-                </div>
-              </div>
+              </DetailBlock>
 
-              {/* Creative Copy & Scripts */}
+              {/* Schedule Info */}
+              {(content.scheduledAt || content.publishDate) && (
+                <DetailBlock>
+                  <div className="grid grid-cols-2 gap-4">
+                    {content.scheduledAt && (
+                      <div>
+                        <DetailLabel><Calendar className="w-3 h-3 inline mr-1" />Scheduled For</DetailLabel>
+                        <span className="text-sm font-semibold text-[#111827] block">
+                          {formatDate(content.scheduledAt, "MMM dd, yyyy h:mm a")}
+                        </span>
+                      </div>
+                    )}
+                    {content.publishDate && (
+                      <div>
+                        <DetailLabel><Clock className="w-3 h-3 inline mr-1" />Published At</DetailLabel>
+                        <span className="text-sm font-semibold text-[#111827] block">
+                          {formatDate(content.publishDate, "MMM dd, yyyy h:mm a")}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </DetailBlock>
+              )}
+
+              {/* Caption */}
               {content.caption && (
-                <div className="space-y-2 bg-zinc-900/20 p-4 border border-zinc-900 rounded-xl relative">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Caption / Description</span>
+                <DetailBlock>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-[#9CA3AF]">Caption / Description</span>
                     <Button
                       variant="ghost"
                       size="icon-sm"
                       onClick={() => copyToClipboard(content.caption, "caption")}
-                      className="text-zinc-500 hover:text-white"
+                      className="text-[#9CA3AF] hover:text-[#111827] h-7 w-7"
                     >
-                      {copiedField === "caption" ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                      {copiedField === "caption" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                     </Button>
                   </div>
-                  <p className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed select-text">
+                  <p className="text-sm text-[#374151] whitespace-pre-wrap leading-relaxed select-text">
                     {content.caption}
                   </p>
-                </div>
+                </DetailBlock>
               )}
 
+              {/* Script */}
               {content.script && (
-                <div className="space-y-2 bg-zinc-900/20 p-4 border border-zinc-900 rounded-xl relative">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Video Script / Notes</span>
+                <DetailBlock>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] uppercase tracking-wider font-bold text-[#9CA3AF]">Video Script / Notes</span>
                     <Button
                       variant="ghost"
                       size="icon-sm"
                       onClick={() => copyToClipboard(content.script, "script")}
-                      className="text-zinc-500 hover:text-white"
+                      className="text-[#9CA3AF] hover:text-[#111827] h-7 w-7"
                     >
-                      {copiedField === "script" ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                      {copiedField === "script" ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
                     </Button>
                   </div>
-                  <p className="text-sm text-zinc-300 font-mono whitespace-pre-wrap leading-relaxed select-text text-[13px] bg-zinc-950 p-3 rounded-lg border border-zinc-850">
-                    {content.script}
-                  </p>
-                </div>
+                  <div className="bg-white border border-[#ECECF4] rounded-lg p-3">
+                    <p className="text-sm text-[#374151] font-mono whitespace-pre-wrap leading-relaxed select-text">
+                      {content.script}
+                    </p>
+                  </div>
+                </DetailBlock>
               )}
 
               {/* Hashtags */}
               {content.hashtags.length > 0 && (
-                <div className="space-y-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Hashtags</span>
+                <div>
+                  <SectionTitle icon={null}>Hashtags</SectionTitle>
                   <div className="flex flex-wrap gap-1.5">
                     {content.hashtags.map((tag, i) => (
                       <span
                         key={i}
-                        className="text-xs text-emerald-400 bg-emerald-500/5 border border-emerald-500/10 px-2 py-0.5 rounded-full font-medium"
+                        className="text-xs text-[#6B7280] bg-[#FAFAFD] border border-[#ECECF4] px-2.5 py-0.5 rounded-full font-medium"
                       >
                         #{tag.replace("#", "")}
                       </span>
@@ -354,22 +401,22 @@ export default function ContentDetailSheet({
                 </div>
               )}
 
-              {/* Linked Products */}
+              {/* Products */}
               {content.products.length > 0 && (
-                <div className="space-y-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Promoting Products</span>
+                <div>
+                  <SectionTitle icon={Package}>Promoting Products</SectionTitle>
                   <div className="space-y-1.5">
                     {content.products.map((p) => (
                       <div
                         key={p.id}
-                        className="flex items-center justify-between p-2.5 rounded-lg border border-zinc-850 bg-zinc-900/20 text-xs"
+                        className="flex items-center justify-between p-2.5 rounded-lg border border-[#ECECF4] bg-[#FAFAFD] text-xs"
                       >
-                        <div className="flex items-center space-x-2 min-w-0">
-                          <Package className="w-4 h-4 text-zinc-500 shrink-0" />
-                          <span className="font-semibold text-zinc-300 truncate">{p.name}</span>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Package className="w-3.5 h-3.5 text-[#9CA3AF] shrink-0" />
+                          <span className="font-semibold text-[#111827] truncate">{p.name}</span>
                         </div>
                         {p.price && (
-                          <span className="font-bold text-zinc-400">${Number(p.price).toFixed(2)}</span>
+                          <span className="font-semibold text-[#6B7280]">${Number(p.price).toFixed(2)}</span>
                         )}
                       </div>
                     ))}
@@ -377,80 +424,77 @@ export default function ContentDetailSheet({
                 </div>
               )}
 
-              {/* Internal Notes Editor (Visible to Admins only) */}
+              {/* Internal Notes */}
               {isAdmin && (
-                <div className="space-y-2 bg-zinc-900/40 p-4 border border-zinc-850 rounded-xl">
-                  <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">Internal Admin Notes</span>
+                <DetailBlock>
+                  <SectionTitle icon={null}>Internal Admin Notes</SectionTitle>
                   <Textarea
                     placeholder="Enter notes visible only to the agency team..."
                     value={notesText}
                     onChange={(e) => setNotesText(e.target.value)}
-                    className="bg-zinc-950 border-zinc-800 text-sm placeholder:text-zinc-600 focus-visible:ring-zinc-700 min-h-[80px]"
+                    className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] min-h-[80px] rounded-xl"
                   />
-                  <div className="flex justify-end pt-1">
+                  <div className="flex justify-end pt-2">
                     <Button
                       size="sm"
                       onClick={handleSaveNotes}
                       disabled={submitting}
-                      className="bg-zinc-850 hover:bg-zinc-800 text-xs font-semibold text-white h-8 border border-zinc-800"
+                      className="bg-[#1E1E2E] hover:bg-[#0E0E1E] text-xs font-semibold text-white h-8 rounded-xl flex items-center gap-1.5 px-3"
                     >
+                      <Save className="w-3 h-3" />
                       Save Notes
                     </Button>
                   </div>
-                </div>
+                </DetailBlock>
               )}
 
-              {/* Collaboration Comments Thread */}
-              <div className="space-y-3 pt-2 border-t border-zinc-900">
-                <span className="text-xs font-bold uppercase tracking-wider text-zinc-500 flex items-center gap-1.5">
-                  <MessageSquare className="w-4 h-4" /> Discussion Feed
-                </span>
+              {/* Discussion Feed */}
+              <div className="pt-3 border-t border-[#ECECF4] space-y-3">
+                <SectionTitle icon={MessageSquare}>Discussion Feed</SectionTitle>
 
-                {/* Comment Form */}
                 <form onSubmit={handleAddComment} className="flex gap-2">
                   <Input
                     placeholder="Ask a question or add feedback..."
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    className="bg-zinc-950 border-zinc-800 text-sm focus-visible:ring-zinc-700 placeholder:text-zinc-600 flex-1"
+                    className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] rounded-xl flex-1 h-10"
                   />
                   <Button
                     type="submit"
                     disabled={submitting || !commentText.trim()}
-                    className="bg-zinc-900 hover:bg-zinc-800 text-xs font-semibold text-white border border-zinc-800 shrink-0 h-9"
+                    className="bg-[#1E1E2E] hover:bg-[#0E0E1E] text-xs font-semibold text-white rounded-xl shrink-0 h-10 px-4"
                   >
                     Post
                   </Button>
                 </form>
 
-                {/* Timeline / Event Feed */}
-                <div className="space-y-3 pt-2">
+                <div className="space-y-2.5">
                   {content.approvalEvents.map((evt) => {
                     const isComment = evt.action === "COMMENTED";
                     const actorName = evt.actor?.name || evt.actor?.username || "System";
-                    
+
                     return (
                       <div
                         key={evt.id}
                         className={cn(
                           "p-3 rounded-lg border text-xs leading-relaxed",
                           isComment
-                            ? "bg-zinc-900/20 border-zinc-900"
-                            : "bg-zinc-950 border-zinc-850/50"
+                            ? "bg-[#FAFAFD] border-[#ECECF4]"
+                            : "bg-white border-[#ECECF4]"
                         )}
                       >
-                        <div className="flex items-center justify-between text-zinc-500 mb-1.5">
-                          <span className="font-bold text-zinc-400">{actorName}</span>
+                        <div className="flex items-center justify-between text-[#9CA3AF] mb-1.5">
+                          <span className="font-bold text-[#111827]">{actorName}</span>
                           <span className="text-[10px]">{formatDate(evt.createdAt, "MMM dd, h:mm a")}</span>
                         </div>
-                        
+
                         {!isComment && (
-                          <span className="inline-block text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-850 text-zinc-400 mb-1.5">
+                          <span className="inline-block text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-white border border-[#ECECF4] text-[#6B7280] mb-1.5">
                             {evt.action.replace(/_/g, " ")}
                           </span>
                         )}
 
-                        {evt.comment && <p className="text-zinc-300">{evt.comment}</p>}
+                        {evt.comment && <p className="text-[#374151]">{evt.comment}</p>}
                       </div>
                     );
                   })}
@@ -458,14 +502,13 @@ export default function ContentDetailSheet({
               </div>
             </div>
 
-            {/* Sticky Action Footer */}
-            <div className="p-4 bg-zinc-950 border-t border-zinc-850 flex flex-col gap-3 shrink-0">
-              {/* Dynamic Action Buttons based on status */}
+            {/* Action Footer */}
+            <div className="p-4 bg-[#FAFAFD] border-t border-[#ECECF4] flex flex-col gap-3 shrink-0">
               {isDraft && isAdmin && (
                 <Button
                   onClick={() => handleAction("submit", undefined, "Submitted for Client Approval")}
                   disabled={submitting}
-                  className="w-full bg-amber-500 hover:bg-amber-600 text-zinc-950 font-bold text-sm h-10 flex items-center justify-center gap-1.5 shadow-lg shadow-amber-500/10"
+                  className="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm h-10 flex items-center justify-center gap-1.5 rounded-xl"
                 >
                   <Send className="w-4 h-4" /> Submit for Client Approval
                 </Button>
@@ -480,9 +523,9 @@ export default function ContentDetailSheet({
                     }}
                     disabled={submitting}
                     variant="outline"
-                    className="border-zinc-800 hover:bg-zinc-900 text-xs font-semibold text-zinc-400 hover:text-white h-10 flex items-center justify-center gap-1"
+                    className="border-[#ECECF4] hover:bg-[#FAFAFD] text-xs font-semibold text-[#6B7280] hover:text-[#111827] h-10 flex items-center justify-center gap-1 rounded-xl"
                   >
-                    <XCircle className="w-4 h-4" /> Request Changes
+                    <XCircle className="w-4 h-4 text-rose-400" /> Request Changes
                   </Button>
                   <Button
                     onClick={() => {
@@ -490,7 +533,7 @@ export default function ContentDetailSheet({
                       handleAction("approve", comment ? { comment } : undefined, "Approved successfully");
                     }}
                     disabled={submitting}
-                    className="bg-emerald-500 hover:bg-emerald-600 text-zinc-950 font-bold text-xs h-10 flex items-center justify-center gap-1 shadow-lg shadow-emerald-500/10"
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs h-10 flex items-center justify-center gap-1 rounded-xl"
                   >
                     <CheckCircle className="w-4 h-4" /> Approve Content
                   </Button>
@@ -502,7 +545,7 @@ export default function ContentDetailSheet({
                   {!showScheduleInput ? (
                     <Button
                       onClick={() => setShowScheduleInput(true)}
-                      className="w-full bg-blue-500 hover:bg-blue-600 text-zinc-950 font-bold text-sm h-10 flex items-center justify-center gap-1.5 shadow-lg shadow-blue-500/10"
+                      className="w-full bg-[#1E1E2E] hover:bg-[#0E0E1E] text-white font-bold text-sm h-10 flex items-center justify-center gap-1.5 rounded-xl"
                     >
                       <Calendar className="w-4 h-4" /> Schedule Post Date
                     </Button>
@@ -512,12 +555,12 @@ export default function ContentDetailSheet({
                         type="datetime-local"
                         value={scheduleDate}
                         onChange={(e) => setScheduleDate(e.target.value)}
-                        className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-zinc-700 text-zinc-200 flex-1"
+                        className="border-[#ECECF4] bg-white text-sm focus-visible:ring-1 focus-visible:ring-[#C5F135] rounded-xl flex-1 h-10"
                       />
                       <Button
                         onClick={() => handleAction("schedule", { scheduledDate: scheduleDate }, "Content scheduled")}
                         disabled={submitting || !scheduleDate}
-                        className="bg-blue-500 hover:bg-blue-600 text-zinc-950 font-bold text-xs h-10 px-4 shrink-0 shadow-lg shadow-blue-500/10"
+                        className="bg-[#1E1E2E] hover:bg-[#0E0E1E] text-white font-bold text-xs h-10 px-4 shrink-0 rounded-xl"
                       >
                         Confirm
                       </Button>
@@ -526,7 +569,6 @@ export default function ContentDetailSheet({
                 </div>
               )}
 
-              {/* Utility edit buttons */}
               {onEdit && (isDraft || content.status === "CLIENT_APPROVAL_PENDING") && isAdmin && (
                 <Button
                   variant="outline"
@@ -534,7 +576,7 @@ export default function ContentDetailSheet({
                     onOpenChange(false);
                     onEdit(content.id);
                   }}
-                  className="w-full border-zinc-800 hover:bg-zinc-900 text-zinc-400 hover:text-white font-semibold text-xs h-9"
+                  className="w-full border-[#ECECF4] hover:bg-[#FAFAFD] text-[#6B7280] hover:text-[#111827] font-semibold text-xs h-9 rounded-xl"
                 >
                   <Edit className="w-3.5 h-3.5 mr-1.5" /> Edit Content Details
                 </Button>

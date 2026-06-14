@@ -6,9 +6,8 @@ import { useRouter } from "next/navigation";
 import type { Platform, ContentStatus, ContentType, ApprovalAction } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import StatusBadge from "@/components/shared/status-badge";
-import { PlatformIcon } from "@/components/shared/social-icons";
+import { PlatformIcon, InstagramIcon, FacebookIcon, LinkedinIcon, YoutubeIcon, TiktokIcon, TwitterIcon } from "@/components/shared/social-icons";
 import {
   Calendar,
   CircleDollarSign,
@@ -21,6 +20,9 @@ import {
   MessageSquare,
   Package,
   ChevronLeft,
+  User,
+  Shield,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
@@ -78,6 +80,11 @@ interface ContentDetailProps {
   content: ContentDetail;
 }
 
+const platformIcons: Record<string, React.ComponentType<{ className?: string }>> = {
+  INSTAGRAM: InstagramIcon, FACEBOOK: FacebookIcon, LINKEDIN: LinkedinIcon,
+  YOUTUBE: YoutubeIcon, TIKTOK: TiktokIcon, X: TwitterIcon,
+};
+
 export default function ContentDetailComponent({ content: initialContent }: ContentDetailProps) {
   const router = useRouter();
   const [content, setContent] = React.useState<ContentDetail>(initialContent);
@@ -90,7 +97,7 @@ export default function ContentDetailComponent({ content: initialContent }: Cont
     if (!text) return;
     navigator.clipboard.writeText(text);
     setCopiedField(field);
-    toast.success(`${field === "caption" ? "Caption" : "Script"} copied to clipboard!`);
+    toast.success(`${field === "caption" ? "Caption" : "Script"} copied!`);
     setTimeout(() => setCopiedField(null), 2000);
   };
 
@@ -101,13 +108,12 @@ export default function ContentDetailComponent({ content: initialContent }: Cont
       if (res.success && res.data) {
         toast.success("Content approved successfully!");
         router.refresh();
-        // Since we refresh, let's update local status too
         setContent((prev) => ({ ...prev, status: "APPROVED" }));
         setActionComment("");
       } else {
         toast.error(res.error || "Failed to approve content");
       }
-    } catch (err) {
+    } catch {
       toast.error("An error occurred");
     } finally {
       setSubmitting(false);
@@ -116,7 +122,7 @@ export default function ContentDetailComponent({ content: initialContent }: Cont
 
   const handleRequestChanges = async () => {
     if (!actionComment.trim()) {
-      toast.error("Feedback/Reason comment is required for requesting changes");
+      toast.error("Feedback is required for requesting changes");
       return;
     }
     setSubmitting(true);
@@ -129,7 +135,7 @@ export default function ContentDetailComponent({ content: initialContent }: Cont
       } else {
         toast.error(res.error || "Failed to request changes");
       }
-    } catch (err) {
+    } catch {
       toast.error("An error occurred");
     } finally {
       setSubmitting(false);
@@ -138,7 +144,7 @@ export default function ContentDetailComponent({ content: initialContent }: Cont
 
   const handleReject = async () => {
     if (!actionComment.trim()) {
-      toast.error("Feedback/Reason comment is required for rejection");
+      toast.error("Feedback is required for rejection");
       return;
     }
     setSubmitting(true);
@@ -152,7 +158,7 @@ export default function ContentDetailComponent({ content: initialContent }: Cont
       } else {
         toast.error(res.error || "Failed to reject content");
       }
-    } catch (err) {
+    } catch {
       toast.error("An error occurred");
     } finally {
       setSubmitting(false);
@@ -169,13 +175,11 @@ export default function ContentDetailComponent({ content: initialContent }: Cont
         toast.success("Comment added!");
         setCommentText("");
         router.refresh();
-        // Force refresh comments list or fetch page data again
-        // Here we can append to state if needed, or rely on router.refresh()
         window.location.reload();
       } else {
         toast.error(res.error || "Failed to add comment");
       }
-    } catch (err) {
+    } catch {
       toast.error("An error occurred");
     } finally {
       setSubmitting(false);
@@ -183,307 +187,238 @@ export default function ContentDetailComponent({ content: initialContent }: Cont
   };
 
   const isPending = content.status === "CLIENT_APPROVAL_PENDING";
+  const PlatformIcon = platformIcons[content.platform];
 
   return (
-    <div className="space-y-6">
-      {/* Back Button */}
-      <div className="flex items-center justify-between">
-        <Link
-          href="/client/content"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ChevronLeft className="size-4" />
+    <div className="py-8 px-8 mx-auto" style={{ maxWidth: 1200 }}>
+      <div className="space-y-6">
+        {/* Back Button */}
+        <Link href="/client/content" className="inline-flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#111827] transition-colors">
+          <ChevronLeft className="w-4 h-4" />
           Back to content list
         </Link>
-      </div>
 
-      {/* Header Info */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-5">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <PlatformIcon platform={content.platform} className="size-5 text-foreground" />
-            <span className="text-xs uppercase font-bold tracking-wider text-muted-foreground bg-muted border border-border px-2 py-0.5 rounded">
-              {CONTENT_TYPE_LABELS[content.contentType]}
-            </span>
-            <StatusBadge status={content.status} />
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#ECECF4] pb-5">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2.5">
+              {PlatformIcon && <PlatformIcon className="w-5 h-5" />}
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#6B7280] bg-[#F4F4FA] px-2 py-0.5 rounded-full">
+                {CONTENT_TYPE_LABELS[content.contentType]}
+              </span>
+              <StatusBadge status={content.status} />
+            </div>
+            <h1 className="text-2xl font-bold text-[#111827] tracking-tight mt-1">{content.title}</h1>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground mt-1">
-            {content.title}
-          </h1>
         </div>
-      </header>
 
-      {/* Main Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Left Columns (Content details) */}
-        <div className="xl:col-span-2 space-y-6">
-          {/* Asset Gallery */}
-          {content.assetUrls.length > 0 && (
-            <Card className="border-border bg-card">
-              <CardHeader>
-                <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Asset Gallery</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex space-x-3 overflow-x-auto pb-2 scrollbar-thin">
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          {/* Left - Content Details */}
+          <div className="xl:col-span-2 space-y-6">
+            {/* Asset Gallery */}
+            {content.assetUrls.length > 0 && (
+              <div className="bg-white border border-[#ECECF4] rounded-[24px] p-6">
+                <span className="text-xs font-bold text-[#6B7280] uppercase tracking-wider block mb-4">Asset Gallery</span>
+                <div className="flex space-x-3 overflow-x-auto pb-2">
                   {content.assetUrls.map((url, i) => (
-                    <div
-                      key={i}
-                      className="relative w-40 h-40 rounded-xl overflow-hidden border border-border bg-muted shrink-0 group/asset"
-                    >
+                    <div key={i} className="relative w-40 h-40 rounded-xl overflow-hidden border border-[#ECECF4] bg-[#F9FAFB] shrink-0 group/asset">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={url}
-                        alt={`Asset ${i + 1}`}
-                        className="w-full h-full object-cover group-hover/asset:scale-105 transition-transform duration-300"
-                      />
+                      <img src={url} alt={`Asset ${i + 1}`} className="w-full h-full object-cover group-hover/asset:scale-105 transition-transform duration-300" />
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            )}
 
-          {/* Details Row */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-muted/30 p-4 border border-border rounded-xl">
-            <div>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">Topic / Concept</span>
-              <span className="text-sm font-semibold text-foreground mt-1 block">
-                {content.topic || "General"}
-              </span>
+            {/* Details Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-white border border-[#ECECF4] rounded-[20px] p-5">
+                <span className="text-[10px] uppercase tracking-wider text-[#6B7280] font-bold block">Topic / Concept</span>
+                <span className="text-sm font-semibold text-[#111827] mt-1 block">{content.topic || "General"}</span>
+              </div>
+              <div className="bg-white border border-[#ECECF4] rounded-[20px] p-5">
+                <span className="text-[10px] uppercase tracking-wider text-[#6B7280] font-bold block">Ad Spend Allocated</span>
+                <span className="text-sm font-semibold text-[#111827] mt-1 block flex items-center gap-1.5">
+                  <CircleDollarSign className="w-4 h-4 text-emerald-500" />
+                  {content.adSpend ? formatCurrency(content.adSpend) : "$0.00"}
+                </span>
+              </div>
             </div>
-            <div>
-              <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">Ad Spend Allocated</span>
-              <span className="text-sm font-semibold text-foreground mt-1 block flex items-center gap-1">
-                <CircleDollarSign className="w-4 h-4 text-emerald-400" />
-                {content.adSpend ? formatCurrency(content.adSpend) : "$0.00"}
-              </span>
-            </div>
-          </div>
 
-          {/* Caption */}
-          {content.caption && (
-            <Card className="border-border bg-card">
-              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Caption / Copy</CardTitle>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => copyToClipboard(content.caption, "caption")}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  {copiedField === "caption" ? <Check className="size-4 text-emerald-400" /> : <Copy className="size-4" />}
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-foreground whitespace-pre-wrap leading-relaxed select-text">
-                  {content.caption}
-                </p>
-              </CardContent>
-            </Card>
-          )}
+            {/* Caption */}
+            {content.caption && (
+              <div className="bg-white border border-[#ECECF4] rounded-[24px] p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold text-[#6B7280] uppercase tracking-wider">Caption / Copy</span>
+                  <button
+                    onClick={() => copyToClipboard(content.caption, "caption")}
+                    className="text-[#6B7280] hover:text-[#111827] transition-colors"
+                  >
+                    {copiedField === "caption" ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                </div>
+                <p className="text-sm text-[#111827] whitespace-pre-wrap leading-relaxed select-text">{content.caption}</p>
+              </div>
+            )}
 
-          {/* Video Script */}
-          {content.script && (
-            <Card className="border-border bg-card">
-              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-                <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Video Script / Notes</CardTitle>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => copyToClipboard(content.script, "script")}
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  {copiedField === "script" ? <Check className="size-4 text-emerald-400" /> : <Copy className="size-4" />}
-                </Button>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm font-mono whitespace-pre-wrap leading-relaxed select-text bg-muted/40 p-3 rounded-lg border border-border">
+            {/* Script */}
+            {content.script && (
+              <div className="bg-white border border-[#ECECF4] rounded-[24px] p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold text-[#6B7280] uppercase tracking-wider">Video Script / Notes</span>
+                  <button
+                    onClick={() => copyToClipboard(content.script, "script")}
+                    className="text-[#6B7280] hover:text-[#111827] transition-colors"
+                  >
+                    {copiedField === "script" ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                </div>
+                <p className="text-sm font-mono whitespace-pre-wrap leading-relaxed select-text bg-[#F9FAFB] p-4 rounded-xl border border-[#ECECF4]">
                   {content.script}
                 </p>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Hashtags */}
-          {content.hashtags.length > 0 && (
-            <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Hashtags</span>
-              <div className="flex flex-wrap gap-1.5">
-                {content.hashtags.map((tag, i) => (
-                  <span
-                    key={i}
-                    className="text-xs text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full font-medium"
-                  >
-                    #{tag.replace("#", "")}
-                  </span>
-                ))}
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Promoting Products */}
-          {content.products.length > 0 && (
-            <div className="space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Promoting Products</span>
-              <div className="space-y-1.5">
-                {content.products.map((p) => (
-                  <div
-                    key={p.id}
-                    className="flex items-center justify-between p-2.5 rounded-lg border border-border bg-card text-xs"
-                  >
-                    <div className="flex items-center space-x-2 min-w-0">
-                      <Package className="size-4 text-muted-foreground shrink-0" />
-                      <span className="font-semibold text-foreground truncate">{p.name}</span>
+            {/* Hashtags */}
+            {content.hashtags.length > 0 && (
+              <div>
+                <span className="text-xs font-bold text-[#6B7280] uppercase tracking-wider block mb-2">Hashtags</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {content.hashtags.map((tag, i) => (
+                    <span key={i} className="text-[11px] font-semibold text-[#6B7280] bg-[#F4F4FA] px-2.5 py-1 rounded-full">
+                      #{tag.replace("#", "")}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Products */}
+            {content.products.length > 0 && (
+              <div>
+                <span className="text-xs font-bold text-[#6B7280] uppercase tracking-wider block mb-2">Promoting Products</span>
+                <div className="space-y-1.5">
+                  {content.products.map((p) => (
+                    <div key={p.id} className="flex items-center justify-between p-3 rounded-xl border border-[#ECECF4] bg-white">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Package className="w-4 h-4 text-[#6B7280] shrink-0" />
+                        <span className="text-sm font-semibold text-[#111827] truncate">{p.name}</span>
+                      </div>
+                      {p.price && <span className="text-sm font-bold text-[#6B7280]">${Number(p.price).toFixed(2)}</span>}
                     </div>
-                    {p.price && (
-                      <span className="font-bold text-muted-foreground">${Number(p.price).toFixed(2)}</span>
-                    )}
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
 
-        {/* Right Column (Actions and Chat) */}
-        <div className="space-y-6">
-          {/* Approval Action Card */}
-          <Card className={cn("border", isPending ? "border-amber-500/30 bg-amber-500/5" : "border-border bg-card")}>
-            <CardHeader>
-              <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                Approval Actions
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+          {/* Right - Actions & Discussion */}
+          <div className="space-y-6">
+            {/* Approval Card */}
+            <div className={cn("bg-white border rounded-[24px] p-6", isPending ? "border-[#C5F135]/50" : "border-[#ECECF4]")}>
+              <span className="text-xs font-bold text-[#6B7280] uppercase tracking-wider block mb-4">Approval Actions</span>
               {isPending ? (
                 <div className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-xs text-muted-foreground font-medium">
-                      Feedback or Note (optional for approvals, required for rejections/changes):
-                    </label>
-                    <Textarea
-                      placeholder="Add any additional comments here..."
-                      value={actionComment}
-                      onChange={(e) => setActionComment(e.target.value)}
-                      className="bg-background border-border text-sm placeholder:text-muted-foreground/60 min-h-[90px]"
-                    />
-                  </div>
+                  <Textarea
+                    placeholder="Add feedback or a note (optional for approve, required for changes/rejection)..."
+                    value={actionComment}
+                    onChange={(e) => setActionComment(e.target.value)}
+                    className="border-[#ECECF4] text-sm placeholder:text-[#9CA3AF] focus-visible:ring-[#C5F135] min-h-[90px]"
+                  />
                   <div className="flex flex-col gap-2">
-                    <Button
-                      onClick={handleApprove}
-                      disabled={submitting}
-                      className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold h-10 flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/10"
-                    >
-                      <CheckCircle className="size-4" /> Approve Content
+                    <Button onClick={handleApprove} disabled={submitting}
+                      className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold h-10 rounded-xl flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/10">
+                      <CheckCircle className="w-4 h-4" /> Approve Content
                     </Button>
                     <div className="grid grid-cols-2 gap-2">
-                      <Button
-                        onClick={handleRequestChanges}
-                        disabled={submitting}
-                        variant="outline"
-                        className="border-border hover:bg-muted text-xs font-semibold h-9 flex items-center justify-center gap-1"
-                      >
-                        <Clock className="size-3.5" /> Request Changes
+                      <Button onClick={handleRequestChanges} disabled={submitting} variant="outline"
+                        className="border-[#ECECF4] hover:bg-[#F4F4FA] text-xs font-semibold h-9 rounded-xl flex items-center justify-center gap-1 text-[#111827]">
+                        <Clock className="w-3.5 h-3.5" /> Request Changes
                       </Button>
-                      <Button
-                        onClick={handleReject}
-                        disabled={submitting}
-                        variant="destructive"
-                        className="text-xs font-semibold h-9 flex items-center justify-center gap-1"
-                      >
-                        <XCircle className="size-3.5" /> Reject
+                      <Button onClick={handleReject} disabled={submitting}
+                        className="text-xs font-semibold h-9 rounded-xl flex items-center justify-center gap-1 bg-rose-500 hover:bg-rose-600 text-white">
+                        <XCircle className="w-3.5 h-3.5" /> Reject
                       </Button>
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm text-foreground">
-                    <Clock className="size-4 text-muted-foreground" />
+                  <div className="flex items-center gap-2 text-sm text-[#111827]">
+                    <Clock className="w-4 h-4 text-[#6B7280]" />
                     <span>Status:</span>
                     <StatusBadge status={content.status} />
                   </div>
                   {content.scheduledAt && (
-                    <div className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Calendar className="size-3.5" />
-                      Scheduled for: {new Date(content.scheduledAt).toLocaleString()}
+                    <div className="text-xs text-[#6B7280] flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" />
+                      Scheduled: {formatDate(content.scheduledAt, "MMM d, yyyy h:mm a")}
                     </div>
                   )}
                   {content.publishDate && (
-                    <div className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Calendar className="size-3.5" />
-                      Publish date: {new Date(content.publishDate).toLocaleDateString()}
+                    <div className="text-xs text-[#6B7280] flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" />
+                      Published: {formatDate(content.publishDate, "MMM d, yyyy")}
                     </div>
                   )}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Discussion Feed */}
-          <Card className="border-border bg-card">
-            <CardHeader className="border-b border-border pb-3 flex flex-row items-center gap-2 space-y-0">
-              <MessageSquare className="size-4 text-muted-foreground" />
-              <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                Discussion Feed
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4 space-y-4">
-              {/* Comment Input */}
-              <form onSubmit={handleAddComment} className="flex gap-2">
-                <Textarea
-                  placeholder="Post comment to thread..."
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  className="bg-muted/40 border-border text-sm placeholder:text-muted-foreground/60 min-h-[50px] flex-1 py-2"
-                />
-                <Button
-                  type="submit"
-                  disabled={submitting || !commentText.trim()}
-                  className="bg-primary hover:bg-primary/95 text-xs font-semibold h-[50px] px-3 shrink-0"
-                >
-                  Post
-                </Button>
-              </form>
-
-              {/* Feed Timeline */}
-              <div className="space-y-3 max-h-[300px] overflow-y-auto scrollbar-thin">
-                {content.approvalEvents.length === 0 ? (
-                  <p className="text-xs text-muted-foreground text-center py-4">No comments or activity yet.</p>
-                ) : (
-                  content.approvalEvents.map((evt) => {
-                    const isComment = evt.action === "COMMENTED";
-                    const actorName = evt.actor?.name || evt.actor?.username || "System";
-                    
-                    return (
-                      <div
-                        key={evt.id}
-                        className={cn(
-                          "p-3 rounded-lg border text-xs leading-relaxed",
-                          isComment
-                            ? "bg-muted/40 border-border"
-                            : "bg-background border-border/60"
-                        )}
-                      >
-                        <div className="flex items-center justify-between text-muted-foreground mb-1.5">
-                          <span className="font-bold text-foreground">{actorName}</span>
-                          <span className="text-[10px]">{formatDate(evt.createdAt, "MMM dd, h:mm a")}</span>
-                        </div>
-                        
-                        {!isComment && (
-                          <span className="inline-block text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border mb-1.5">
-                            {evt.action.replace(/_/g, " ")}
-                          </span>
-                        )}
-
-                        {evt.comment && <p className="text-foreground">{evt.comment}</p>}
-                      </div>
-                    );
-                  })
-                )}
+            {/* Discussion Feed */}
+            <div className="bg-white border border-[#ECECF4] rounded-[24px] overflow-hidden">
+              <div className="flex items-center gap-2 px-6 py-4 border-b border-[#ECECF4]">
+                <MessageSquare className="w-4 h-4 text-[#6B7280]" />
+                <span className="text-xs font-bold text-[#6B7280] uppercase tracking-wider">Discussion Feed</span>
               </div>
-            </CardContent>
-          </Card>
+              <div className="p-6 space-y-4">
+                <form onSubmit={handleAddComment} className="flex gap-2">
+                  <Textarea
+                    placeholder="Post comment to thread..."
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    className="border-[#ECECF4] text-sm placeholder:text-[#9CA3AF] min-h-[50px] flex-1 py-2 focus-visible:ring-[#C5F135]"
+                  />
+                  <Button type="submit" disabled={submitting || !commentText.trim()}
+                    className="bg-[#111827] text-white hover:bg-[#1F2937] text-xs font-semibold h-[50px] px-3 shrink-0 rounded-xl">
+                    Post
+                  </Button>
+                </form>
+
+                <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                  {content.approvalEvents.length === 0 ? (
+                    <p className="text-xs text-[#6B7280] text-center py-4">No comments or activity yet.</p>
+                  ) : (
+                    content.approvalEvents.map((evt) => {
+                      const isComment = evt.action === "COMMENTED";
+                      const actorName = evt.actor?.name || evt.actor?.username || "System";
+                      return (
+                        <div key={evt.id} className={cn(
+                          "p-3.5 rounded-xl border text-xs leading-relaxed",
+                          isComment ? "bg-[#F9FAFB] border-[#ECECF4]" : "bg-white border-[#ECECF4]"
+                        )}>
+                          <div className="flex items-center justify-between text-[#6B7280] mb-1.5">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-bold text-[#111827]">{actorName}</span>
+                              {evt.actor && <span className="text-[#9CA3AF]">·</span>}
+                            </div>
+                            <span className="text-[10px]">{formatDate(evt.createdAt, "MMM d, h:mm a")}</span>
+                          </div>
+                          {!isComment && (
+                            <span className="inline-block text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[#F4F4FA] text-[#6B7280] border border-[#ECECF4] mb-1.5">
+                              {evt.action.replace(/_/g, " ")}
+                            </span>
+                          )}
+                          {evt.comment && <p className="text-[#111827]">{evt.comment}</p>}
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

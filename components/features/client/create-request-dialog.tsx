@@ -19,7 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, MessageSquare } from "lucide-react";
 
 interface CreateRequestDialogProps {
   clientId: string;
@@ -38,10 +38,7 @@ export default function CreateRequestDialog({ clientId }: CreateRequestDialogPro
     formState: { errors },
   } = useForm<CreateRequestInput>({
     resolver: zodResolver(createRequestSchema),
-    defaultValues: {
-      title: "",
-      body: "",
-    },
+    defaultValues: { title: "", body: "" },
   });
 
   const onSubmit = (data: CreateRequestInput) => {
@@ -57,7 +54,7 @@ export default function CreateRequestDialog({ clientId }: CreateRequestDialogPro
         } else {
           setServerError(res.error || "Failed to create request");
         }
-      } catch (err) {
+      } catch {
         setServerError("An unexpected error occurred");
       }
     });
@@ -65,61 +62,70 @@ export default function CreateRequestDialog({ clientId }: CreateRequestDialogPro
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button className="gap-1.5"><Plus className="size-4" /> New Request</Button>} />
-      <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-800 text-foreground">
+      <DialogTrigger
+        render={
+          <Button className="inline-flex items-center gap-2 h-10 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] text-sm font-semibold hover:brightness-95 transition-all">
+            <Plus className="w-4 h-4" />
+            New Request
+          </Button>
+        }
+      />
+      <DialogContent className="sm:max-w-md bg-white border-[#ECECF4] text-[#111827] rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
         <DialogHeader>
-          <DialogTitle className="text-lg font-bold">Create Operations Request</DialogTitle>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-[#F2F8D7] flex items-center justify-center">
+              <MessageSquare className="w-4 h-4 text-[#6B7280]" />
+            </div>
+            <div>
+              <DialogTitle className="text-lg font-bold text-[#111827]">Create Operations Request</DialogTitle>
+              <p className="text-xs text-[#6B7280] mt-0.5">Submit a request for your agency team.</p>
+            </div>
+          </div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-2">
           {serverError && (
-            <div className="p-3 bg-red-950/30 border border-red-500/20 rounded-md text-xs text-red-400">
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-600">
               {serverError}
             </div>
           )}
 
           <div className="space-y-1.5">
-            <Label htmlFor="title">Request Title *</Label>
+            <Label htmlFor="title" className="text-xs font-semibold text-[#111827]">Request Title *</Label>
             <Input
               id="title"
               {...register("title")}
               placeholder="e.g. Update wellness campaign assets"
-              className="bg-zinc-900 border-zinc-800 focus-visible:ring-zinc-700"
+              className="border-[#ECECF4] text-sm placeholder:text-[#9CA3AF] focus-visible:ring-[#C5F135]"
             />
-            {errors.title && (
-              <p className="text-xs text-rose-500">{errors.title.message}</p>
-            )}
+            {errors.title && <p className="text-xs text-rose-500">{errors.title.message}</p>}
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="body">Details / Context</Label>
+            <Label htmlFor="body" className="text-xs font-semibold text-[#111827]">Details / Context</Label>
             <Textarea
               id="body"
               {...register("body")}
               placeholder="Please provide details about your request..."
-              className="bg-zinc-900 border-zinc-800 focus-visible:ring-zinc-700 min-h-[120px]"
+              className="border-[#ECECF4] text-sm placeholder:text-[#9CA3AF] focus-visible:ring-[#C5F135] min-h-[120px]"
             />
-            {errors.body && (
-              <p className="text-xs text-rose-500">{errors.body.message}</p>
-            )}
+            {errors.body && <p className="text-xs text-rose-500">{errors.body.message}</p>}
           </div>
 
-          <DialogFooter className="pt-4 border-t border-zinc-800">
+          <DialogFooter className="pt-4 border-t border-[#ECECF4]">
             <Button
               type="button"
               variant="outline"
               onClick={() => setOpen(false)}
               disabled={isPending}
-              className="border-zinc-800 hover:bg-zinc-900"
+              className="border-[#ECECF4] text-[#6B7280] hover:bg-[#F4F4FA] hover:text-[#111827] rounded-xl"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending}
+              className="bg-[#111827] text-white hover:bg-[#1F2937] rounded-xl font-semibold">
               {isPending ? (
-                <>
-                  <Loader2 className="size-4 mr-2 animate-spin" />
-                  Creating...
-                </>
+                <><Loader2 className="size-4 mr-2 animate-spin" /> Creating...</>
               ) : (
                 "Submit Request"
               )}

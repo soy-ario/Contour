@@ -3,7 +3,6 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { parsePaginationParams, buildPaginatedResult } from "@/lib/pagination";
 import {
-  successResponse,
   paginatedResponse,
   unauthorizedResponse,
   forbiddenResponse,

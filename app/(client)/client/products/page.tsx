@@ -1,7 +1,7 @@
 import { requireClient } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { formatCurrency, formatNumber } from "@/lib/utils";
-import { Package, ShoppingBag, DollarSign, BarChart3, Eye, Heart, MessageSquare, Share2 } from "lucide-react";
+import { Package, ShoppingBag, DollarSign, BarChart3, Eye, Heart } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 

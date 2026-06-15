@@ -1,12 +1,12 @@
+import * as React from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import type { ClientStatus, Platform, ConnectionStatus } from "@prisma/client";
 import { cn, formatCurrency, formatNumber, formatPercent, formatDate, formatRelativeDate } from "@/lib/utils";
-import { Check, ChevronRight, Globe, User, Mail, Phone, DollarSign, Clock, FileText, Eye, Users as UsersIcon, Heart, MessageSquare, Share2, BarChart3, Plus, FileEdit, ArrowUpRight, UserPlus, Settings } from "lucide-react";
+import { Check, ChevronRight, Globe, User, Mail, Clock, Eye, Users as UsersIcon, Heart, MessageSquare, Share2, BarChart3, Plus, FileEdit, ArrowUpRight, UserPlus, Settings } from "lucide-react";
 import { InstagramIcon, FacebookIcon, LinkedinIcon, TiktokIcon } from "@/components/shared/social-icons";
 import InternalNotes from "@/components/features/admin/internal-notes";
-import StatusBadge from "@/components/shared/status-badge";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +15,7 @@ interface OverviewPageProps {
 }
 
 // ─── Onboarding Progress ───────────────────────────────────────────────
-function OnboardingProgressSection({ status, socialCount, productCount }: { status: ClientStatus; socialCount: number; productCount: number }) {
+function OnboardingProgressSection({ status }: { status: ClientStatus }) {
   const statusOrder: ClientStatus[] = ["LEAD", "DISCOVERY", "PROPOSAL_SENT", "CONTRACT_SIGNED", "SETUP", "DASHBOARD_READY", "ACTIVE"];
   const currentIndex = statusOrder.indexOf(status);
   const isPausedOrArchived = status === "PAUSED" || status === "ARCHIVED";
@@ -184,7 +184,18 @@ function PaymentStatusBadge({ status }: { status: string }) {
   );
 }
 
-function ProfileDetails({ client }: { client: any }) {
+interface ClientProfileData {
+  id: string;
+  contactName: string;
+  contactEmail: string;
+  industry: string | null;
+  monthlyRetainer: unknown;
+  contractStart: Date | null;
+  contractEnd: Date | null;
+  paymentStatus: string;
+}
+
+function ProfileDetails({ client }: { client: ClientProfileData }) {
   return (
     <div className="bg-white border border-[#ECECF4] rounded-[24px] p-7">
       <h2 className="text-xl font-bold text-[#111827] mb-6">Client Profile Details</h2>
@@ -234,7 +245,7 @@ function ProfileDetails({ client }: { client: any }) {
   );
 }
 
-function DetailRow({ icon: Icon, sublabel, value }: { icon: any; sublabel: string; value: string }) {
+function DetailRow({ icon: Icon, sublabel, value }: { icon: React.ComponentType<{ className?: string }>; sublabel: string; value: string }) {
   return (
     <div className="flex items-center gap-3">
       <div className="w-8 h-8 rounded-lg bg-[#F6F7FB] flex items-center justify-center shrink-0">
@@ -243,20 +254,6 @@ function DetailRow({ icon: Icon, sublabel, value }: { icon: any; sublabel: strin
       <div className="min-w-0">
         <span className="text-xs font-medium text-[#9CA3AF] block">{sublabel}</span>
         <span className="text-[15px] font-semibold text-[#111827]">{value}</span>
-      </div>
-    </div>
-  );
-}
-
-function DescriptionRow({ text }: { text: string }) {
-  return (
-    <div className="flex items-start gap-3">
-      <div className="w-8 h-8 rounded-lg bg-[#F6F7FB] flex items-center justify-center shrink-0 mt-0.5">
-        <FileText className="w-3.5 h-3.5 text-[#6B7280]" />
-      </div>
-      <div className="min-w-0">
-        <span className="text-xs font-medium text-[#9CA3AF] block">About</span>
-        <span className="text-[15px] text-[#6B7280] leading-relaxed">{text}</span>
       </div>
     </div>
   );
@@ -503,8 +500,6 @@ export default async function ClientOverviewPage({ params }: OverviewPageProps) 
       <div className="space-y-6">
         <OnboardingProgressSection
           status={client.status}
-          socialCount={client.socialAccounts.length}
-          productCount={client._count.products}
         />
 
         <KPIRow metrics={metrics} />

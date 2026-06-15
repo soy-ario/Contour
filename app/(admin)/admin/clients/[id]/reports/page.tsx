@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { cn, formatDate } from "@/lib/utils";
-import { FileText, Plus, ArrowUpRight, Clock } from "lucide-react";
+import { formatDate } from "@/lib/utils";
+import { FileText, ArrowUpRight, Clock } from "lucide-react";
+import GenerateReportButton from "@/components/features/admin/generate-report-button";
 
 export const dynamic = "force-dynamic";
 
@@ -45,10 +45,7 @@ export default async function AdminClientReportsPage({ params }: ReportsPageProp
             Generate and review performance reports for {client.brandName}.
           </p>
         </div>
-        <button className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold flex items-center gap-2 hover:brightness-95 transition-all shrink-0">
-          <Plus className="w-4 h-4" />
-          Generate Report
-        </button>
+        <GenerateReportButton clientId={id} />
       </div>
 
       {/* Report History */}

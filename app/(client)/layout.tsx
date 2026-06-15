@@ -1,28 +1,28 @@
 import { requireClient } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import ClientTopbar from "@/components/layout/client-topbar";
+import { redirect } from "next/navigation";
 
 export default async function ClientLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await requireClient();
+  let user;
+  try {
+    user = await requireClient();
+  } catch {
+    redirect("/login");
+  }
+
   const client = await prisma.client.findUnique({
     where: { id: user.clientId },
     select: { brandName: true, contractStart: true, contractEnd: true },
   });
 
-  const sessionUser = {
-    name: user.name || "Client User",
-    email: user.email || "client@contour.com",
-    username: user.username,
-  };
-
   return (
     <div className="flex flex-col min-h-screen bg-[#F7F8FC]">
       <ClientTopbar
-        user={sessionUser}
         brandName={client?.brandName || "Client Portal"}
         contractStart={client?.contractStart ?? undefined}
         contractEnd={client?.contractEnd ?? undefined}

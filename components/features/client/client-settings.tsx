@@ -1,7 +1,9 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import {
   User, Globe, Mail, Lock, Clock, DollarSign, ChevronRight, Eye, EyeOff,
   ChevronDown, Pencil, Loader2, CheckCircle2,
@@ -264,9 +266,14 @@ export default function ClientSettings({ data }: { data: SettingsData }) {
         setDirty(false);
         setSaved(true);
         setNewPassword("");
+        toast.success("Settings saved successfully!");
         setTimeout(() => setSaved(false), 3000);
+      } else {
+        toast.error(json.error || "Failed to save settings");
       }
-    } catch { /* ignore */ }
+    } catch {
+      toast.error("An unexpected error occurred while saving settings.");
+    }
     setSaving(false);
   }
 
@@ -295,7 +302,7 @@ export default function ClientSettings({ data }: { data: SettingsData }) {
                 <div className="relative w-[120px] h-[120px] shrink-0 group">
                   <div className="w-full h-full rounded-[24px] bg-[#F4F4FA] flex items-center justify-center overflow-hidden">
                     {logoUrl ? (
-                      <img src={logoUrl} alt="" className="w-full h-full object-cover" />
+                      <Image src={logoUrl} alt="" className="w-full h-full object-cover" unoptimized width={120} height={120} />
                     ) : (
                       <User className="w-8 h-8 text-[#D1D5DB]" />
                     )}

@@ -119,7 +119,7 @@ export default function SocialAccountsPanel({
       } else {
         toast.error(result.error?.message || `Failed to disconnect ${platformLabel}`);
       }
-    } catch (err) {
+    } catch {
       toast.error("A network error occurred. Please try again.");
     } finally {
       setActionType(null);
@@ -150,7 +150,7 @@ export default function SocialAccountsPanel({
       } else {
         toast.error(result.error?.message || `Failed to queue sync for ${platformLabel}`, { id: toastId });
       }
-    } catch (err) {
+    } catch {
       toast.error("A network error occurred. Please try again.", { id: toastId });
     } finally {
       setActionType(null);
@@ -165,8 +165,8 @@ export default function SocialAccountsPanel({
       if (response.ok && result.success) {
         setAccounts(result.data);
       }
-    } catch (e) {
-      console.error("Failed to refresh social accounts list", e);
+    } catch {
+      console.error("Failed to refresh social accounts list");
     }
   };
 

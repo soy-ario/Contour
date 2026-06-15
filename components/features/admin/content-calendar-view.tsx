@@ -11,7 +11,6 @@ import {
   endOfMonth,
   eachDayOfInterval,
   isSameMonth,
-  isSameDay,
   isToday,
   startOfWeek,
   endOfWeek,
@@ -58,7 +57,6 @@ function getChipStyle(contentType: ContentType): string {
 export default function ContentCalendarView({
   data,
   onViewDetails,
-  isAdmin = true,
 }: ContentCalendarViewProps) {
   const [monthQuery, setMonthQuery] = useQueryState("month", {
     defaultValue: format(new Date(), "yyyy-MM"),

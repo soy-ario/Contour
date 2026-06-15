@@ -79,14 +79,50 @@ export async function generateReportAction(
     );
 
     // Platform breakdown
-    const platformStats: Record<string, { reach: number; engagement: number; posts: number }> = {};
+    const platformStats: Record<
+      string,
+      {
+        views: number;
+        reach: number;
+        engagement: number;
+        posts: number;
+        followerGrowth: number;
+        profileVisits: number;
+        websiteClicks: number;
+        pageLikes: number;
+        profileViews: number;
+        subscribers: number;
+        watchTimeSeconds: number;
+      }
+    > = {};
+
     for (const sn of snapshots) {
       if (!platformStats[sn.platform]) {
-        platformStats[sn.platform] = { reach: 0, engagement: 0, posts: 0 };
+        platformStats[sn.platform] = {
+          views: 0,
+          reach: 0,
+          engagement: 0,
+          posts: 0,
+          followerGrowth: 0,
+          profileVisits: 0,
+          websiteClicks: 0,
+          pageLikes: 0,
+          profileViews: 0,
+          subscribers: 0,
+          watchTimeSeconds: 0,
+        };
       }
+      platformStats[sn.platform].views += Number(sn.totalViews);
       platformStats[sn.platform].reach += Number(sn.totalReach);
       platformStats[sn.platform].engagement += Number(sn.totalEngagement);
       platformStats[sn.platform].posts += sn.postCount;
+      platformStats[sn.platform].followerGrowth += sn.followerGrowth;
+      platformStats[sn.platform].profileVisits += Number(sn.profileVisits || BigInt(0));
+      platformStats[sn.platform].websiteClicks += Number(sn.websiteClicks || BigInt(0));
+      platformStats[sn.platform].pageLikes += Number(sn.pageLikes || BigInt(0));
+      platformStats[sn.platform].profileViews += Number(sn.profileViews || BigInt(0));
+      platformStats[sn.platform].subscribers += Number(sn.subscribers || BigInt(0));
+      platformStats[sn.platform].watchTimeSeconds += Number(sn.watchTimeSeconds || BigInt(0));
     }
 
     // Top content
@@ -94,25 +130,78 @@ export async function generateReportAction(
       .filter((c) => c.analytics)
       .sort((a, b) => Number(b.analytics!.engagementRate) - Number(a.analytics!.engagementRate))
       .slice(0, 5)
-      .map((c) => ({
-        title: c.title,
-        platform: c.platform,
-        reach: Number(c.analytics?.reach ?? 0),
-        engagement:
-          (c.analytics?.likes ?? 0) +
-          (c.analytics?.comments ?? 0) +
-          (c.analytics?.shares ?? 0),
-        engagementRate: Number(c.analytics?.engagementRate ?? 0),
-      }));
+      .map((c) => {
+        const analytics = c.analytics!;
+        const likesVal = analytics.likes;
+        const commentsVal = analytics.comments;
+        const sharesVal = analytics.shares;
+        const savesVal = analytics.saves;
+        const clicksVal = analytics.clicks || 0;
+        const reactionsVal = analytics.reactions || 0;
+        const repostsVal = analytics.reposts || 0;
+        const repliesVal = analytics.replies || 0;
+
+        return {
+          title: c.title,
+          platform: c.platform,
+          views: Number(analytics.views),
+          reach: Number(analytics.reach),
+          engagement:
+            likesVal +
+            commentsVal +
+            sharesVal +
+            savesVal +
+            clicksVal +
+            reactionsVal +
+            repostsVal +
+            repliesVal,
+          engagementRate: Number(analytics.engagementRate ?? 0),
+          watchTimeSecs: Number(analytics.watchTimeSecs || BigInt(0)),
+          ctr: analytics.ctr ? Number(analytics.ctr) : null,
+        };
+      });
 
     // Top products
     const topProducts = products
       .map((p) => {
-        const totalReachP = p.contents.reduce(
-          (s, cp) => s + Number(cp.content.analytics?.reach ?? 0),
-          0
-        );
-        return { name: p.name, posts: p.contents.length, reach: totalReachP };
+        let totalReachP = 0;
+        let totalViewsP = 0;
+        let totalEngagementP = 0;
+
+        p.contents.forEach((cp) => {
+          const analytics = cp.content.analytics;
+          if (analytics) {
+            totalReachP += Number(analytics.reach ?? 0);
+            totalViewsP += Number(analytics.views ?? 0);
+
+            const likesVal = analytics.likes;
+            const commentsVal = analytics.comments;
+            const sharesVal = analytics.shares;
+            const savesVal = analytics.saves;
+            const clicksVal = analytics.clicks || 0;
+            const reactionsVal = analytics.reactions || 0;
+            const repostsVal = analytics.reposts || 0;
+            const repliesVal = analytics.replies || 0;
+
+            totalEngagementP +=
+              likesVal +
+              commentsVal +
+              sharesVal +
+              savesVal +
+              clicksVal +
+              reactionsVal +
+              repostsVal +
+              repliesVal;
+          }
+        });
+
+        return {
+          name: p.name,
+          posts: p.contents.length,
+          reach: totalReachP,
+          views: totalViewsP,
+          engagement: totalEngagementP,
+        };
       })
       .sort((a, b) => b.reach - a.reach)
       .slice(0, 5);

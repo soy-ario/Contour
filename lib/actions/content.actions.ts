@@ -314,7 +314,7 @@ export async function submitContentAction(
     // Send email notification to client
     const clientEmail = content.client.user?.email || content.client.contactEmail;
     if (clientEmail) {
-      await sendContentSubmittedEmail(clientEmail, content.title, content.clientId);
+      await sendContentSubmittedEmail(clientEmail, content.title);
     }
 
     revalidatePath("/content");

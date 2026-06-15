@@ -7,8 +7,7 @@ const BASE_URL =
 
 export async function sendContentSubmittedEmail(
   clientEmail: string,
-  contentTitle: string,
-  _clientId: string
+  contentTitle: string
 ): Promise<void> {
   const approvalLink = `${BASE_URL}/client/content`; // Scoped to client portal
   await sendEmail({

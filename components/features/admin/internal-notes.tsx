@@ -12,7 +12,7 @@ import {
   deleteNoteAction,
 } from "@/lib/actions/note.actions";
 import { toast } from "sonner";
-import { Edit2, Trash2, Plus, Save, X, Loader2, FileText } from "lucide-react";
+import { Edit2, Trash2, Plus, Loader2, FileText } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 interface Note {

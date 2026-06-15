@@ -13,10 +13,36 @@ export interface AnalyticsOverview {
   followerGrowth: number;
   postCount: number;
   engagementRate: number;
+  // Platform-specific metrics
+  profileVisits: number;
+  websiteClicks: number;
+  pageLikes: number;
+  profileViews: number;
+  subscribers: number;
+  videoViews: number;
+  watchTimeSeconds: number;
 }
 
 export interface PlatformBreakdown extends AnalyticsOverview {
   platform: Platform;
+}
+
+export interface ProductPerformance {
+  productId: string;
+  name: string;
+  postCount: number;
+  totalViews: number;
+  totalReach: number;
+  totalImpressions: number;
+  totalEngagement: number;
+  engagementRate: number;
+}
+
+export interface GrowthMetrics {
+  viewsGrowthPct: number;
+  reachGrowthPct: number;
+  engagementGrowthPct: number;
+  followerGrowthPct: number;
 }
 
 /**
@@ -145,6 +171,14 @@ function aggregateSnapshots(
       totalSaves: acc.totalSaves + Number(s.totalSaves),
       followerGrowth: acc.followerGrowth + s.followerGrowth,
       postCount: acc.postCount + s.postCount,
+      // Platform-specific metrics
+      profileVisits: acc.profileVisits + Number(s.profileVisits || 0),
+      websiteClicks: acc.websiteClicks + Number(s.websiteClicks || 0),
+      pageLikes: acc.pageLikes + Number(s.pageLikes || 0),
+      profileViews: acc.profileViews + Number(s.profileViews || 0),
+      subscribers: acc.subscribers + Number(s.subscribers || 0),
+      videoViews: acc.videoViews + Number(s.videoViews || 0),
+      watchTimeSeconds: acc.watchTimeSeconds + Number(s.watchTimeSeconds || 0),
     }),
     {
       totalViews: 0,
@@ -157,6 +191,13 @@ function aggregateSnapshots(
       totalSaves: 0,
       followerGrowth: 0,
       postCount: 0,
+      profileVisits: 0,
+      websiteClicks: 0,
+      pageLikes: 0,
+      profileViews: 0,
+      subscribers: 0,
+      videoViews: 0,
+      watchTimeSeconds: 0,
     }
   );
 
@@ -166,4 +207,134 @@ function aggregateSnapshots(
       : 0;
 
   return { ...totals, engagementRate };
+}
+
+// ─── REUSABLE WRAPPERS REQUIRED BY SPEC ─────────────────────────────────────
+
+export async function getClientOverviewMetrics(
+  clientId: string,
+  year: number,
+  month: number
+): Promise<AnalyticsOverview> {
+  const start = new Date(year, month - 1, 1);
+  const end = new Date(year, month, 0);
+
+  const snapshots = await prisma.analyticsSnapshot.findMany({
+    where: {
+      clientId,
+      periodStart: { gte: start, lte: end },
+    },
+  });
+
+  return aggregateSnapshots(snapshots);
+}
+
+export async function getPlatformAnalytics(
+  clientId: string,
+  year: number,
+  month: number
+): Promise<PlatformBreakdown[]> {
+  return getClientPlatformBreakdown(clientId, year, month);
+}
+
+export async function getProductPerformance(
+  clientId: string,
+  year: number,
+  month: number
+): Promise<ProductPerformance[]> {
+  const start = new Date(year, month - 1, 1);
+  const end = new Date(year, month, 0);
+
+  const products = await prisma.product.findMany({
+    where: { clientId },
+    include: {
+      contents: {
+        include: {
+          content: {
+            include: {
+              analytics: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return products.map((p) => {
+    const monthlyContents = p.contents.filter((cp) => {
+      const pubDate = cp.content.publishDate;
+      return (
+        cp.content.status === "POSTED" &&
+        pubDate &&
+        pubDate >= start &&
+        pubDate <= end
+      );
+    });
+
+    let totalViews = 0;
+    let totalReach = 0;
+    let totalImpressions = 0;
+    let totalEngagement = 0;
+
+    for (const cp of monthlyContents) {
+      const analytics = cp.content.analytics;
+      if (analytics) {
+        totalViews += Number(analytics.views);
+        totalReach += Number(analytics.reach);
+        totalImpressions += Number(analytics.impressions);
+        
+        // sum up core and platform specific engagement interactions
+        const likesVal = analytics.likes;
+        const commentsVal = analytics.comments;
+        const sharesVal = analytics.shares;
+        const savesVal = analytics.saves;
+        const clicksVal = analytics.clicks || 0;
+        const reactionsVal = analytics.reactions || 0;
+        const repostsVal = analytics.reposts || 0;
+        const repliesVal = analytics.replies || 0;
+        
+        totalEngagement += (likesVal + commentsVal + sharesVal + savesVal + clicksVal + reactionsVal + repostsVal + repliesVal);
+      }
+    }
+
+    const engagementRate = totalReach > 0 ? (totalEngagement / totalReach) * 100 : 0;
+
+    return {
+      productId: p.id,
+      name: p.name,
+      postCount: monthlyContents.length,
+      totalViews,
+      totalReach,
+      totalImpressions,
+      totalEngagement,
+      engagementRate,
+    };
+  });
+}
+
+export async function getTopContent(
+  clientId: string,
+  year: number,
+  month: number,
+  take = 5
+) {
+  return getTopPerformingContent(clientId, year, month, take);
+}
+
+export async function getGrowthMetrics(
+  clientId: string,
+  year: number,
+  month: number
+): Promise<GrowthMetrics> {
+  const { current, previous } = await getClientMonthlyOverview(clientId, year, month);
+
+  const calcPct = (curr: number, prev: number) =>
+    prev > 0 ? ((curr - prev) / prev) * 100 : curr > 0 ? 100 : 0;
+
+  return {
+    viewsGrowthPct: calcPct(current.totalViews, previous.totalViews),
+    reachGrowthPct: calcPct(current.totalReach, previous.totalReach),
+    engagementGrowthPct: calcPct(current.totalEngagement, previous.totalEngagement),
+    followerGrowthPct: calcPct(current.followerGrowth, previous.followerGrowth),
+  };
 }

@@ -10,7 +10,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 
 interface ClientTopbarProps {
-  user: { name: string; email: string; username: string };
   brandName: string;
   contractStart?: Date;
   contractEnd?: Date;
@@ -45,7 +44,7 @@ function getDefaultComparison(contractFrom: Date) {
   return { from, to };
 }
 
-export default function ClientTopbar({ user, brandName, contractStart, contractEnd }: ClientTopbarProps) {
+export default function ClientTopbar({ brandName, contractStart, contractEnd }: ClientTopbarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -83,12 +82,12 @@ export default function ClientTopbar({ user, brandName, contractStart, contractE
       hoverRef.current = d;
       setHoveredDate(d);
     }
-  }, []);
+  }, [setHoveredDate]);
 
   const handlePointerLeave = React.useCallback(() => {
     hoverRef.current = null;
     setHoveredDate(null);
-  }, []);
+  }, [setHoveredDate]);
 
   const rangeStart = React.useMemo(() => {
     if (!hoveredDate) return null;

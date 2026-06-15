@@ -1,4 +1,4 @@
-import { NextRequest } from "next/server";
+import { NextRequest, after } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
@@ -8,6 +8,7 @@ import {
   notFoundResponse,
   internalErrorResponse,
 } from "@/lib/api-helpers";
+import { syncSocialAccount } from "@/lib/services/social-sync.service";
 
 interface RouteParams {
   params: Promise<{
@@ -43,6 +44,13 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
         status: "STARTED",
         recordsSynced: 0,
       },
+    });
+
+    // Trigger the background sync process without awaiting
+    after(() => {
+      syncSocialAccount(clientId, socialAccount.id, syncLog.id).catch((e) => {
+        console.error("[POST /api/clients/[id]/social-accounts/[accountId]/sync] Background task error:", e);
+      });
     });
 
     // Return 202 Accepted response as required by API specification

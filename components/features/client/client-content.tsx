@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import {
-  Clock, CalendarDays, ChevronLeft, ChevronRight, Eye, TrendingUp, Users,
+  Clock, CalendarDays, ChevronLeft, ChevronRight, Eye,
   AlertCircle, CheckCircle2, MoreHorizontal, ArrowUp, ArrowDown,
 } from "lucide-react";
 import {
@@ -25,15 +26,6 @@ const STATUS_LABELS: Record<string, string> = {
   APPROVED: "Approved",
   SCHEDULED: "Scheduled",
   POSTED: "Published",
-};
-
-const PLATFORM_CALENDAR_COLORS: Record<string, { border: string; bg: string }> = {
-  INSTAGRAM: { border: "border-[#E1306C]/30", bg: "bg-[#FCE4EC]" },
-  FACEBOOK: { border: "border-[#1877F2]/30", bg: "bg-[#E3F2FD]" },
-  LINKEDIN: { border: "border-[#0A66C2]/30", bg: "bg-[#E3F2FD]" },
-  TIKTOK: { border: "border-gray-200", bg: "bg-[#F5F5F5]" },
-  YOUTUBE: { border: "border-[#FF0000]/30", bg: "bg-[#FFEBEE]" },
-  X: { border: "border-gray-200", bg: "bg-[#F5F5F5]" },
 };
 
 const PLATFORM_EVENT_COLORS: Record<string, string> = {
@@ -66,7 +58,6 @@ function KpiCard({ label, value, delta, icon, color }: {
     green: "text-[#16A34A]", purple: "text-[#9333EA]",
   };
   const isUp = delta > 0;
-  const isDown = delta < 0;
 
   return (
     <div className="bg-white border border-[#ECECF4] rounded-[24px] p-6 flex flex-col justify-between h-[120px] group hover:translate-y-[-2px] hover:shadow-[0_10px_30px_rgba(16,24,40,0.08)] transition-all duration-200">
@@ -160,7 +151,7 @@ export default function ClientContent({ data }: { data: ContentPageData }) {
                         item.thumbnail ? "" : "bg-[#F4F4FA]"
                       )}>
                         {item.thumbnail ? (
-                          <img src={item.thumbnail} alt="" className="w-full h-full object-cover" />
+                          <Image src={item.thumbnail} alt="" className="w-full h-full object-cover" unoptimized width={60} height={60} />
                         ) : (
                           <Eye className="w-5 h-5 text-[#D1D5DB]" />
                         )}
@@ -315,7 +306,7 @@ export default function ClientContent({ data }: { data: ContentPageData }) {
                                 row.thumbnail ? "" : "bg-[#F4F4FA]"
                               )}>
                                 {row.thumbnail ? (
-                                  <img src={row.thumbnail} alt="" className="w-full h-full object-cover" />
+                                  <Image src={row.thumbnail} alt="" className="w-full h-full object-cover" unoptimized width={40} height={40} />
                                 ) : (
                                   <Eye className="w-4 h-4 text-[#D1D5DB]" />
                                 )}

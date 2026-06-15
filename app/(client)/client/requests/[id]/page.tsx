@@ -40,5 +40,5 @@ export default async function ClientRequestDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  return <RequestThread request={request} currentUserId={user.id} />;
+  return <RequestThread request={request} />;
 }

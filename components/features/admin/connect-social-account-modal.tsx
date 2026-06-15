@@ -104,7 +104,7 @@ export default function ConnectSocialAccountModal({
         } else {
           setServerError(result.error?.message || "Failed to connect social account");
         }
-      } catch (error) {
+      } catch {
         setServerError("A network error occurred. Please try again.");
       }
     });

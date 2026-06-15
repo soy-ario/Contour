@@ -43,7 +43,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     try {
       const body = await req.json();
       comment = body?.comment;
-    } catch (e) {
+    } catch {
       // Body might be empty, ignore
     }
 

@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import type { Platform, ContentStatus, ContentType } from "@prisma/client";
-import { cn, formatDate } from "@/lib/utils";
-import { PLATFORM_LABELS, CONTENT_TYPE_LABELS, CONTENT_STATUS_LABELS } from "@/types";
+import { cn } from "@/lib/utils";
+import { CONTENT_TYPE_LABELS } from "@/types";
 import { PlatformIcon } from "@/components/shared/social-icons";
 import {
   MoreHorizontal,
@@ -99,19 +99,17 @@ export default function ContentListView({
   data,
   loading = false,
   onViewDetails,
-  onEdit,
-  onSubmitApproval,
-  onApprove,
-  onSchedule,
-  onDelete,
-  isAdmin = true,
 }: ContentListViewProps) {
   const [page, setPage] = React.useState(0);
+  const [prevDataLength, setPrevDataLength] = React.useState(data.length);
+
+  if (data.length !== prevDataLength) {
+    setPrevDataLength(data.length);
+    setPage(0);
+  }
+
   const totalPages = Math.max(1, Math.ceil(data.length / PAGE_SIZE));
   const pagedData = data.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
-
-  // Reset page when data changes
-  React.useEffect(() => { setPage(0); }, [data.length]);
 
   if (loading) {
     return (
@@ -170,8 +168,6 @@ export default function ContentListView({
             {pagedData.map((item, idx) => {
               const thumbnail = item.assetUrls?.[0] || null;
               const typeStyle = TYPE_STYLES[item.contentType] || TYPE_STYLES.POST;
-              const hasPendingAction = item.status === "DRAFT" || item.status === "IDEA";
-              const hasApproveAction = item.status === "CLIENT_APPROVAL_PENDING";
               const dateVal = item.publishDate || item.scheduledAt;
               const dateObj = dateVal ? new Date(dateVal) : null;
               const totalEngagements = item.likes + item.comments + item.shares;

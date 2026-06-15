@@ -1,22 +1,21 @@
 import { requireAdmin } from "@/lib/session";
 import AdminSidebar from "@/components/layout/admin-sidebar";
+import { redirect } from "next/navigation";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const user = await requireAdmin();
-
-  const sessionUser = {
-    name: user.name || "Admin User",
-    email: user.email || "admin@contour.com",
-    username: user.username,
-  };
+  try {
+    await requireAdmin();
+  } catch {
+    redirect("/login");
+  }
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      <AdminSidebar user={sessionUser} />
+      <AdminSidebar />
       <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden">
         {children}
       </div>

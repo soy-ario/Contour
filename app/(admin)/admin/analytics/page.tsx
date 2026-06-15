@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminAnalyticsPage() {
   const user = await requireAdmin();
 
-  const [clients, snapshots, topContent] = await Promise.all([
+  const [clients, snapshots, topContent, products] = await Promise.all([
     prisma.client.findMany({
       where: { status: { not: "ARCHIVED" } },
       select: { id: true, brandName: true },
@@ -24,6 +24,20 @@ export default async function AdminAnalyticsPage() {
       include: {
         client: { select: { brandName: true } },
         analytics: true,
+      },
+    }),
+    prisma.product.findMany({
+      where: { status: "ACTIVE" },
+      include: {
+        contents: {
+          include: {
+            content: {
+              include: {
+                analytics: true,
+              },
+            },
+          },
+        },
       },
     }),
   ]);
@@ -70,6 +84,41 @@ export default async function AdminAnalyticsPage() {
     engagementRate: c.analytics?.engagementRate ? Number(c.analytics.engagementRate) : 0,
   }));
 
+  const formattedProducts = products.map((p) => {
+    let totalReach = 0;
+    let totalViews = 0;
+    let totalEngagement = 0;
+
+    p.contents.forEach((cp) => {
+      const analytics = cp.content.analytics;
+      if (analytics) {
+        totalReach += Number(analytics.reach ?? 0);
+        totalViews += Number(analytics.views ?? 0);
+        
+        const likesVal = analytics.likes;
+        const commentsVal = analytics.comments;
+        const sharesVal = analytics.shares;
+        const savesVal = analytics.saves;
+        const clicksVal = analytics.clicks || 0;
+        const reactionsVal = analytics.reactions || 0;
+        const repostsVal = analytics.reposts || 0;
+        const repliesVal = analytics.replies || 0;
+
+        totalEngagement += (likesVal + commentsVal + sharesVal + savesVal + clicksVal + reactionsVal + repostsVal + repliesVal);
+      }
+    });
+
+    return {
+      id: p.id,
+      name: p.name,
+      clientId: p.clientId,
+      postCount: p.contents.length,
+      reach: totalReach,
+      views: totalViews,
+      engagement: totalEngagement,
+    };
+  });
+
   const sessionUser = {
     name: user.name || "Admin",
     email: user.email || "",
@@ -81,6 +130,7 @@ export default async function AdminAnalyticsPage() {
       clients={clients}
       snapshots={formattedSnapshots}
       topContent={formattedTopContent}
+      products={formattedProducts}
       user={sessionUser}
     />
   );

@@ -7,22 +7,18 @@ import type { Platform, ContentStatus, ContentType, ApprovalAction } from "@pris
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import StatusBadge from "@/components/shared/status-badge";
-import { PlatformIcon, InstagramIcon, FacebookIcon, LinkedinIcon, YoutubeIcon, TiktokIcon, TwitterIcon } from "@/components/shared/social-icons";
+import { InstagramIcon, FacebookIcon, LinkedinIcon, YoutubeIcon, TiktokIcon, TwitterIcon } from "@/components/shared/social-icons";
 import {
   Calendar,
   CircleDollarSign,
   Clock,
   Copy,
   Check,
-  Send,
   CheckCircle,
   XCircle,
   MessageSquare,
   Package,
   ChevronLeft,
-  User,
-  Shield,
-  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";

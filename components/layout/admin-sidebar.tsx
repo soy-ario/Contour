@@ -12,15 +12,7 @@ import {
   Settings,
 } from "lucide-react";
 
-interface AdminSidebarProps {
-  user: {
-    name: string;
-    email: string;
-    username: string;
-  };
-}
-
-export default function AdminSidebar({ user }: AdminSidebarProps) {
+export default function AdminSidebar() {
   const pathname = usePathname();
   const [expanded, setExpanded] = React.useState(false);
 

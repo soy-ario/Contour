@@ -2,12 +2,12 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { cn, formatCurrency, formatNumber } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import {
-  LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart,
 } from "recharts";
 import {
-  Eye, Heart, UserPlus, FileText, Package, Calendar, ChevronRight, TrendingUp, Users, ArrowUpRight,
+  Eye, Heart, UserPlus, FileText, Package, Calendar, Users, ArrowUpRight,
   BarChart3, CheckCircle, MessageCircle, Upload, Target,
 } from "lucide-react";
 

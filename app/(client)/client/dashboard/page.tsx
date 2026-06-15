@@ -59,7 +59,7 @@ export default async function ClientDashboardPage() {
     monthGroups.get(key)!.push(s);
   }
 
-  const monthlyTrend = Array.from(monthGroups.entries()).map(([month, snaps]) => ({
+  const monthlyTrend = Array.from(monthGroups.entries()).map(([, snaps]) => ({
     month: new Date(snaps[0].periodStart).toLocaleString("default", { month: "short" }),
     views: snaps.reduce((a, s) => a + num(s.totalViews), 0),
     reach: snaps.reduce((a, s) => a + num(s.totalReach), 0),

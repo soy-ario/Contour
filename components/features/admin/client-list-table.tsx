@@ -95,12 +95,6 @@ function getContractLabel(start: string | Date | null, end: string | Date | null
   return { label: "Active", variant: "active" };
 }
 
-const statusBadgeVariant: Record<string, "default" | "secondary" | "destructive" | "outline" | "ghost" | "link"> = {
-  active: "default",
-  inactive: "outline",
-  default: "secondary",
-};
-
 export default function ClientListTable({
   data,
   loading = false,
@@ -261,6 +255,7 @@ export default function ClientListTable({
     [onEdit, onArchive]
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,

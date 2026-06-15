@@ -1,9 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   updateClientAction,
   createClientUserAction,
@@ -12,7 +10,6 @@ import {
   updateClientStatusAction,
 } from "@/lib/actions/client.actions";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 import { PlatformIcon } from "@/components/shared/social-icons";
 import {
   Globe,
@@ -121,6 +118,11 @@ function SocialAccountRow({
   const [disconnecting, setDisconnecting] = React.useState(false);
 
   const handleDisconnect = async () => {
+    const isConfirmed = window.confirm(
+      `Are you sure you want to disconnect this ${account.platform.toLowerCase()} account? This will permanently stop all background analytics syncs.`
+    );
+    if (!isConfirmed) return;
+
     setDisconnecting(true);
     try {
       const res = await fetch(`/api/clients/${clientId}/social-accounts/${account.id}`, { method: "DELETE" });
@@ -344,7 +346,7 @@ function ConnectPlatformDialog({
 export default function ClientSettingsForm({ client }: { client: ClientSettings }) {
   const router = useRouter();
   const [saving, setSaving] = React.useState(false);
-  const [serverError, setServerError] = React.useState<string | null>(null);
+  const [, setServerError] = React.useState<string | null>(null);
 
   const formatDateForInput = (dateVal: string | Date | null) => {
     if (!dateVal) return "";
@@ -409,9 +411,9 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
 
   const handleCopyCredentials = async (e: React.MouseEvent) => {
     e.preventDefault();
-    const pw = passwordRevealed || client.portalPassword;
+    const pw = passwordRevealed;
     if (!client.user || !pw) {
-      toast.error("No credentials available to copy");
+      toast.error("Password only available immediately after reset");
       return;
     }
     try {
@@ -625,21 +627,21 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
                         <button
                           type="button"
                           onClick={() => {
-                            if (!passwordRevealed && client.portalPassword) {
-                              setPasswordRevealed(client.portalPassword);
+                            if (passwordRevealed) {
+                              setShowPassword(!showPassword);
                             }
-                            setShowPassword(!showPassword);
                           }}
-                          className="h-8 px-3 bg-[#F8F9FC] border border-[#E5E7EB] rounded-[10px] text-xs font-medium text-[#6B7280] hover:bg-[#F3F4F6] transition-colors shrink-0 flex items-center gap-1"
+                          disabled={!passwordRevealed}
+                          className="h-8 px-3 bg-[#F8F9FC] border border-[#E5E7EB] rounded-[10px] text-xs font-medium text-[#6B7280] hover:bg-[#F3F4F6] transition-colors shrink-0 flex items-center gap-1 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                          {showPassword ? "Hide" : "Show"}
+                          {passwordRevealed ? (showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />) : <Eye className="w-3.5 h-3.5" />}
+                          {passwordRevealed ? (showPassword ? "Hide" : "Show") : "Locked"}
                         </button>
                       </div>
                     </FormField>
                     <FormField label="&nbsp;">
                       <p className="text-xs text-[#9CA3AF] h-11 flex items-center">
-                        {passwordRevealed ? "Password available above" : "Click Show to reveal stored password"}
+                        {passwordRevealed ? "Password shown above — copy it now, it won't be stored" : "Password is only displayed once after creation or reset"}
                       </p>
                     </FormField>
                   </div>

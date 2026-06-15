@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireClient } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
-import { MessageSquare, Clock, CheckCircle2, Plus, ArrowUpRight } from "lucide-react";
+import { MessageSquare, Clock, CheckCircle2 } from "lucide-react";
 import CreateRequestDialog from "@/components/features/client/create-request-dialog";
 import { formatRelativeDate } from "@/lib/utils";
 

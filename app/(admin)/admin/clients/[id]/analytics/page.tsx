@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
+import { useId } from "react";
 import { cn, formatNumber } from "@/lib/utils";
 import { PLATFORM_LABELS } from "@/types";
 import {
@@ -15,7 +16,6 @@ import {
   Globe,
   ChevronDown,
 } from "lucide-react";
-import type { Platform } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -62,6 +62,9 @@ function AreaChartSVG({
   yFormatter?: (v: number) => string;
   previousData?: number[];
 }) {
+  const randomId = useId().replace(/:/g, "");
+  const gradientId = `areaGrad-${randomId}`;
+
   if (data.length < 2) {
     return <div className="flex items-center justify-center h-[180px] text-xs text-[#9CA3AF]">Insufficient data</div>;
   }
@@ -96,8 +99,6 @@ function AreaChartSVG({
     }
     return ticks.length > 1 ? ticks : [0, max];
   })();
-
-  const gradientId = `areaGrad-${Math.random().toString(36).slice(2, 8)}`;
 
   return (
     <svg width="100%" height={height} viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" className="overflow-visible">
@@ -166,22 +167,6 @@ function PlatformIconSVG({ platform }: { platform: string }) {
       <span className="text-[9px] font-bold text-white">{meta.label}</span>
     </div>
   );
-}
-
-function ContentTypeBadge({ type }: { type: string }) {
-  const colors: Record<string, string> = {
-    REEL: "bg-purple-50 text-purple-700 border-purple-200",
-    POST: "bg-blue-50 text-blue-700 border-blue-200",
-    STORY: "bg-orange-50 text-orange-700 border-orange-200",
-    VIDEO: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    CAROUSEL: "bg-pink-50 text-pink-700 border-pink-200",
-    THREAD: "bg-indigo-50 text-indigo-700 border-indigo-200",
-    SHORT: "bg-amber-50 text-amber-700 border-amber-200",
-    LIVE: "bg-red-50 text-red-700 border-red-200",
-  };
-  const cls = colors[type] || "bg-[#F5F5F5] text-[#6B6B80] border-[#ECECF4]";
-  const label = type.charAt(0) + type.slice(1).toLowerCase();
-  return <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${cls}`}>{label}</span>;
 }
 
 function PlatformOverlay({ platform }: { platform: string }) {
@@ -443,7 +428,7 @@ export default async function ClientAnalyticsPage({ params }: PageProps) {
 
       {/* ─── 5-Column KPI Row ─────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-        {kpis.map((kpi, i) => {
+        {kpis.map((kpi) => {
           const Icon = kpi.icon;
           const isUp = kpi.delta > 0;
           return (
@@ -639,7 +624,6 @@ export default async function ClientAnalyticsPage({ params }: PageProps) {
             <div className="grid grid-cols-3 gap-3 mt-4">
               {showcaseContent.map((item) => {
                 const analytics = item.analytics;
-                const views = Number(analytics?.views || 0);
                 const reach = Number(analytics?.reach || 0);
                 const likes = analytics?.likes || 0;
                 const comments = analytics?.comments || 0;

@@ -39,7 +39,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     try {
       const body = await req.json();
       scheduledDate = body?.scheduledDate;
-    } catch (e) {
+    } catch {
       return errorResponse("BAD_REQUEST", "Request body is required");
     }
 

@@ -5,7 +5,6 @@ import type { Platform, ContentType } from "@prisma/client";
 import { PlatformIcon } from "@/components/shared/social-icons";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { formatDate } from "@/lib/utils";
 import { Eye, Check, Loader2, Clock, Inbox } from "lucide-react";
 
 interface PendingContentItem {
@@ -32,14 +31,31 @@ export default function ApprovalQueuePanel({
   loading = false,
 }: ApprovalQueuePanelProps) {
   const [approvingId, setApprovingId] = React.useState<string | null>(null);
+  const [nowTime, setNowTime] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setNowTime(Date.now());
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const sortedItems = React.useMemo(() => {
-    return [...items].sort((a, b) => {
-      const d1 = new Date(a.updatedAt).getTime();
-      const d2 = new Date(b.updatedAt).getTime();
-      return d1 - d2;
-    });
-  }, [items]);
+    return [...items]
+      .map((item) => ({
+        ...item,
+        daysWaiting: nowTime
+          ? Math.floor(
+              (nowTime - new Date(item.updatedAt).getTime()) / (1000 * 60 * 60 * 24)
+            )
+          : null,
+      }))
+      .sort((a, b) => {
+        const d1 = new Date(a.updatedAt).getTime();
+        const d2 = new Date(b.updatedAt).getTime();
+        return d1 - d2;
+      });
+  }, [items, nowTime]);
 
   const handleApprove = async (e: React.MouseEvent, item: PendingContentItem) => {
     e.stopPropagation();
@@ -105,9 +121,7 @@ export default function ApprovalQueuePanel({
           {sortedItems.map((item) => {
             const isApproving = approvingId === item.id;
 
-            const daysWaiting = Math.floor(
-              (Date.now() - new Date(item.updatedAt).getTime()) / (1000 * 60 * 60 * 24)
-            );
+            const daysWaiting = item.daysWaiting;
 
             return (
               <div
@@ -124,7 +138,7 @@ export default function ApprovalQueuePanel({
                     <span className="text-[11px] text-[#6B7280] flex items-center gap-1.5">
                       {item.clientBrandName}
                       <span className="text-[#D1D5DB]">·</span>
-                      {daysWaiting === 0 ? "Today" : `${daysWaiting}d ago`}
+                      {daysWaiting === null ? "..." : daysWaiting === 0 ? "Today" : `${daysWaiting}d ago`}
                     </span>
                   </div>
                 </div>

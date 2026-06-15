@@ -303,6 +303,10 @@ model SocialAccount {
   status           ConnectionStatus @default(CONNECTED)
   lastSyncAt       DateTime?        @map("last_sync_at")
   syncError        String?          @map("sync_error")
+  username         String?          @map("username")
+  profileUrl       String?          @map("profile_url")
+  profileImageUrl  String?          @map("profile_image_url")
+  expiresAt        DateTime?        @map("expires_at")
   createdAt        DateTime         @default(now()) @map("created_at")
   updatedAt        DateTime         @updatedAt      @map("updated_at")
 
@@ -472,6 +476,13 @@ model AnalyticsSnapshot {
   storyCount Int @default(0) @map("story_count")
   reelCount  Int @default(0) @map("reel_count")
 
+  // Platform-specific metrics
+  profileVisits      BigInt   @default(0) @map("profile_visits")
+  websiteClicks      BigInt   @default(0) @map("website_clicks")
+  pageLikes          BigInt   @default(0) @map("page_likes")
+  profileViews       BigInt   @default(0) @map("profile_views")
+  subscribers        BigInt   @default(0) @map("subscribers")
+
   // Sync metadata
   syncedAt   DateTime @default(now()) @map("synced_at")
   rawPayload Json?    @map("raw_payload")
@@ -504,6 +515,12 @@ model ContentAnalytic {
   avgWatchPct   Decimal? @db.Decimal(5, 2) @map("avg_watch_pct")
   ctr           Decimal? @db.Decimal(8, 4)
 
+  // Platform-specific metrics
+  reactions      Int      @default(0)
+  reposts        Int      @default(0)
+  replies        Int      @default(0)
+  clicks         Int      @default(0)
+
   // Platform sync
   nativePostId String?   @map("native_post_id")
   permalink    String?
@@ -532,6 +549,12 @@ model PlatformDailyMetric {
   saves         BigInt @default(0)
   followerDelta Int    @default(0) @map("follower_delta")
   videoViews    BigInt @default(0) @map("video_views")
+
+  profileVisits    BigInt @default(0) @map("profile_visits")
+  websiteClicks    BigInt @default(0) @map("website_clicks")
+  pageLikes        BigInt @default(0) @map("page_likes")
+  profileViews     BigInt @default(0) @map("profile_views")
+  subscribers      BigInt @default(0) @map("subscribers")
 
   syncedAt DateTime @default(now()) @map("synced_at")
 

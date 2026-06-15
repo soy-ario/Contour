@@ -117,7 +117,7 @@ export default function AdminTopbar({
                   <Bell className="w-4 h-4 text-[#6B7280]" />
                 </div>
                 <p className="text-sm font-medium text-[#111827]">No new notifications</p>
-                <p className="text-xs text-[#6B7280] mt-0.5">You're all caught up!</p>
+                <p className="text-xs text-[#6B7280] mt-0.5">You&apos;re all caught up!</p>
               </div>
             </DropdownMenuContent>
           </DropdownMenu>

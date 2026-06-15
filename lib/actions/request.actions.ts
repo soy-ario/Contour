@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { requireAdmin } from "@/lib/session";
+import { requireAdmin, getRequiredSession, assertClientOwnership } from "@/lib/session";
 import { createAuditLog } from "@/lib/services/audit.service";
 import { createRequestSchema, createCommentSchema } from "@/lib/validations/request";
 import type { ActionResult } from "@/types";
@@ -14,6 +14,8 @@ export async function createRequestAction(
   formData: unknown
 ): Promise<ActionResult<Request>> {
   try {
+    await assertClientOwnership(clientId);
+
     const result = createRequestSchema.safeParse(formData);
     if (!result.success) {
       return {
@@ -82,8 +84,6 @@ export async function reopenRequestAction(
   requestId: string
 ): Promise<ActionResult<Request>> {
   try {
-    const user = await requireAdmin();
-
     const existing = await prisma.request.findUnique({ where: { id: requestId } });
     if (!existing) {
       return { success: false, error: "Request not found" };
@@ -110,11 +110,12 @@ export async function reopenRequestAction(
 
 export async function addRequestCommentAction(
   requestId: string,
-  authorId: string,
   prevState: unknown,
   formData: unknown
 ): Promise<ActionResult<RequestComment>> {
   try {
+    const { user } = await getRequiredSession();
+
     const result = createCommentSchema.safeParse(formData);
     if (!result.success) {
       return {
@@ -128,10 +129,15 @@ export async function addRequestCommentAction(
       return { success: false, error: "Request not found" };
     }
 
+    // Verify ownership: client must own the request, admin has global access
+    if (user.role === "CLIENT") {
+      await assertClientOwnership(request.clientId);
+    }
+
     const comment = await prisma.requestComment.create({
       data: {
         requestId,
-        authorId,
+        authorId: user.id,
         body: result.data.body,
       },
     });

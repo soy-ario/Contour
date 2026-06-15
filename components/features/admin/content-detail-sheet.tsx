@@ -25,8 +25,6 @@ import {
   CheckCircle,
   XCircle,
   MessageSquare,
-  AlertTriangle,
-  ArrowRight,
   Package,
   Save,
 } from "lucide-react";

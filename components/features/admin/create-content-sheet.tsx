@@ -92,6 +92,7 @@ export default function CreateContentSheet({
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const selectedClientId = watch("clientId");
   const selectedPlatform = watch("platform");
   const selectedContentType = watch("contentType");

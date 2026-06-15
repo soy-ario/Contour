@@ -33,7 +33,7 @@ export class SupabaseStorageProvider implements StorageProvider {
     return bucket;
   }
 
-  async getUploadSignedUrl(key: string, contentType?: string): Promise<string> {
+  async getUploadSignedUrl(key: string): Promise<string> {
     const supabase = this.getSupabaseClient();
     const bucket = this.getBucketName();
 

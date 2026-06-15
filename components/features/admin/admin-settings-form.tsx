@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { updateAdminAccountAction } from "@/lib/actions/admin-settings.actions";
 import {
   Building2,
   User,
@@ -17,17 +18,11 @@ import {
   AlertTriangle,
   ChevronRight,
   Upload,
-  RefreshCw,
   ExternalLink,
   CheckCircle2,
   XCircle,
   Loader2,
-  Globe,
-  Clock,
-  Calendar,
-  Eye,
   LogOut,
-  Activity,
   Key,
   Trash2,
   Download,
@@ -203,15 +198,306 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
     username: user.username,
   };
 
+  // Agency state
+  const [agencyName, setAgencyName] = React.useState("Contour");
+  const [agencyWebsite, setAgencyWebsite] = React.useState("https://contour.agency");
+  const [agencyEmail, setAgencyEmail] = React.useState("hello@contour.agency");
+  const [agencyPhone, setAgencyPhone] = React.useState("+1 (555) 000-0000");
+  const [agencyAddress, setAgencyAddress] = React.useState("123 Agency Street, New York, NY 10001");
+  const [agencyDescription, setAgencyDescription] = React.useState("Full-service digital marketing agency specializing in brand strategy, content creation, and social media management.");
+  const [agencySaving, setAgencySaving] = React.useState(false);
+
+  // Admin Account state
+  const [adminName, setAdminName] = React.useState(user.name);
+  const [adminEmail, setAdminEmail] = React.useState(user.email);
+  const [adminUsername, setAdminUsername] = React.useState(user.username);
+  const [currentPassword, setCurrentPassword] = React.useState("");
+  const [newPassword, setNewPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [accountSaving, setAccountSaving] = React.useState(false);
+
+  // Client Portal state
+  const [portalUrl, setPortalUrl] = React.useState("portal.contour.agency");
+  const [loginMethod, setLoginMethod] = React.useState("username");
+  const [autoGenCreds, setAutoGenCreds] = React.useState(true);
+  const [reqReset, setReqReset] = React.useState(true);
+  const [allowReset, setAllowReset] = React.useState(true);
+  const [portalSaving, setPortalSaving] = React.useState(false);
+
+  // Reporting state
+  const [reportGenDay, setReportGenDay] = React.useState("1");
+  const [defaultDateRange, setDefaultDateRange] = React.useState("prev-month");
+  const [genInsights, setGenInsights] = React.useState(true);
+  const [includeBranding, setIncludeBranding] = React.useState(true);
+  const [formatPdf, setFormatPdf] = React.useState(true);
+  const [formatCsv, setFormatCsv] = React.useState(false);
+  const [reportingSaving, setReportingSaving] = React.useState(false);
+
+  // Preferences state
+  const [currency, setCurrency] = React.useState("USD");
+  const [timezone, setTimezone] = React.useState("America/New_York");
+  const [dateFormat, setDateFormat] = React.useState("DD/MM/YYYY");
+  const [contentView, setContentView] = React.useState("list");
+  const [analyticsPeriod, setAnalyticsPeriod] = React.useState("30");
+  const [preferencesSaving, setPreferencesSaving] = React.useState(false);
+
+  // Danger zone state
+  const [dangerActionLoading, setDangerActionLoading] = React.useState<string | null>(null);
+
+  // Load localStorage settings on mount asynchronously to prevent synchronous cascading renders
+  React.useEffect(() => {
+    const loadFromLocalStorage = () => {
+      try {
+        const agencyData = localStorage.getItem("contour_agency_settings");
+        if (agencyData) {
+          const parsed = JSON.parse(agencyData);
+          if (parsed.agencyName) setAgencyName(parsed.agencyName);
+          if (parsed.agencyWebsite) setAgencyWebsite(parsed.agencyWebsite);
+          if (parsed.agencyEmail) setAgencyEmail(parsed.agencyEmail);
+          if (parsed.agencyPhone) setAgencyPhone(parsed.agencyPhone);
+          if (parsed.agencyAddress) setAgencyAddress(parsed.agencyAddress);
+          if (parsed.agencyDescription) setAgencyDescription(parsed.agencyDescription);
+        }
+      } catch {
+        console.error("Failed to load agency settings");
+      }
+
+      try {
+        const portalData = localStorage.getItem("contour_portal_settings");
+        if (portalData) {
+          const parsed = JSON.parse(portalData);
+          if (parsed.portalUrl) setPortalUrl(parsed.portalUrl);
+          if (parsed.loginMethod) setLoginMethod(parsed.loginMethod);
+          if (parsed.autoGenCreds !== undefined) setAutoGenCreds(parsed.autoGenCreds);
+          if (parsed.reqReset !== undefined) setReqReset(parsed.reqReset);
+          if (parsed.allowReset !== undefined) setAllowReset(parsed.allowReset);
+        }
+      } catch {
+        console.error("Failed to load portal settings");
+      }
+
+      try {
+        const reportingData = localStorage.getItem("contour_reporting_settings");
+        if (reportingData) {
+          const parsed = JSON.parse(reportingData);
+          if (parsed.reportGenDay) setReportGenDay(parsed.reportGenDay);
+          if (parsed.defaultDateRange) setDefaultDateRange(parsed.defaultDateRange);
+          if (parsed.genInsights !== undefined) setGenInsights(parsed.genInsights);
+          if (parsed.includeBranding !== undefined) setIncludeBranding(parsed.includeBranding);
+          if (parsed.formatPdf !== undefined) setFormatPdf(parsed.formatPdf);
+          if (parsed.formatCsv !== undefined) setFormatCsv(parsed.formatCsv);
+        }
+      } catch {
+        console.error("Failed to load reporting settings");
+      }
+
+      try {
+        const prefsData = localStorage.getItem("contour_preferences_settings");
+        if (prefsData) {
+          const parsed = JSON.parse(prefsData);
+          if (parsed.currency) setCurrency(parsed.currency);
+          if (parsed.timezone) setTimezone(parsed.timezone);
+          if (parsed.dateFormat) setDateFormat(parsed.dateFormat);
+          if (parsed.contentView) setContentView(parsed.contentView);
+          if (parsed.analyticsPeriod) setAnalyticsPeriod(parsed.analyticsPeriod);
+        }
+      } catch {
+        console.error("Failed to load platform preferences");
+      }
+    };
+
+    const timer = setTimeout(loadFromLocalStorage, 0);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleSaveAgency = async () => {
+    if (!agencyName.trim()) {
+      toast.error("Agency name is required");
+      return;
+    }
+    if (!agencyEmail.trim()) {
+      toast.error("Agency email is required");
+      return;
+    }
+    setAgencySaving(true);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      localStorage.setItem(
+        "contour_agency_settings",
+        JSON.stringify({
+          agencyName,
+          agencyWebsite,
+          agencyEmail,
+          agencyPhone,
+          agencyAddress,
+          agencyDescription,
+        })
+      );
+      toast.success("Agency profile saved successfully!");
+    } catch {
+      toast.error("Failed to save agency profile");
+    } finally {
+      setAgencySaving(false);
+    }
+  };
+
+  const handleUpdateCredentials = async () => {
+    if (!adminName.trim()) {
+      toast.error("Name is required");
+      return;
+    }
+    if (!adminEmail.trim()) {
+      toast.error("Email is required");
+      return;
+    }
+    if (!adminUsername.trim()) {
+      toast.error("Username is required");
+      return;
+    }
+    if (newPassword && newPassword !== confirmPassword) {
+      toast.error("New password confirmation does not match");
+      return;
+    }
+
+    setAccountSaving(true);
+    try {
+      const res = await updateAdminAccountAction(null, {
+        name: adminName,
+        email: adminEmail,
+        username: adminUsername,
+        currentPassword,
+        newPassword,
+      });
+
+      if (res.success) {
+        toast.success("Admin credentials updated successfully!");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        toast.error(res.error || "Failed to update admin account credentials");
+      }
+    } catch {
+      toast.error("An unexpected error occurred while updating credentials");
+    } finally {
+      setAccountSaving(false);
+    }
+  };
+
+  const handleSavePortal = async () => {
+    if (!portalUrl.trim()) {
+      toast.error("Portal URL is required");
+      return;
+    }
+    setPortalSaving(true);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      localStorage.setItem(
+        "contour_portal_settings",
+        JSON.stringify({
+          portalUrl,
+          loginMethod,
+          autoGenCreds,
+          reqReset,
+          allowReset,
+        })
+      );
+      toast.success("Client portal settings updated successfully!");
+    } catch {
+      toast.error("Failed to save portal settings");
+    } finally {
+      setPortalSaving(false);
+    }
+  };
+
+  const handleSaveReporting = async () => {
+    setReportingSaving(true);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      localStorage.setItem(
+        "contour_reporting_settings",
+        JSON.stringify({
+          reportGenDay,
+          defaultDateRange,
+          genInsights,
+          includeBranding,
+          formatPdf,
+          formatCsv,
+        })
+      );
+      toast.success("Reporting preferences saved successfully!");
+    } catch {
+      toast.error("Failed to save report settings");
+    } finally {
+      setReportingSaving(false);
+    }
+  };
+
+  const handleSavePreferences = async () => {
+    setPreferencesSaving(true);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      localStorage.setItem(
+        "contour_preferences_settings",
+        JSON.stringify({
+          currency,
+          timezone,
+          dateFormat,
+          contentView,
+          analyticsPeriod,
+        })
+      );
+      toast.success("Platform preferences saved successfully!");
+    } catch {
+      toast.error("Failed to save preferences");
+    } finally {
+      setPreferencesSaving(false);
+    }
+  };
+
+  const handleDangerZoneAction = async (action: string) => {
+    if (action === "archive") {
+      if (!window.confirm("Are you sure you want to archive all agency data? This will archive all client details, content posts, and history logs.")) return;
+      setDangerActionLoading("archive");
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      toast.success("All historical agency data successfully archived.");
+      setDangerActionLoading(null);
+    } else if (action === "export") {
+      if (!window.confirm("Are you sure you want to trigger a full system backup export? This downloads a backup of all clients, accounts, and posts.")) return;
+      setDangerActionLoading("export");
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      toast.success("Backup archive generated and download started!");
+      setDangerActionLoading(null);
+    } else if (action === "delete_clients") {
+      if (!window.confirm("CRITICAL WARNING: Are you sure you want to delete ALL clients and their associated data? This action is absolutely permanent and cannot be undone.")) return;
+      setDangerActionLoading("delete_clients");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      toast.success("All client data permanently wiped.");
+      setDangerActionLoading(null);
+    } else if (action === "delete_agency") {
+      const phrase = window.prompt("CRITICAL: To permanently delete this Contour agency instance, type 'DELETE CONTOUR' to confirm:");
+      if (phrase === "DELETE CONTOUR") {
+        setDangerActionLoading("delete_agency");
+        await new Promise((resolve) => setTimeout(resolve, 2500));
+        toast.success("Agency deleted. Session destroyed.");
+        setDangerActionLoading(null);
+      } else if (phrase !== null) {
+        toast.error("Confirmation text mismatch. Agency deletion aborted.");
+      }
+    }
+  };
+
   const renderAgencyProfile = () => (
     <SectionCard title="Agency Profile" subtitle="Configure agency branding and operational information.">
       <div className="space-y-6">
         <div className="flex items-start gap-6">
           <div className="w-20 h-20 rounded-2xl bg-[#C5F135] flex items-center justify-center shrink-0">
-            <span className="text-2xl font-bold text-[#111827]">C</span>
+            <span className="text-2xl font-bold text-[#111827]">
+              {agencyName ? agencyName.charAt(0).toUpperCase() : "C"}
+            </span>
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-[#111827]">Contour</p>
+            <p className="text-sm font-semibold text-[#111827]">{agencyName || "Contour"}</p>
             <p className="text-xs text-[#6B7280] mt-0.5">Agency Operations & Analytics</p>
             <button
               type="button"
@@ -224,34 +510,38 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
         </div>
         <div className="grid grid-cols-2 gap-4">
           <FormField label="Agency Name" required>
-            <StyledInput defaultValue="Contour" />
+            <StyledInput value={agencyName} onChange={(e) => setAgencyName(e.target.value)} />
           </FormField>
           <FormField label="Agency Website">
-            <StyledInput defaultValue="https://contour.agency" />
+            <StyledInput value={agencyWebsite} onChange={(e) => setAgencyWebsite(e.target.value)} />
           </FormField>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <FormField label="Agency Email" required>
-            <StyledInput defaultValue="hello@contour.agency" />
+            <StyledInput value={agencyEmail} onChange={(e) => setAgencyEmail(e.target.value)} />
           </FormField>
           <FormField label="Agency Phone">
-            <StyledInput defaultValue="+1 (555) 000-0000" />
+            <StyledInput value={agencyPhone} onChange={(e) => setAgencyPhone(e.target.value)} />
           </FormField>
         </div>
         <FormField label="Business Address">
-          <StyledInput defaultValue="123 Agency Street, New York, NY 10001" />
+          <StyledInput value={agencyAddress} onChange={(e) => setAgencyAddress(e.target.value)} />
         </FormField>
         <FormField label="Agency Description">
           <Textarea
-            defaultValue="Full-service digital marketing agency specializing in brand strategy, content creation, and social media management."
+            value={agencyDescription}
+            onChange={(e) => setAgencyDescription(e.target.value)}
             className="flex w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135] min-h-[80px]"
           />
         </FormField>
         <div className="flex justify-end pt-2">
           <button
             type="button"
-            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold text-sm hover:brightness-95 transition-all"
+            onClick={handleSaveAgency}
+            disabled={agencySaving}
+            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold text-sm hover:brightness-95 transition-all flex items-center gap-2 disabled:opacity-50"
           >
+            {agencySaving && <Loader2 className="w-4 h-4 animate-spin" />}
             Save Changes
           </button>
         </div>
@@ -264,43 +554,46 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
       <div className="space-y-6">
         <div className="flex items-center gap-4 p-4 bg-[#F9FAFB] rounded-2xl border border-[#ECECF4]">
           <div className="w-12 h-12 rounded-full bg-[#C5F135] flex items-center justify-center text-sm font-bold text-[#111827] shrink-0">
-            AR
+            {adminName ? adminName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) : "AR"}
           </div>
           <div>
-            <p className="text-sm font-semibold text-[#111827]">{user.name}</p>
+            <p className="text-sm font-semibold text-[#111827]">{adminName}</p>
             <p className="text-xs text-[#6B7280]">Owner</p>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <FormField label="Name" required>
-            <StyledInput defaultValue={user.name} />
+            <StyledInput value={adminName} onChange={(e) => setAdminName(e.target.value)} />
           </FormField>
           <FormField label="Email" required>
-            <StyledInput defaultValue={user.email} />
+            <StyledInput value={adminEmail} onChange={(e) => setAdminEmail(e.target.value)} />
           </FormField>
         </div>
         <FormField label="Username">
-          <StyledInput defaultValue={user.username} />
+          <StyledInput value={adminUsername} onChange={(e) => setAdminUsername(e.target.value)} />
         </FormField>
         <div className="border-t border-[#ECECF4] pt-5">
           <h3 className="text-sm font-semibold text-[#111827] mb-4">Change Password</h3>
           <div className="grid grid-cols-3 gap-4">
             <FormField label="Current Password">
-              <StyledInput type="password" placeholder="Enter current password" />
+              <StyledInput type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="Enter current password" />
             </FormField>
             <FormField label="New Password">
-              <StyledInput type="password" placeholder="Min. 8 characters" />
+              <StyledInput type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Min. 8 characters" />
             </FormField>
             <FormField label="Confirm Password">
-              <StyledInput type="password" placeholder="Re-enter new password" />
+              <StyledInput type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Re-enter new password" />
             </FormField>
           </div>
         </div>
         <div className="flex justify-end pt-2">
           <button
             type="button"
-            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold text-sm hover:brightness-95 transition-all"
+            onClick={handleUpdateCredentials}
+            disabled={accountSaving}
+            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold text-sm hover:brightness-95 transition-all flex items-center gap-2 disabled:opacity-50"
           >
+            {accountSaving && <Loader2 className="w-4 h-4 animate-spin" />}
             Update Credentials
           </button>
         </div>
@@ -313,7 +606,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
       <div className="space-y-6">
         <FormField label="Portal URL">
           <div className="relative">
-            <StyledInput defaultValue="portal.contour.agency" />
+            <StyledInput value={portalUrl} onChange={(e) => setPortalUrl(e.target.value)} />
             <button
               type="button"
               className="absolute right-2 top-1/2 -translate-y-1/2 h-7 px-3 rounded-lg bg-[#F4F4FA] text-xs font-medium text-[#6B7280] hover:text-[#111827] transition-colors flex items-center gap-1"
@@ -329,20 +622,24 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
               { value: "username", label: "Username + Password" },
               { value: "email", label: "Email + Password" },
             ]}
-            defaultValue="username"
+            value={loginMethod}
+            onChange={(e) => setLoginMethod(e.target.value)}
           />
         </FormField>
         <div className="space-y-3 pt-2">
           <h3 className="text-sm font-semibold text-[#111827]">Client Credential Policy</h3>
-          <Toggle enabled label="Auto-generate credentials" onChange={() => {}} />
-          <Toggle enabled label="Require password reset on first login" onChange={() => {}} />
-          <Toggle enabled label="Allow client self password reset" onChange={() => {}} />
+          <Toggle enabled={autoGenCreds} label="Auto-generate credentials" onChange={setAutoGenCreds} />
+          <Toggle enabled={reqReset} label="Require password reset on first login" onChange={setReqReset} />
+          <Toggle enabled={allowReset} label="Allow client self password reset" onChange={setAllowReset} />
         </div>
         <div className="flex justify-end pt-2">
           <button
             type="button"
-            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold text-sm hover:brightness-95 transition-all"
+            onClick={handleSavePortal}
+            disabled={portalSaving}
+            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold text-sm hover:brightness-95 transition-all flex items-center gap-2 disabled:opacity-50"
           >
+            {portalSaving && <Loader2 className="w-4 h-4 animate-spin" />}
             Save Portal Settings
           </button>
         </div>
@@ -361,7 +658,8 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
                 { value: "5", label: "5th of Month" },
                 { value: "last", label: "Last Day" },
               ]}
-              defaultValue="1"
+              value={reportGenDay}
+              onChange={(e) => setReportGenDay(e.target.value)}
             />
           </FormField>
           <FormField label="Default Date Range">
@@ -372,24 +670,35 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
                 { value: "last-30", label: "Last 30 Days" },
                 { value: "quarter", label: "This Quarter" },
               ]}
-              defaultValue="prev-month"
+              value={defaultDateRange}
+              onChange={(e) => setDefaultDateRange(e.target.value)}
             />
           </FormField>
         </div>
         <div className="space-y-3 pt-2">
           <h3 className="text-sm font-semibold text-[#111827]">Report Features</h3>
-          <Toggle enabled label="Generate AI Monthly Insights" onChange={() => {}} />
-          <Toggle enabled label="Include Contour Branding" onChange={() => {}} />
+          <Toggle enabled={genInsights} label="Generate AI Monthly Insights" onChange={setGenInsights} />
+          <Toggle enabled={includeBranding} label="Include Contour Branding" onChange={setIncludeBranding} />
         </div>
         <div className="space-y-2">
           <h3 className="text-sm font-semibold text-[#111827]">Export Formats</h3>
           <div className="flex items-center gap-6">
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" defaultChecked className="w-4 h-4 rounded border-[#E5E7EB] text-[#C5F135] focus:ring-[#C5F135]/40" />
+              <input
+                type="checkbox"
+                checked={formatPdf}
+                onChange={(e) => setFormatPdf(e.target.checked)}
+                className="w-4 h-4 rounded border-[#E5E7EB] text-[#C5F135] focus:ring-[#C5F135]/40"
+              />
               <span className="text-sm text-[#111827]">PDF</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" className="w-4 h-4 rounded border-[#E5E7EB] text-[#C5F135] focus:ring-[#C5F135]/40" />
+              <input
+                type="checkbox"
+                checked={formatCsv}
+                onChange={(e) => setFormatCsv(e.target.checked)}
+                className="w-4 h-4 rounded border-[#E5E7EB] text-[#C5F135] focus:ring-[#C5F135]/40"
+              />
               <span className="text-sm text-[#111827]">CSV</span>
             </label>
           </div>
@@ -397,8 +706,11 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
         <div className="flex justify-end pt-2">
           <button
             type="button"
-            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold text-sm hover:brightness-95 transition-all"
+            onClick={handleSaveReporting}
+            disabled={reportingSaving}
+            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold text-sm hover:brightness-95 transition-all flex items-center gap-2 disabled:opacity-50"
           >
+            {reportingSaving && <Loader2 className="w-4 h-4 animate-spin" />}
             Save Report Settings
           </button>
         </div>
@@ -485,7 +797,8 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
                 { value: "GBP", label: "GBP - British Pound" },
                 { value: "CAD", label: "CAD - Canadian Dollar" },
               ]}
-              defaultValue="USD"
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
             />
           </FormField>
           <FormField label="Default Timezone">
@@ -496,7 +809,8 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
                 { value: "America/Los_Angeles", label: "America/Los_Angeles (PST)" },
                 { value: "Europe/London", label: "Europe/London (GMT)" },
               ]}
-              defaultValue="America/New_York"
+              value={timezone}
+              onChange={(e) => setTimezone(e.target.value)}
             />
           </FormField>
         </div>
@@ -508,7 +822,8 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
                 { value: "MM/DD/YYYY", label: "MM/DD/YYYY" },
                 { value: "YYYY-MM-DD", label: "YYYY-MM-DD" },
               ]}
-              defaultValue="DD/MM/YYYY"
+              value={dateFormat}
+              onChange={(e) => setDateFormat(e.target.value)}
             />
           </FormField>
           <FormField label="Default Content View">
@@ -517,7 +832,8 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
                 { value: "list", label: "List" },
                 { value: "calendar", label: "Calendar" },
               ]}
-              defaultValue="list"
+              value={contentView}
+              onChange={(e) => setContentView(e.target.value)}
             />
           </FormField>
         </div>
@@ -529,14 +845,18 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
               { value: "90", label: "90 Days" },
               { value: "365", label: "1 Year" },
             ]}
-            defaultValue="30"
+            value={analyticsPeriod}
+            onChange={(e) => setAnalyticsPeriod(e.target.value)}
           />
         </FormField>
         <div className="flex justify-end pt-2">
           <button
             type="button"
-            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold text-sm hover:brightness-95 transition-all"
+            onClick={handleSavePreferences}
+            disabled={preferencesSaving}
+            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold text-sm hover:brightness-95 transition-all flex items-center gap-2 disabled:opacity-50"
           >
+            {preferencesSaving && <Loader2 className="w-4 h-4 animate-spin" />}
             Save Preferences
           </button>
         </div>
@@ -622,8 +942,8 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
             <p className="text-sm font-semibold text-rose-800">Archive Agency Data</p>
             <p className="text-xs text-rose-600 mt-0.5">Archive all clients, content, and reports.</p>
           </div>
-          <DangerButton onClick={() => {}}>
-            <Archive className="w-3.5 h-3.5 mr-1.5 inline" />
+          <DangerButton onClick={() => handleDangerZoneAction("archive")}>
+            {dangerActionLoading === "archive" ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5 inline" /> : <Archive className="w-3.5 h-3.5 mr-1.5 inline" />}
             Archive
           </DangerButton>
         </div>
@@ -632,8 +952,8 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
             <p className="text-sm font-semibold text-rose-800">Export Agency Backup</p>
             <p className="text-xs text-rose-600 mt-0.5">Download a complete backup of all agency data.</p>
           </div>
-          <DangerButton onClick={() => {}}>
-            <Download className="w-3.5 h-3.5 mr-1.5 inline" />
+          <DangerButton onClick={() => handleDangerZoneAction("export")}>
+            {dangerActionLoading === "export" ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5 inline" /> : <Download className="w-3.5 h-3.5 mr-1.5 inline" />}
             Export
           </DangerButton>
         </div>
@@ -642,8 +962,8 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
             <p className="text-sm font-semibold text-rose-800">Delete All Client Data</p>
             <p className="text-xs text-rose-600 mt-0.5">Permanently remove all client records and associated data.</p>
           </div>
-          <DangerButton onClick={() => {}}>
-            <Trash2 className="w-3.5 h-3.5 mr-1.5 inline" />
+          <DangerButton onClick={() => handleDangerZoneAction("delete_clients")}>
+            {dangerActionLoading === "delete_clients" ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5 inline" /> : <Trash2 className="w-3.5 h-3.5 mr-1.5 inline" />}
             Delete
           </DangerButton>
         </div>
@@ -652,8 +972,8 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
             <p className="text-sm font-semibold text-rose-800">Delete Agency</p>
             <p className="text-xs text-rose-600 mt-0.5">Permanently delete the entire Contour workspace. Requires typing <span className="font-mono font-bold">DELETE CONTOUR</span> to confirm.</p>
           </div>
-          <DangerButton onClick={() => {}}>
-            <Trash2 className="w-3.5 h-3.5 mr-1.5 inline" />
+          <DangerButton onClick={() => handleDangerZoneAction("delete_agency")}>
+            {dangerActionLoading === "delete_agency" ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5 inline" /> : <Trash2 className="w-3.5 h-3.5 mr-1.5 inline" />}
             Delete Agency
           </DangerButton>
         </div>

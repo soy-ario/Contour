@@ -35,7 +35,6 @@ interface RequestDetail {
 
 interface RequestThreadProps {
   request: RequestDetail;
-  currentUserId: string;
 }
 
 const statusConfig: Record<string, { label: string; style: string }> = {
@@ -45,7 +44,7 @@ const statusConfig: Record<string, { label: string; style: string }> = {
   CLOSED: { label: "Closed", style: "bg-rose-50 text-rose-600" },
 };
 
-export default function RequestThread({ request, currentUserId }: RequestThreadProps) {
+export default function RequestThread({ request }: RequestThreadProps) {
   const router = useRouter();
   const [isPending, startTransition] = React.useTransition();
   const [serverError, setServerError] = React.useState<string | null>(null);
@@ -64,7 +63,7 @@ export default function RequestThread({ request, currentUserId }: RequestThreadP
     setServerError(null);
     startTransition(async () => {
       try {
-        const res = await addRequestCommentAction(request.id, currentUserId, null, data);
+        const res = await addRequestCommentAction(request.id, null, data);
         if (res.success) {
           toast.success("Comment posted!");
           reset();

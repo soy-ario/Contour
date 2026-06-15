@@ -292,11 +292,6 @@ export async function createClientUserAction(clientId: string, username: string,
       },
     });
 
-    await prisma.client.update({
-      where: { id: clientId },
-      data: { portalPassword: password },
-    });
-
     await createAuditLog({
       actorId: user.id,
       action: "CLIENT_USER_CREATED",
@@ -341,10 +336,6 @@ export async function resetClientPasswordAction(clientId: string) {
       prisma.account.updateMany({
         where: { userId: clientUser.id, providerId: "credential" },
         data: { password: passwordHash },
-      }),
-      prisma.client.update({
-        where: { id: clientId },
-        data: { portalPassword: newPassword },
       }),
     ]);
 

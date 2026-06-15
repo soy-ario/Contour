@@ -4,7 +4,6 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import type { Platform, ContentStatus, ContentType } from "@prisma/client";
-import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ContentListView from "@/components/features/admin/content-list-view";
 import ContentCalendarView from "@/components/features/admin/content-calendar-view";
@@ -92,8 +91,6 @@ export default function ContentPageContent({
   statusSummary,
   clientId = null,
   clients = [],
-  pendingContents = [],
-  user,
 }: ContentPageContentProps) {
   const router = useRouter();
 

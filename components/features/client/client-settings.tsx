@@ -363,7 +363,7 @@ export default function ClientSettings({ data }: { data: SettingsData }) {
                       <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA3AF]" />
                       <input type="email" value={data.userEmail} className={cn(inputClasses(), "pl-10")} readOnly />
                     </div>
-                    <span className="flex items-center gap-1 text-[12px] font-medium px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#166534] shrink-0">
+                    <span className="flex items-center gap-1 text-[12px] font-medium px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#F2485A] shrink-0">
                       <CheckCircle2 className="w-3 h-3" /> Verified
                     </span>
                   </div>
@@ -461,7 +461,7 @@ export default function ClientSettings({ data }: { data: SettingsData }) {
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className="text-[12px] font-medium px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#166534]">Connected</span>
+                            <span className="text-[12px] font-medium px-2.5 py-1 rounded-full bg-[#DCFCE7] text-[#F2485A]">Connected</span>
                             <ChevronRight className="w-4 h-4 text-[#9CA3AF]" />
                           </div>
                         </div>

@@ -35,10 +35,10 @@ interface StatusBadgeProps {
 }
 
 const statusStyles: Record<string, { bg: string; text: string; dot: string }> = {
-  completed: { bg: "bg-[#EEFAF3]", text: "text-[#27AE60]", dot: "bg-[#27AE60]" },
+  completed: { bg: "bg-[#FFE3E3]", text: "text-[#F2485A]", dot: "bg-[#F2485A]" },
   inprogress: { bg: "bg-[#EEF0FF]", text: "text-[#5B5EEF]", dot: "bg-[#5B5EEF]" },
   pending: { bg: "bg-[#FFF4EC]", text: "text-[#E07A2F]", dot: "bg-[#E07A2F]" },
-  active: { bg: "bg-[#EEFAF3]", text: "text-[#27AE60]", dot: "bg-[#27AE60]" },
+  active: { bg: "bg-[#FFE3E3]", text: "text-[#F2485A]", dot: "bg-[#F2485A]" },
   draft: { bg: "bg-[#F5F5F5]", text: "text-[#6B6B80]", dot: "bg-[#6B6B80]" },
   error: { bg: "bg-rose-50", text: "text-rose-500", dot: "bg-rose-500" },
   muted: { bg: "bg-zinc-50", text: "text-zinc-400", dot: "bg-zinc-400" },

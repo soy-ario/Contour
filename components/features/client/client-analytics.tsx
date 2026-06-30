@@ -275,7 +275,7 @@ function MetricChartCard({
     <div className="bg-white border border-[#E5E7EB] rounded-2xl p-5">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-[#F2F8D7] flex items-center justify-center shrink-0 text-gray-500">
+          <div className="w-8 h-8 rounded-full bg-[#FFE3E3] flex items-center justify-center shrink-0 text-gray-500">
             {METRIC_ICONS[metric]}
           </div>
           <span className="text-sm font-bold text-[#111827]">{METRIC_LABELS[metric]}</span>
@@ -728,7 +728,7 @@ export default function ClientAnalytics({
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="w-9 h-9 rounded-full bg-[#F2F8D7] flex items-center justify-center shrink-0 text-gray-500">
+                    <div className="w-9 h-9 rounded-full bg-[#FFE3E3] flex items-center justify-center shrink-0 text-gray-500">
                       {kpi.icon}
                     </div>
                     <span className="text-xs font-medium text-gray-400">{kpi.label}</span>
@@ -875,7 +875,7 @@ export default function ClientAnalytics({
                 <h3 className="text-base font-bold text-[#111827]">Top Performing Content</h3>
                 <Info className="w-4 h-4 text-gray-400" />
               </div>
-              <button className="text-xs font-semibold text-[#82D616] hover:text-[#6BB012] transition-colors">
+              <button className="text-xs font-semibold text-[#82D616] hover:text-[#F2485A] transition-colors">
                 View All
               </button>
             </div>

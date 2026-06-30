@@ -295,7 +295,7 @@ export default function ContentPageContent({
                   onClick={() => setView("list")}
                   className={cn(
                     "flex-1 flex items-center justify-center gap-1.5 h-full rounded-md text-xs font-medium transition-all",
-                    view === "list" ? "bg-[#F2F8D7] text-[#111827]" : "text-[#9CA3AF] hover:text-[#6B7280]"
+                    view === "list" ? "bg-[#FFE3E3] text-[#111827]" : "text-[#9CA3AF] hover:text-[#6B7280]"
                   )}
                 >
                   <List className="w-3.5 h-3.5" />
@@ -305,7 +305,7 @@ export default function ContentPageContent({
                   onClick={() => setView("calendar")}
                   className={cn(
                     "flex-1 flex items-center justify-center gap-1.5 h-full rounded-md text-xs font-medium transition-all",
-                    view === "calendar" ? "bg-[#F2F8D7] text-[#111827]" : "text-[#9CA3AF] hover:text-[#6B7280]"
+                    view === "calendar" ? "bg-[#FFE3E3] text-[#111827]" : "text-[#9CA3AF] hover:text-[#6B7280]"
                   )}
                 >
                   <CalendarDays className="w-3.5 h-3.5" />
@@ -336,7 +336,7 @@ export default function ContentPageContent({
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-9 h-9 rounded-full bg-[#F2F8D7] flex items-center justify-center shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-[#FFE3E3] flex items-center justify-center shrink-0">
                         <Icon className="w-4 h-4 text-gray-500" />
                       </div>
                       <span className="text-xs font-medium text-gray-500 truncate">{card.label}</span>

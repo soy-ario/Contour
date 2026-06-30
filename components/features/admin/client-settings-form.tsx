@@ -56,7 +56,7 @@ function SettingsCard({
     <div className="bg-white border border-[#ECECF4] rounded-[24px] overflow-hidden">
       <div className="px-7 pt-7 pb-0">
         <div className="flex items-center gap-3 mb-6 pb-5 border-b border-[#ECECF4]">
-          <div className="w-10 h-10 rounded-xl bg-[#F2F8D7] flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-[#FFE3E3] flex items-center justify-center shrink-0">
             <Icon className="w-5 h-5 text-[#111827]" />
           </div>
           <div>
@@ -514,7 +514,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
       <SettingsCard icon={Globe} title="Client Identity" subtitle="Core brand information and profile metadata">
         <div className="flex items-start justify-between mb-7">
           <div className="flex items-center gap-5">
-            <div className="w-[72px] h-[72px] rounded-full bg-[#F2F8D7] flex items-center justify-center shrink-0">
+            <div className="w-[72px] h-[72px] rounded-full bg-[#FFE3E3] flex items-center justify-center shrink-0">
               <span className="text-[24px] font-bold text-[#111827]">{initials}</span>
             </div>
             <div>
@@ -579,7 +579,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
       <div className="bg-white border border-[#ECECF4] rounded-[24px] overflow-hidden">
         <div className="px-7 pt-7 pb-0">
           <div className="flex items-center gap-3 mb-6 pb-5 border-b border-[#ECECF4]">
-            <div className="w-10 h-10 rounded-xl bg-[#F2F8D7] flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#FFE3E3] flex items-center justify-center shrink-0">
               <Shield className="w-5 h-5 text-[#111827]" />
             </div>
             <div>
@@ -592,8 +592,8 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
           {user ? (
             <div className="space-y-5">
               {/* Credential Status Banner */}
-              <div className="flex items-center gap-4 p-4 bg-[#F0FDF4] border border-[#D1FAE5] rounded-[14px]">
-                <div className="w-10 h-10 rounded-xl bg-[#22c55e]/10 flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-4 p-4 bg-[#FFE3E3] border border-[#FFE3E3] rounded-[14px]">
+                <div className="w-10 h-10 rounded-xl bg-[#F2485A]/10 flex items-center justify-center shrink-0">
                   <UserCheck className="w-5 h-5 text-[#16A34A]" />
                 </div>
                 <div className="flex-1">

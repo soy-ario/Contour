@@ -57,7 +57,7 @@
   --color-tiktok: #ee1d52;
   --color-youtube: #ff0000;
   --color-x-twitter: #e7e9ea;
-  --color-success: #22c55e;
+  --color-success: #F2485A;
   --color-success-subtle: rgba(34, 197, 94, 0.08);
   --color-warning: #f59e0b;
   --color-warning-subtle: rgba(245, 158, 11, 0.08);
@@ -96,7 +96,7 @@
   /* Chart colors (Coral primary + complementary) */
   --chart-1: #F2485A;
   --chart-2: #8b5cf6;
-  --chart-3: #22c55e;
+  --chart-3: #F2485A;
   --chart-4: #f59e0b;
   --chart-5: #3b82f6;
 
@@ -115,7 +115,7 @@
   --color-accent-dark: #C13145;
   --color-text-secondary: #6B6B80;
   --color-text-muted: #A0A0B0;
-  --color-positive-trend: #4ADE80;
+  --color-positive-trend: #F2485A;
   --sidebar-muted: #A0A0B8;
   
   --radius-sm: 8px;

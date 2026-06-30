@@ -287,8 +287,8 @@ export default function ProductCatalogManager({
               className="bg-white border border-[#ECECF4] rounded-[20px] p-5 h-[130px] flex flex-col justify-between"
             >
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-[#F2F8D7] flex items-center justify-center shrink-0">
-                  <Icon className="w-[18px] h-[18px] text-[#6D8A00]" />
+                <div className="w-11 h-11 rounded-full bg-[#FFE3E3] flex items-center justify-center shrink-0">
+                  <Icon className="w-[18px] h-[18px] text-[#F2485A]" />
                 </div>
                 <span className="text-[12px] font-semibold tracking-[0.06em] uppercase text-[#6B7280]">
                   {kpi.label}
@@ -370,7 +370,7 @@ export default function ProductCatalogManager({
           <div className="flex-1" />
           <div className="flex items-center gap-3 shrink-0">
             <div className="w-[140px] h-10 rounded-lg border border-[#ECECF4] p-0.5 bg-white flex items-center">
-              <button className="flex-1 flex items-center justify-center gap-1.5 h-full rounded-md text-xs font-medium bg-[#F2F8D7] text-[#111827]">
+              <button className="flex-1 flex items-center justify-center gap-1.5 h-full rounded-md text-xs font-medium bg-[#FFE3E3] text-[#111827]">
                 <List className="w-3.5 h-3.5" />
                 List
               </button>
@@ -571,7 +571,7 @@ export default function ProductCatalogManager({
                 Showing 1–{filteredProducts.length} of {filteredProducts.length} products
               </span>
               <div className="flex items-center gap-1">
-                <button className="w-9 h-9 flex items-center justify-center rounded-xl text-[13px] font-semibold bg-[#F2F8D7] text-[#111827]">
+                <button className="w-9 h-9 flex items-center justify-center rounded-xl text-[13px] font-semibold bg-[#FFE3E3] text-[#111827]">
                   1
                 </button>
               </div>

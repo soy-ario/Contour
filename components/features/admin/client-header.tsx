@@ -45,7 +45,7 @@ export default function ClientHeader({ client }: ClientHeaderProps) {
           <div className="flex items-center justify-between">
             {/* Left: Avatar + Name + Status + Metadata */}
             <div className="flex items-center gap-4 min-w-0">
-              <Avatar className="w-14 h-14 rounded-[16px] bg-[#EBF7C1] shrink-0">
+              <Avatar className="w-14 h-14 rounded-[16px] bg-[#FFE3E3] shrink-0">
                 <AvatarFallback className="text-lg font-bold text-[#111827] bg-transparent">
                   {initials}
                 </AvatarFallback>
@@ -55,7 +55,7 @@ export default function ClientHeader({ client }: ClientHeaderProps) {
                   <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
                     {client.brandName}
                   </h1>
-                  <div className="bg-[#ECFDF5] text-[#10B981] text-xs font-semibold px-2.5 py-0.5 rounded-full border border-[#D1FAE5]">
+                  <div className="bg-[#FFE3E3] text-[#F2485A] text-xs font-semibold px-2.5 py-0.5 rounded-full border border-[#FFE3E3]">
                     {client.status === "ACTIVE" ? "Active" : client.status.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
                   </div>
                 </div>
@@ -77,7 +77,7 @@ export default function ClientHeader({ client }: ClientHeaderProps) {
             <div className="flex items-center gap-6 shrink-0">
               {/* Monthly Retainer */}
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-full bg-[#F2F8D7] flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-full bg-[#FFE3E3] flex items-center justify-center shrink-0">
                   <DollarSign className="w-4 h-4 text-gray-900" />
                 </div>
                 <div>

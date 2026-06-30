@@ -437,7 +437,7 @@ export default function ContentDetailSheet({
                       size="sm"
                       onClick={handleSaveNotes}
                       disabled={submitting}
-                      className="bg-[#1E1E2E] hover:bg-[#0E0E1E] text-xs font-semibold text-white h-8 rounded-xl flex items-center gap-1.5 px-3"
+                      className="bg-[#181818] hover:bg-[#181818] text-xs font-semibold text-white h-8 rounded-xl flex items-center gap-1.5 px-3"
                     >
                       <Save className="w-3 h-3" />
                       Save Notes
@@ -460,7 +460,7 @@ export default function ContentDetailSheet({
                   <Button
                     type="submit"
                     disabled={submitting || !commentText.trim()}
-                    className="bg-[#1E1E2E] hover:bg-[#0E0E1E] text-xs font-semibold text-white rounded-xl shrink-0 h-10 px-4"
+                    className="bg-[#181818] hover:bg-[#181818] text-xs font-semibold text-white rounded-xl shrink-0 h-10 px-4"
                   >
                     Post
                   </Button>
@@ -543,7 +543,7 @@ export default function ContentDetailSheet({
                   {!showScheduleInput ? (
                     <Button
                       onClick={() => setShowScheduleInput(true)}
-                      className="w-full bg-[#1E1E2E] hover:bg-[#0E0E1E] text-white font-bold text-sm h-10 flex items-center justify-center gap-1.5 rounded-xl"
+                      className="w-full bg-[#181818] hover:bg-[#181818] text-white font-bold text-sm h-10 flex items-center justify-center gap-1.5 rounded-xl"
                     >
                       <Calendar className="w-4 h-4" /> Schedule Post Date
                     </Button>
@@ -558,7 +558,7 @@ export default function ContentDetailSheet({
                       <Button
                         onClick={() => handleAction("schedule", { scheduledDate: scheduleDate }, "Content scheduled")}
                         disabled={submitting || !scheduleDate}
-                        className="bg-[#1E1E2E] hover:bg-[#0E0E1E] text-white font-bold text-xs h-10 px-4 shrink-0 rounded-xl"
+                        className="bg-[#181818] hover:bg-[#181818] text-white font-bold text-xs h-10 px-4 shrink-0 rounded-xl"
                       >
                         Confirm
                       </Button>

@@ -20,8 +20,8 @@ export default function HealthScoreRing({
   const clampedScore = hasScore ? Math.max(0, Math.min(100, score)) : 0;
   const strokeDashoffset = circumference - (clampedScore / 100) * circumference;
 
-  let color = "#22c55e";
-  let textColor = "text-[#27AE60]";
+  let color = "#F2485A";
+  let textColor = "text-[#F2485A]";
   let labelText = "Good";
 
   if (hasScore) {
@@ -34,8 +34,8 @@ export default function HealthScoreRing({
       textColor = "text-[#E07A2F]";
       labelText = "Fair";
     } else {
-      color = "#27AE60";
-      textColor = "text-[#27AE60]";
+      color = "#F2485A";
+      textColor = "text-[#F2485A]";
       labelText = "Good";
     }
   }

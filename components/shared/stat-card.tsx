@@ -102,7 +102,7 @@ export default function StatCard({
           {hasDelta && !meta && (
             <span className={cn(
               "text-[13px] font-semibold",
-              isPositive ? "text-[#4CAF50]" : isNegative ? "text-rose-500" : "text-[#6B7280]"
+              isPositive ? "text-[#F2485A]" : isNegative ? "text-rose-500" : "text-[#6B7280]"
             )}>
               {deltaText} <span className="font-normal text-[#6B7280]">{deltaLabel}</span>
             </span>

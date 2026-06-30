@@ -178,7 +178,7 @@ function KpiCard({ label, value, delta, icon: Icon, sparkline, isPercent = false
     <div className="bg-white border border-[#ECECF4] rounded-2xl p-4 flex flex-col justify-between min-h-[130px] transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_10px_30px_rgba(16,24,40,0.08)]" style={{ boxShadow: "0 2px 8px rgba(16,24,40,0.04)" }}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-[#F4F9DD] flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-full bg-[#FFE3E3] flex items-center justify-center shrink-0">
             <Icon className="w-[14px] h-[14px] text-[#6B7280]" strokeWidth={1.75} />
           </div>
           <span className="text-[11px] font-semibold text-gray-500">{label}</span>
@@ -313,7 +313,7 @@ function TopContentCard({ item, rank }: { item: ContentItem; rank: number }) {
     <Link href={`/client/content/${item.id}`}
       className="block bg-white border border-[#ECECF4] rounded-[24px] overflow-hidden transition-all duration-200 hover:-translate-y-[2px] hover:shadow-[0_10px_30px_rgba(16,24,40,0.08)]" style={{ boxShadow: "0 2px 8px rgba(16,24,40,0.04)" }}
     >
-      <div className="aspect-video w-full relative bg-gradient-to-br from-[#F2F8D7] to-[#E8F0CC]">
+      <div className="aspect-video w-full relative bg-gradient-to-br from-[#FFE3E3] to-[#FFE3E3]">
         {item.assetUrls.length > 0 ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={item.assetUrls[0]} alt="" className="w-full h-full object-cover rounded-xl" />
@@ -385,8 +385,8 @@ function TopContentSection({ items }: { items: ContentItem[] }) {
    ═══════════════════════════════════════════════ */
 
 const performanceLabels: Record<string, { label: string; style: string; icon?: string }> = {
-  top: { label: "Top Performer", style: "bg-[#DCFCE7] text-[#166534]" },
-  strong: { label: "Strong", style: "bg-[#ECFDF5] text-[#047857]" },
+  top: { label: "Top Performer", style: "bg-[#DCFCE7] text-[#F2485A]" },
+  strong: { label: "Strong", style: "bg-[#FFE3E3] text-[#F2485A]" },
   average: { label: "Average", style: "bg-[#FEF3C7] text-[#92400E]" },
   focus: { label: "Needs Focus", style: "bg-[#FEE2E2] text-[#B91C1C]", icon: "↓" },
 };
@@ -436,7 +436,7 @@ function ProductTable({ items }: { items: ProductItem[] }) {
                 <tr key={product.id} className="border-b border-[#ECECF4]/60 last:border-b-0">
                   <td className="py-2 pr-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-[10px] bg-[#F4F9DD] flex items-center justify-center shrink-0">
+                      <div className="w-10 h-10 rounded-[10px] bg-[#FFE3E3] flex items-center justify-center shrink-0">
                         <Package className="w-4 h-4 text-[#6B7280]" strokeWidth={1.75} />
                       </div>
                       <div>

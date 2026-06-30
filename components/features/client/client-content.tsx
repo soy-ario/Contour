@@ -51,7 +51,7 @@ function KpiCard({ label, value, delta, icon, color }: {
 }) {
   const bgMap: Record<string, string> = {
     orange: "bg-[#FFF7ED]", blue: "bg-[#EFF6FF]",
-    green: "bg-[#F0FDF4]", purple: "bg-[#FAF5FF]",
+    green: "bg-[#FFE3E3]", purple: "bg-[#FAF5FF]",
   };
   const textMap: Record<string, string> = {
     orange: "text-[#EA580C]", blue: "text-[#2563EB]",
@@ -437,14 +437,14 @@ function ContentCalendarCard({ data }: { data: ContentPageData }) {
               onClick={() => setView("calendar")}
               className={cn(
                 "h-9 px-4 rounded-[10px] text-[13px] font-medium transition-all",
-                view === "calendar" ? "bg-[#EAF8D0] text-[#111827]" : "text-[#6B7280]"
+                view === "calendar" ? "bg-[#FFE3E3] text-[#111827]" : "text-[#6B7280]"
               )}
             >Calendar</button>
             <button
               onClick={() => setView("list")}
               className={cn(
                 "h-9 px-4 rounded-[10px] text-[13px] font-medium transition-all",
-                view === "list" ? "bg-[#EAF8D0] text-[#111827]" : "text-[#6B7280]"
+                view === "list" ? "bg-[#FFE3E3] text-[#111827]" : "text-[#6B7280]"
               )}
             >List</button>
           </div>
@@ -462,7 +462,7 @@ function ContentCalendarCard({ data }: { data: ContentPageData }) {
           {!isCurrentMonth && (
             <button
               onClick={goToToday}
-              className="h-9 px-4 bg-[#F5F6FA] rounded-[10px] text-[13px] font-medium text-[#111827] hover:bg-[#EAF8D0] transition-all"
+              className="h-9 px-4 bg-[#F5F6FA] rounded-[10px] text-[13px] font-medium text-[#111827] hover:bg-[#FFE3E3] transition-all"
             >Today</button>
           )}
         </div>
@@ -478,7 +478,7 @@ function ContentCalendarCard({ data }: { data: ContentPageData }) {
               const events = day ? dayEvents(day) : [];
               const isT = day === today.getDate() && isCurrentMonth;
               return (
-                <div key={`${wi}-${di}`} className={cn("bg-white min-h-[100px] p-2", isT && "bg-[#F2F8D7]/30")}>
+                <div key={`${wi}-${di}`} className={cn("bg-white min-h-[100px] p-2", isT && "bg-[#FFE3E3]/30")}>
                   <span className={cn(
                     "inline-flex w-6 h-6 items-center justify-center text-[12px] font-medium rounded-full mb-1",
                     isT ? "bg-[#F2485A] text-white" : "text-[#111827]"
@@ -576,14 +576,14 @@ const STATUS_COLORS: Record<string, string> = {
 const STATUS_COLORS_LIST: Record<string, string> = {
   DRAFT: "text-[#6B7280] bg-[#F3F4F6]",
   CLIENT_APPROVAL_PENDING: "text-[#EA580C] bg-[#FFF7ED]",
-  APPROVED: "text-[#16A34A] bg-[#F0FDF4]",
+  APPROVED: "text-[#16A34A] bg-[#FFE3E3]",
   SCHEDULED: "text-[#2563EB] bg-[#EFF6FF]",
-  POSTED: "text-[#16A34A] bg-[#F0FDF4]",
+  POSTED: "text-[#16A34A] bg-[#FFE3E3]",
 };
 
 const performanceLabelColors: Record<string, string> = {
-  "Top Performer": "text-[#166534] bg-[#DCFCE7]",
-  "Strong": "text-[#047857] bg-[#ECFDF5]",
+  "Top Performer": "text-[#F2485A] bg-[#DCFCE7]",
+  "Strong": "text-[#F2485A] bg-[#FFE3E3]",
   "Average": "text-[#92400E] bg-[#FEF3C7]",
   "Needs Improvement": "text-[#B91C1C] bg-[#FEE2E2]",
 };

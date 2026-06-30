@@ -478,7 +478,7 @@ export default function CreateContentSheet({
             <Button
               type="submit"
               disabled={saving}
-              className="bg-[#1E1E2E] hover:bg-[#0E0E1E] text-white font-bold text-xs px-4 h-9 rounded-xl flex items-center gap-1.5"
+              className="bg-[#181818] hover:bg-[#181818] text-white font-bold text-xs px-4 h-9 rounded-xl flex items-center gap-1.5"
             >
               {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               <span>{isEditMode ? "Save Changes" : "Create Item"}</span>

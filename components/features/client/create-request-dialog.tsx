@@ -73,7 +73,7 @@ export default function CreateRequestDialog({ clientId }: CreateRequestDialogPro
       <DialogContent className="sm:max-w-md bg-white border-[#ECECF4] text-[#111827] rounded-[24px] shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
         <DialogHeader>
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#F2F8D7] flex items-center justify-center">
+            <div className="w-9 h-9 rounded-full bg-[#FFE3E3] flex items-center justify-center">
               <MessageSquare className="w-4 h-4 text-[#6B7280]" />
             </div>
             <div>

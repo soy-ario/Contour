@@ -40,12 +40,12 @@ export async function sendContentApprovedEmail(
     subject: `Contr.: Content Approved — ${contentTitle}`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
-        <h2 style="color: #10b981;">Content Approved</h2>
+        <h2 style="color: #F2485A;">Content Approved</h2>
         <p>Hello Admin,</p>
         <p>The client has approved the content: <strong>"${contentTitle}"</strong>.</p>
         <p>You can now schedule or post this item.</p>
         <div style="margin: 24px 0;">
-          <a href="${contentLink}" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500;">View in Dashboard</a>
+          <a href="${contentLink}" style="background-color: #F2485A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500;">View in Dashboard</a>
         </div>
         <hr style="border: 0; border-top: 1px solid #eee; margin: 24px 0;" />
         <p style="color: #64748b; font-size: 12px;">This is an automated notification from Contr.</p>

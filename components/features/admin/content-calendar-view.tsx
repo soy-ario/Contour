@@ -138,7 +138,7 @@ export default function ContentCalendarView({
           className={cn(
             "h-7 px-3 rounded-lg text-xs font-medium transition-all border",
             isCurrentMonthActive
-              ? "bg-[#F2F8D7] text-[#111827] border-[#F2485A]"
+              ? "bg-[#FFE3E3] text-[#111827] border-[#F2485A]"
               : "bg-white text-[#6B7280] border-[#ECECF4] hover:text-[#111827] hover:border-[#F2485A]"
           )}
         >

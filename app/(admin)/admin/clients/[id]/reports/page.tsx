@@ -11,7 +11,7 @@ interface ReportsPageProps {
 }
 
 const statusStyles: Record<string, { dot: string; label: string }> = {
-  COMPLETED: { dot: "#22c55e", label: "Completed" },
+  COMPLETED: { dot: "#F2485A", label: "Completed" },
   GENERATING: { dot: "#f59e0b", label: "Generating" },
   FAILED: { dot: "#ef4444", label: "Failed" },
   DRAFT: { dot: "#6B7280", label: "Draft" },

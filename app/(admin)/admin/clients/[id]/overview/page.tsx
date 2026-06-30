@@ -148,7 +148,7 @@ function KPIRow({ metrics }: {
           <div key={item.label} className="bg-white border border-[#ECECF4] rounded-[20px] p-5 h-[150px] flex flex-col justify-between transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-9 h-9 rounded-full bg-[#F2F8D7] flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-full bg-[#FFE3E3] flex items-center justify-center shrink-0">
                   <Icon className="w-4 h-4 text-[#6B7280]" />
                 </div>
                 <span className="text-xs font-medium text-gray-500 truncate">{item.label}</span>

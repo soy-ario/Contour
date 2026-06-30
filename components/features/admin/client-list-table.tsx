@@ -113,7 +113,7 @@ export default function ClientListTable({
           const client = row.original;
           return (
             <div className="flex items-center gap-3">
-              <Avatar className="w-10 h-10 rounded-full bg-[#F2F8D7] text-[#C13145] border border-[#ECECF4]">
+              <Avatar className="w-10 h-10 rounded-full bg-[#FFE3E3] text-[#C13145] border border-[#ECECF4]">
                 <AvatarFallback className="font-bold text-xs">
                   {getInitials(client.brandName)}
                 </AvatarFallback>
@@ -186,7 +186,7 @@ export default function ClientListTable({
               </p>
               <span className={`inline-flex h-5 items-center px-2 rounded-full text-[10px] font-medium mt-0.5 ${
                 variant === "active"
-                  ? "bg-[#EEFAF3] text-[#27AE60]"
+                  ? "bg-[#FFE3E3] text-[#F2485A]"
                   : "bg-[#F4F4FA] text-[#6B7280]"
               }`}>
                 {label}

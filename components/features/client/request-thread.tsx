@@ -110,7 +110,7 @@ export default function RequestThread({ request }: RequestThreadProps) {
             {/* Original Request */}
             <div className="bg-white border border-[#ECECF4] rounded-[24px] p-6">
               <div className="flex items-center gap-2 mb-4 pb-3 border-b border-[#ECECF4]">
-                <div className="w-6 h-6 rounded-full bg-[#F2F8D7] flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-[#FFE3E3] flex items-center justify-center">
                   <User className="w-3 h-3 text-[#6B7280]" />
                 </div>
                 <span className="text-xs font-semibold text-[#111827]">Request Details</span>
@@ -147,7 +147,7 @@ export default function RequestThread({ request }: RequestThreadProps) {
                         <div className="flex items-center gap-2">
                           <div className={cn(
                             "w-7 h-7 rounded-full flex items-center justify-center",
-                            isAdmin ? "bg-[#F2F8D7]" : "bg-[#F4F4FA]"
+                            isAdmin ? "bg-[#FFE3E3]" : "bg-[#F4F4FA]"
                           )}>
                             {isAdmin ? <Shield className="w-3.5 h-3.5 text-[#6B7280]" /> : <User className="w-3.5 h-3.5 text-[#6B7280]" />}
                           </div>

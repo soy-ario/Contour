@@ -39,7 +39,7 @@ export default async function ClientProductsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div className="bg-white border border-[#ECECF4] rounded-[20px] p-5">
             <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-9 h-9 rounded-full bg-[#F2F8D7] flex items-center justify-center">
+              <div className="w-9 h-9 rounded-full bg-[#FFE3E3] flex items-center justify-center">
                 <ShoppingBag className="w-4 h-4 text-[#6B7280]" />
               </div>
               <span className="text-xs font-medium text-gray-500">Total Products</span>
@@ -48,7 +48,7 @@ export default async function ClientProductsPage() {
           </div>
           <div className="bg-white border border-[#ECECF4] rounded-[20px] p-5">
             <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-9 h-9 rounded-full bg-[#F2F8D7] flex items-center justify-center">
+              <div className="w-9 h-9 rounded-full bg-[#FFE3E3] flex items-center justify-center">
                 <DollarSign className="w-4 h-4 text-[#6B7280]" />
               </div>
               <span className="text-xs font-medium text-gray-500">Total Value</span>
@@ -57,7 +57,7 @@ export default async function ClientProductsPage() {
           </div>
           <div className="bg-white border border-[#ECECF4] rounded-[20px] p-5">
             <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-9 h-9 rounded-full bg-[#F2F8D7] flex items-center justify-center">
+              <div className="w-9 h-9 rounded-full bg-[#FFE3E3] flex items-center justify-center">
                 <BarChart3 className="w-4 h-4 text-[#6B7280]" />
               </div>
               <span className="text-xs font-medium text-gray-500">Content Mentions</span>

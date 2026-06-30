@@ -107,7 +107,7 @@ export default function ClientTopbar({ brandName, contractStart, contractEnd }: 
         </Link>
         <div className="hidden sm:flex items-center gap-2">
           <span className="text-[32px] font-bold text-[#111827] tracking-tight leading-none">{brandName}</span>
-          <span className="bg-[#ECFDF5] text-[#10B981] text-xs font-bold px-2.5 py-0.5 rounded-full">
+          <span className="bg-[#FFE3E3] text-[#F2485A] text-xs font-bold px-2.5 py-0.5 rounded-full">
             Campaign Active
           </span>
         </div>

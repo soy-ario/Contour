@@ -434,7 +434,7 @@ export default async function ClientAnalyticsPage({ params }: PageProps) {
           return (
             <div key={kpi.label} className="bg-white border border-[#ECECF4] rounded-2xl p-5 flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <div className="w-9 h-9 rounded-full bg-[#F2F8D7] flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-full bg-[#FFE3E3] flex items-center justify-center shrink-0">
                   <Icon className="w-[18px] h-[18px] text-gray-500" />
                 </div>
                 <Sparkline data={kpi.sparkData} color={kpi.color} />

@@ -90,7 +90,7 @@ function KpiCard({
   return (
     <div className="bg-white border border-[#ECECF4] rounded-2xl p-4 transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] relative overflow-hidden">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-full bg-[#F2F8D7] flex items-center justify-center shrink-0 mt-0.5">
+        <div className="w-10 h-10 rounded-full bg-[#FFE3E3] flex items-center justify-center shrink-0 mt-0.5">
           {icon}
         </div>
         <div className="flex-1 min-w-0">

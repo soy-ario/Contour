@@ -88,8 +88,10 @@ export async function createContentAction(
     });
 
     // Revalidate relevant pages
-    revalidatePath("/content");
-    revalidatePath(`/clients/${contentData.clientId}/content`);
+    revalidatePath("/admin/content");
+    revalidatePath("/client/content");
+    revalidatePath(`/admin/clients/${contentData.clientId}/content`);
+    revalidatePath("/client/content");
 
     return { success: true, data: newContent };
   } catch (error) {
@@ -184,8 +186,10 @@ export async function updateContentAction(
       afterSnapshot: updatedContent as unknown as Record<string, unknown>,
     });
 
-    revalidatePath("/content");
-    revalidatePath(`/clients/${content.clientId}/content`);
+    revalidatePath("/admin/content");
+    revalidatePath("/client/content");
+    revalidatePath(`/admin/clients/${content.clientId}/content`);
+    revalidatePath("/client/content");
 
     return { success: true, data: updatedContent };
   } catch (error) {
@@ -233,8 +237,10 @@ export async function deleteContentAction(
       beforeSnapshot: content as unknown as Record<string, unknown>,
     });
 
-    revalidatePath("/content");
-    revalidatePath(`/clients/${content.clientId}/content`);
+    revalidatePath("/admin/content");
+    revalidatePath("/client/content");
+    revalidatePath(`/admin/clients/${content.clientId}/content`);
+    revalidatePath("/client/content");
 
     return { success: true };
   } catch (error) {
@@ -317,8 +323,10 @@ export async function submitContentAction(
       await sendContentSubmittedEmail(clientEmail, content.title);
     }
 
-    revalidatePath("/content");
-    revalidatePath(`/clients/${content.clientId}/content`);
+    revalidatePath("/admin/content");
+    revalidatePath("/client/content");
+    revalidatePath(`/admin/clients/${content.clientId}/content`);
+    revalidatePath("/client/content");
 
     return { success: true, data: updatedContent };
   } catch (error) {
@@ -384,8 +392,10 @@ export async function scheduleContentAction(
       afterSnapshot: updatedContent as unknown as Record<string, unknown>,
     });
 
-    revalidatePath("/content");
-    revalidatePath(`/clients/${content.clientId}/content`);
+    revalidatePath("/admin/content");
+    revalidatePath("/client/content");
+    revalidatePath(`/admin/clients/${content.clientId}/content`);
+    revalidatePath("/client/content");
 
     return { success: true, data: updatedContent };
   } catch (error) {

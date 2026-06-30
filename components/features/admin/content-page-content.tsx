@@ -226,14 +226,14 @@ export default function ContentPageContent({
                   placeholder="Search titles, concepts, hashtags..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full h-11 pl-10 pr-4 rounded-[14px] border border-[#E5E7EB] text-sm text-[#111827] placeholder:text-[#9CA3AF] bg-white focus:outline-none focus:ring-2 focus:ring-[#C5F135]/40 focus:border-transparent transition-all"
+                  className="w-full h-11 pl-10 pr-4 rounded-[14px] border border-[#E5E7EB] text-sm text-[#111827] placeholder:text-[#9CA3AF] bg-white focus:outline-none focus:ring-2 focus:ring-[#F2485A]/40 focus:border-transparent transition-all"
                 />
               </div>
 
               {/* Client Filter (global mode) */}
               {!clientId && (
                 <Select value={filterClient} onValueChange={(val) => setFilterClient(val)}>
-                  <SelectTrigger className="w-[180px] h-11 rounded-[14px] border border-[#E5E7EB] text-sm text-[#111827] bg-white focus:ring-[#C5F135]/40 px-3.5">
+                  <SelectTrigger className="w-[180px] h-11 rounded-[14px] border border-[#E5E7EB] text-sm text-[#111827] bg-white focus:ring-[#F2485A]/40 px-3.5">
                     <SelectValue placeholder="All Clients" />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
@@ -247,7 +247,7 @@ export default function ContentPageContent({
 
               {/* Platform Filter */}
               <Select value={filterPlatform} onValueChange={(val) => setFilterPlatform(val)}>
-                <SelectTrigger className="w-[220px] h-11 rounded-[14px] border border-[#E5E7EB] text-sm text-[#111827] bg-white focus:ring-[#C5F135]/40 px-3.5">
+                <SelectTrigger className="w-[220px] h-11 rounded-[14px] border border-[#E5E7EB] text-sm text-[#111827] bg-white focus:ring-[#F2485A]/40 px-3.5">
                   <SelectValue placeholder="All Platforms" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
@@ -260,7 +260,7 @@ export default function ContentPageContent({
 
               {/* Content Type Filter */}
               <Select value={filterType} onValueChange={(val) => setFilterType(val)}>
-                <SelectTrigger className="w-[220px] h-11 rounded-[14px] border border-[#E5E7EB] text-sm text-[#111827] bg-white focus:ring-[#C5F135]/40 px-3.5">
+                <SelectTrigger className="w-[220px] h-11 rounded-[14px] border border-[#E5E7EB] text-sm text-[#111827] bg-white focus:ring-[#F2485A]/40 px-3.5">
                   <SelectValue placeholder="All Content Types" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
@@ -275,7 +275,7 @@ export default function ContentPageContent({
 
               {/* Status Filter */}
               <Select value={filterStatus} onValueChange={(val) => setFilterStatus(val)}>
-                <SelectTrigger className="w-[180px] h-11 rounded-[14px] border border-[#E5E7EB] text-sm text-[#111827] bg-white focus:ring-[#C5F135]/40 px-3.5">
+                <SelectTrigger className="w-[180px] h-11 rounded-[14px] border border-[#E5E7EB] text-sm text-[#111827] bg-white focus:ring-[#F2485A]/40 px-3.5">
                   <SelectValue placeholder="All Statuses" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
@@ -316,7 +316,7 @@ export default function ContentPageContent({
               {/* Create Button */}
               <button
                 onClick={handleCreateContent}
-                className="h-11 px-5 rounded-[14px] bg-[#C5F135] hover:bg-[#B8E620] active:bg-[#8FBF00] text-[#111827] text-sm font-semibold flex items-center gap-2 transition-colors"
+                className="h-11 px-5 rounded-[14px] bg-[#F2485A] hover:bg-[#D93D4E] active:bg-[#C13145] text-white text-sm font-semibold flex items-center gap-2 transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 Create Content

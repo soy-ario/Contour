@@ -57,7 +57,7 @@ interface DashboardData {
    HELPERS
    ═══════════════════════════════════════════════ */
 
-function Sparkline70({ data, color = "#C5F135" }: { data: number[]; color?: string }) {
+function Sparkline70({ data, color = "#F2485A" }: { data: number[]; color?: string }) {
   const w = 70; const h = 28;
   let points: string;
   if (data.length < 2) {
@@ -156,7 +156,7 @@ function HeroSection({ client, budget }: { client: ClientData | null; budget: Da
         </div>
         {budget.monthly > 0 && (
           <div className="w-full h-2 bg-gray-100 rounded-full relative">
-            <div className="h-full rounded-full bg-[#C5F135] transition-all duration-500" style={{ width: `${pct}%` }} />
+            <div className="h-full rounded-full bg-[#F2485A] transition-all duration-500" style={{ width: `${pct}%` }} />
           </div>
         )}
       </div>
@@ -265,7 +265,7 @@ function PerformanceChart({ data }: { data: TrendMonth[] }) {
             <button key={m.key} onClick={() => setActive(m.key)}
               className={cn(
                 "px-3.5 py-1.5 rounded-[10px] text-sm font-medium transition-all duration-200",
-                active === m.key ? "bg-[#C5F135] text-[#111827]" : "bg-[#F5F6FA] text-[#6B7280] hover:bg-[#EEF0F6]"
+                active === m.key ? "bg-[#F2485A] text-white" : "bg-[#F5F6FA] text-[#6B7280] hover:bg-[#EEF0F6]"
               )}
             >
               {m.label}
@@ -278,8 +278,8 @@ function PerformanceChart({ data }: { data: TrendMonth[] }) {
           <AreaChart data={currentData} margin={{ top: 5, right: 12, left: -10, bottom: 0 }}>
             <defs>
               <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#C5F135" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#C5F135" stopOpacity={0.02} />
+                <stop offset="5%" stopColor="#F2485A" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#F2485A" stopOpacity={0.02} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#EEF0F6" vertical={false} />
@@ -296,7 +296,7 @@ function PerformanceChart({ data }: { data: TrendMonth[] }) {
                 return [formatTooltip(v), active === "engagementRate" ? "Engagement Rate" : active.charAt(0).toUpperCase() + active.slice(1)];
               }}
             />
-            <Area type="monotone" dataKey="value" stroke="#C5F135" strokeWidth={3} fill="url(#colorValue)" dot={false} activeDot={{ r: 5, strokeWidth: 0, fill: "#C5F135" }} />
+            <Area type="monotone" dataKey="value" stroke="#F2485A" strokeWidth={3} fill="url(#colorValue)" dot={false} activeDot={{ r: 5, strokeWidth: 0, fill: "#F2485A" }} />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -326,7 +326,7 @@ function TopContentCard({ item, rank }: { item: ContentItem; rank: number }) {
           <PlatformBadge platform={item.platform} />
         </div>
         {rank === 1 && (
-          <div className="absolute top-2 right-2 bg-[#C5F135] text-[#111827] text-[10px] font-extrabold px-2 py-0.5 rounded-full">
+          <div className="absolute top-2 right-2 bg-[#F2485A] text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full">
             #1
           </div>
         )}
@@ -450,7 +450,7 @@ function ProductTable({ items }: { items: ProductItem[] }) {
                   <td className="py-2 pr-4">
                     <div className="flex items-center gap-2">
                       <div className="w-16 h-1.5 bg-[#EEF0F6] rounded-full overflow-hidden">
-                        <div className="h-full rounded-full bg-[#C5F135]" style={{ width: `${Math.min(pct, 100)}%` }} />
+                        <div className="h-full rounded-full bg-[#F2485A]" style={{ width: `${Math.min(pct, 100)}%` }} />
                       </div>
                       <span className="text-sm font-bold text-[#111827]">{formatNum(product.totalEngagement)}</span>
                     </div>

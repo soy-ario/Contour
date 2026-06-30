@@ -27,16 +27,16 @@ export default function AdminSidebar() {
     <aside
       onMouseEnter={() => setExpanded(true)}
       onMouseLeave={() => setExpanded(false)}
-      className="h-screen sticky top-0 bg-[#0A1023] bg-[radial-gradient(ellipse_at_top,rgba(197,241,53,0.03)_0%,transparent_60%)] text-white flex flex-col justify-between transition-[width] duration-300 ease-in-out z-30"
+      className="h-screen sticky top-0 bg-[#181818] bg-[radial-gradient(ellipse_at_top,rgba(242,72,90,0.03)_0%,transparent_60%)] text-white flex flex-col justify-between transition-[width] duration-300 ease-in-out z-30"
       style={{ width: expanded ? 280 : 64 }}
     >
       <div className="pt-5" style={{ paddingLeft: expanded ? 20 : 8, paddingRight: expanded ? 20 : 8, transition: 'padding 300ms ease-in-out' }}>
         {/* Branding */}
         <div className={cn("flex items-center min-h-[56px] mb-6", expanded ? "justify-between" : "justify-center")}>
           <Link href="/admin/dashboard" className="flex items-center" style={{ gap: expanded ? 12 : 0, transition: 'gap 300ms ease-in-out' }}>
-            <div className="w-10 h-10 rounded-xl bg-[#C5F135] flex items-center justify-center shrink-0 shadow-lg shadow-[#C5F135]/20">
+            <div className="w-10 h-10 rounded-xl bg-[#F2485A] flex items-center justify-center shrink-0 shadow-lg shadow-[#F2485A]/20">
               <svg
-                className="w-5 h-5 text-[#0A1023]"
+                className="w-5 h-5 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -60,8 +60,8 @@ export default function AdminSidebar() {
               className="overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out"
               style={{ maxWidth: expanded ? 200 : 0, opacity: expanded ? 1 : 0 }}
             >
-              <h1 className="text-2xl font-semibold text-white leading-none tracking-tight">
-                Contour
+              <h1 className="text-2xl font-bold text-white leading-none tracking-tight">
+                Contr<span className="font-accent text-[#F2485A] font-normal lowercase">.studio</span>
               </h1>
               <p className="text-[8px] font-medium text-white/30 tracking-[0.2em] uppercase mt-0.5">
                 Agency Operations & Analytics
@@ -85,7 +85,7 @@ export default function AdminSidebar() {
                     ? "px-4 h-11"
                     : "justify-center w-9 h-9 rounded-full",
                   isActive
-                    ? "bg-[#C5F135] text-[#111827] font-semibold"
+                    ? "bg-[#F2485A] text-white font-semibold"
                     : "text-white/50 hover:text-white hover:bg-white/5"
                 )}
                 style={{ gap: expanded ? 12 : 0, transition: 'all 200ms, gap 300ms ease-in-out' }}
@@ -121,7 +121,7 @@ export default function AdminSidebar() {
               ? "px-4 h-10"
               : "justify-center w-9 h-9 rounded-full",
             pathname === "/admin/settings"
-              ? "bg-[#C5F135] text-[#111827] font-semibold"
+              ? "bg-[#F2485A] text-white font-semibold"
               : "text-white/50 hover:text-white hover:bg-white/5"
           )}
           style={{ gap: expanded ? 12 : 0, transition: 'all 200ms, gap 300ms ease-in-out' }}

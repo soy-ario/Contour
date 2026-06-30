@@ -127,7 +127,7 @@ export default function ApprovalQueuePanel({
               <div
                 key={item.id}
                 onClick={() => onView(item.id)}
-                className="h-[72px] px-3.5 border border-[#ECECF4] hover:border-[#C5F135] rounded-xl flex items-center justify-between gap-3 transition-colors cursor-pointer bg-white hover:bg-[#FAFAFD]"
+                className="h-[72px] px-3.5 border border-[#ECECF4] hover:border-[#F2485A] rounded-xl flex items-center justify-between gap-3 transition-colors cursor-pointer bg-white hover:bg-[#FAFAFD]"
               >
                 <div className="flex items-center gap-3 min-w-0 flex-1">
                   <PlatformIcon platform={item.platform} className="w-4 h-4 shrink-0 text-[#6B7280]" />

@@ -12,7 +12,7 @@ export async function sendContentSubmittedEmail(
   const approvalLink = `${BASE_URL}/client/content`; // Scoped to client portal
   await sendEmail({
     to: clientEmail,
-    subject: `Contour: New Content Pending Approval — ${contentTitle}`,
+    subject: `Contr.: New Content Pending Approval — ${contentTitle}`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
         <h2 style="color: #0f172a;">New Content Ready for Approval</h2>
@@ -24,7 +24,7 @@ export async function sendContentSubmittedEmail(
         </div>
         <p style="color: #64748b; font-size: 14px;">If the button above does not work, copy and paste this link into your browser: <br/> <a href="${approvalLink}">${approvalLink}</a></p>
         <hr style="border: 0; border-top: 1px solid #eee; margin: 24px 0;" />
-        <p style="color: #64748b; font-size: 12px;">This is an automated notification from Contour. Please do not reply directly to this email.</p>
+        <p style="color: #64748b; font-size: 12px;">This is an automated notification from Contr. Please do not reply directly to this email.</p>
       </div>
     `,
   });
@@ -37,7 +37,7 @@ export async function sendContentApprovedEmail(
   const contentLink = `${BASE_URL}/admin/content`; // Scoped to admin panel
   await sendEmail({
     to: adminEmail,
-    subject: `Contour: Content Approved — ${contentTitle}`,
+    subject: `Contr.: Content Approved — ${contentTitle}`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
         <h2 style="color: #10b981;">Content Approved</h2>
@@ -48,7 +48,7 @@ export async function sendContentApprovedEmail(
           <a href="${contentLink}" style="background-color: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500;">View in Dashboard</a>
         </div>
         <hr style="border: 0; border-top: 1px solid #eee; margin: 24px 0;" />
-        <p style="color: #64748b; font-size: 12px;">This is an automated notification from Contour.</p>
+        <p style="color: #64748b; font-size: 12px;">This is an automated notification from Contr.</p>
       </div>
     `,
   });
@@ -62,7 +62,7 @@ export async function sendContentRejectedEmail(
   const contentLink = `${BASE_URL}/admin/content`;
   await sendEmail({
     to: adminEmail,
-    subject: `Contour: Content Rejected — ${contentTitle}`,
+    subject: `Contr.: Content Rejected — ${contentTitle}`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
         <h2 style="color: #ef4444;">Content Rejected</h2>
@@ -76,7 +76,7 @@ export async function sendContentRejectedEmail(
           <a href="${contentLink}" style="background-color: #ef4444; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500;">View Content</a>
         </div>
         <hr style="border: 0; border-top: 1px solid #eee; margin: 24px 0;" />
-        <p style="color: #64748b; font-size: 12px;">This is an automated notification from Contour.</p>
+        <p style="color: #64748b; font-size: 12px;">This is an automated notification from Contr.</p>
       </div>
     `,
   });
@@ -90,7 +90,7 @@ export async function sendChangesRequestedEmail(
   const contentLink = `${BASE_URL}/admin/content`;
   await sendEmail({
     to: adminEmail,
-    subject: `Contour: Changes Requested — ${contentTitle}`,
+    subject: `Contr.: Changes Requested — ${contentTitle}`,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
         <h2 style="color: #f59e0b;">Changes Requested</h2>
@@ -104,7 +104,7 @@ export async function sendChangesRequestedEmail(
           <a href="${contentLink}" style="background-color: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500;">View Content</a>
         </div>
         <hr style="border: 0; border-top: 1px solid #eee; margin: 24px 0;" />
-        <p style="color: #64748b; font-size: 12px;">This is an automated notification from Contour.</p>
+        <p style="color: #64748b; font-size: 12px;">This is an automated notification from Contr.</p>
       </div>
     `,
   });

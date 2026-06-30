@@ -33,7 +33,7 @@ export const auth = betterAuth({
   plugins: [
     username(),
     twoFactor({
-      issuer: "Contour",
+      issuer: "Contr.",
       otpOptions: {
         period: 30,
         digits: 6,

@@ -47,7 +47,7 @@ export default function ClientTabs({ clientId }: ClientTabsProps) {
                   className={cn(
                     "flex items-center gap-2 px-4 py-3 text-sm font-semibold whitespace-nowrap transition-colors duration-200",
                     isActive
-                      ? "text-gray-900 border-b-2 border-[#C5F135] pb-[10px]"
+                      ? "text-gray-900 border-b-2 border-[#F2485A] pb-[10px]"
                       : "text-gray-500 hover:text-gray-900 pb-3 border-b-2 border-transparent"
                   )}
                 >

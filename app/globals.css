@@ -8,6 +8,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-accent: var(--font-accent);
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -49,7 +50,7 @@
   --radius-xl: 20px;
   --radius-2xl: 24px;
 
-  /* Contour Platform Colors */
+  /* Contr. Platform Colors */
   --color-instagram: #e1306c;
   --color-facebook: #1877f2;
   --color-linkedin: #0a66c2;
@@ -67,51 +68,51 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
-   DARK MODE (Default) — Contour Design System
-   Near-black surfaces, cool-white text, electric indigo accent
+   Contr.studio Design System — Coral-Red Brand Identity
+   Dark surfaces (#181818), coral accent (#F2485A), light pink secondary (#FFE3E3)
    ═══════════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* Canvas / Main Content (Light Theme) */
-  --background: #F4F4FA;
-  --foreground: #1A1A2E;
+  /* Canvas / Main Content */
+  --background: #F9F5F5;
+  --foreground: #181818;
   --card: #FFFFFF;
-  --card-foreground: #1A1A2E;
+  --card-foreground: #181818;
   --popover: #FFFFFF;
-  --popover-foreground: #1A1A2E;
-  --primary: #C5F135;
-  --primary-foreground: #1A1A2E;
-  --secondary: #ECECF4;
+  --popover-foreground: #181818;
+  --primary: #F2485A;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F0E8E8;
   --secondary-foreground: #6B6B80;
-  --muted: #ECECF4;
+  --muted: #F0E8E8;
   --muted-foreground: #6B6B80;
-  --accent: #C5F135;
-  --accent-foreground: #1A1A2E;
+  --accent: #F2485A;
+  --accent-foreground: #FFFFFF;
   --destructive: #ef4444;
   --border: #ECECF4;
   --input: #ECECF4;
-  --ring: #C5F135;
+  --ring: #F2485A;
   --radius: 0.75rem;
 
-  /* Chart colors (Lime primary + complementary) */
-  --chart-1: #C5F135;
+  /* Chart colors (Coral primary + complementary) */
+  --chart-1: #F2485A;
   --chart-2: #8b5cf6;
   --chart-3: #22c55e;
   --chart-4: #f59e0b;
-  --chart-5: #ef4444;
+  --chart-5: #3b82f6;
 
-  /* Sidebar (Dark Navy Theme) */
-  --sidebar: #1E1E2E;
+  /* Sidebar (Dark Theme) */
+  --sidebar: #181818;
   --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: #C5F135;
-  --sidebar-primary-foreground: #1E1E2E;
-  --sidebar-accent: #2A2A3D;
+  --sidebar-primary: #F2485A;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #2A2A2A;
   --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #2A2A3D;
-  --sidebar-ring: #C5F135;
+  --sidebar-border: #2A2A2A;
+  --sidebar-ring: #F2485A;
 
   /* Design Guideline Tokens */
-  --color-accent-hover: #B8E620;
-  --color-accent-dark: #8FBF00;
+  --color-accent-hover: #D93D4E;
+  --color-accent-dark: #C13145;
   --color-text-secondary: #6B6B80;
   --color-text-muted: #A0A0B0;
   --color-positive-trend: #4ADE80;
@@ -148,7 +149,7 @@
   /* Focus ring */
   :focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(197, 241, 53, 0.4);
+    box-shadow: 0 0 0 3px rgba(242, 72, 90, 0.4);
     border-radius: 4px;
   }
 

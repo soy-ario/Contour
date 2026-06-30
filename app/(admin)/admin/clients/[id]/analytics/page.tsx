@@ -27,7 +27,7 @@ type ChartMetric = "views" | "reach" | "engagement" | "followers";
 
 // ─── SVG Helpers ─────────────────────────────────────────────────────────────
 
-function Sparkline({ data, color = "#C5F135" }: { data: number[]; color?: string }) {
+function Sparkline({ data, color = "#F2485A" }: { data: number[]; color?: string }) {
   if (data.length < 2) return null;
   const max = Math.max(...data);
   const min = Math.min(...data);
@@ -45,7 +45,7 @@ function AreaChartSVG({
   data,
   width = 420,
   height = 180,
-  color = "#C5F135",
+  color = "#F2485A",
   gradient = true,
   xLabels,
   yTicks,
@@ -381,11 +381,11 @@ export default async function ClientAnalyticsPage({ params }: PageProps) {
 
   // ─── KPI definitions ──────────────────────────────────────────────────────
   const kpis = [
-    { label: "Total Views", value: formatNumber(curr.views), icon: Eye, delta: delta(curr.views, prev.views), color: "#C5F135", sparkData: kpiSparklines.views },
-    { label: "Total Reach", value: formatNumber(curr.reach), icon: Users, delta: delta(curr.reach, prev.reach), color: "#C5F135", sparkData: kpiSparklines.reach },
-    { label: "Engagement Rate", value: `${engagementRate.toFixed(1)}%`, icon: Heart, delta: delta(curr.reach > 0 ? curr.engagement / curr.reach : 0, prev.reach > 0 ? prev.engagement / prev.reach : 0), color: "#C5F135", sparkData: kpiSparklines.engagement },
-    { label: "Followers Gained", value: formatNumber(curr.followers), icon: TrendingUp, delta: delta(curr.followers, prev.followers), color: "#C5F135", sparkData: kpiSparklines.followers },
-    { label: "Posts Published", value: String(curr.posts), icon: BarChart3, delta: delta(curr.posts, prev.posts), color: "#C5F135", sparkData: kpiSparklines.posts },
+    { label: "Total Views", value: formatNumber(curr.views), icon: Eye, delta: delta(curr.views, prev.views), color: "#F2485A", sparkData: kpiSparklines.views },
+    { label: "Total Reach", value: formatNumber(curr.reach), icon: Users, delta: delta(curr.reach, prev.reach), color: "#F2485A", sparkData: kpiSparklines.reach },
+    { label: "Engagement Rate", value: `${engagementRate.toFixed(1)}%`, icon: Heart, delta: delta(curr.reach > 0 ? curr.engagement / curr.reach : 0, prev.reach > 0 ? prev.engagement / prev.reach : 0), color: "#F2485A", sparkData: kpiSparklines.engagement },
+    { label: "Followers Gained", value: formatNumber(curr.followers), icon: TrendingUp, delta: delta(curr.followers, prev.followers), color: "#F2485A", sparkData: kpiSparklines.followers },
+    { label: "Posts Published", value: String(curr.posts), icon: BarChart3, delta: delta(curr.posts, prev.posts), color: "#F2485A", sparkData: kpiSparklines.posts },
   ];
 
   return (
@@ -401,7 +401,7 @@ export default async function ClientAnalyticsPage({ params }: PageProps) {
             </div>
             <label className="flex items-center gap-2.5 cursor-pointer">
               <div className="relative w-9 h-5">
-                <div className="absolute inset-0 rounded-full bg-[#C5F135] transition-colors" />
+                <div className="absolute inset-0 rounded-full bg-[#F2485A] transition-colors" />
                 <div className="absolute top-0.5 left-[18px] w-4 h-4 rounded-full bg-white shadow-sm transition-transform" />
               </div>
               <span className="text-xs font-semibold text-gray-600 select-none">Compare Previous Period</span>
@@ -469,7 +469,7 @@ export default async function ClientAnalyticsPage({ params }: PageProps) {
                   key={m}
                   className={cn(
                     "text-xs px-3 py-1 rounded-full font-bold cursor-default",
-                    m === "views" ? "bg-[#C5F135] text-gray-900" : "text-gray-500"
+                    m === "views" ? "bg-[#F2485A] text-gray-900" : "text-gray-500"
                   )}
                 >
                   {m.charAt(0).toUpperCase() + m.slice(1)}
@@ -494,7 +494,7 @@ export default async function ClientAnalyticsPage({ params }: PageProps) {
               {/* Legend */}
               <div className="flex items-center justify-center gap-6 mt-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-5 h-0.5 bg-[#C5F135]" />
+                  <div className="w-5 h-0.5 bg-[#F2485A]" />
                   <span className="text-xs text-gray-500 font-medium">Current Period</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -524,7 +524,7 @@ export default async function ClientAnalyticsPage({ params }: PageProps) {
                     <PlatformIconSVG platform={p.name} />
                     <div className="flex-1 min-w-0">
                       <div className="w-full h-2 rounded-full bg-[#F4F4FA] overflow-hidden">
-                        <div className="h-full rounded-full bg-[#C5F135] transition-all" style={{ width: `${Math.max(pct, 1)}%` }} />
+                        <div className="h-full rounded-full bg-[#F2485A] transition-all" style={{ width: `${Math.max(pct, 1)}%` }} />
                       </div>
                     </div>
                     <div className="text-right shrink-0">

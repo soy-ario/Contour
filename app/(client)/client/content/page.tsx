@@ -150,7 +150,7 @@ export default async function ClientContentPage() {
       title: c.title,
       description: c.caption?.slice(0, 120) ?? "",
       dueDate: c.scheduledAt ? c.scheduledAt.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "—",
-      submittedBy: c.creator?.name || "Contour Team",
+      submittedBy: c.creator?.name || "Contr. Team",
       thumbnail: c.assetUrls?.[0] ?? null,
       contentType: c.contentType,
     }));

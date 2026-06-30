@@ -113,7 +113,7 @@ export default function ClientListTable({
           const client = row.original;
           return (
             <div className="flex items-center gap-3">
-              <Avatar className="w-10 h-10 rounded-full bg-[#F2F8D7] text-[#5B7A1A] border border-[#ECECF4]">
+              <Avatar className="w-10 h-10 rounded-full bg-[#F2F8D7] text-[#C13145] border border-[#ECECF4]">
                 <AvatarFallback className="font-bold text-xs">
                   {getInitials(client.brandName)}
                 </AvatarFallback>
@@ -121,7 +121,7 @@ export default function ClientListTable({
               <div className="flex flex-col min-w-0">
                 <Link
                   href={`/admin/clients/${client.id}/overview`}
-                  className="text-sm font-bold text-[#111827] hover:text-[#5B7A1A] transition-colors truncate"
+                  className="text-sm font-bold text-[#111827] hover:text-[#C13145] transition-colors truncate"
                 >
                   {client.brandName}
                 </Link>
@@ -203,7 +203,7 @@ export default function ClientListTable({
             <DropdownMenu>
               <DropdownMenuTrigger
                 render={
-                  <button className="flex items-center justify-center w-8 h-8 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] bg-white transition-all">
+                  <button className="flex items-center justify-center w-8 h-8 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#F2485A] bg-white transition-all">
                     <span className="sr-only">Open menu</span>
                     <MoreHorizontal className="w-3.5 h-3.5" />
                   </button>
@@ -326,7 +326,7 @@ export default function ClientListTable({
           onChange={(event) =>
             table.getColumn("brandName")?.setFilterValue(event.target.value)
           }
-          className="h-10 w-full rounded-xl border border-[#ECECF4] bg-white pl-10 pr-4 text-sm text-[#111827] placeholder:text-[#6B7280]/60 focus-visible:ring-2 focus-visible:ring-[#C5F135]/30 focus-visible:border-[#C5F135] transition-all"
+          className="h-10 w-full rounded-xl border border-[#ECECF4] bg-white pl-10 pr-4 text-sm text-[#111827] placeholder:text-[#6B7280]/60 focus-visible:ring-2 focus-visible:ring-[#F2485A]/30 focus-visible:border-[#F2485A] transition-all"
         />
       </div>
 
@@ -384,7 +384,7 @@ export default function ClientListTable({
             <button
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
-              className="flex items-center justify-center w-8 h-8 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex items-center justify-center w-8 h-8 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#F2485A] bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
             </button>
@@ -394,8 +394,8 @@ export default function ClientListTable({
                 onClick={() => table.setPageIndex(i)}
                 className={`flex items-center justify-center w-8 h-8 rounded-lg text-xs font-semibold transition-all ${
                   i === pageIndex
-                    ? "bg-[#C5F135] text-[#111827]"
-                    : "border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] bg-white"
+                    ? "bg-[#F2485A] text-white"
+                    : "border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#F2485A] bg-white"
                 }`}
               >
                 {i + 1}
@@ -404,7 +404,7 @@ export default function ClientListTable({
             <button
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
-              className="flex items-center justify-center w-8 h-8 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex items-center justify-center w-8 h-8 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#F2485A] bg-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronRight className="w-3.5 h-3.5" />
             </button>

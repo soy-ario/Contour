@@ -73,7 +73,7 @@ export default function LoginForm() {
             Welcome back
           </h1>
           <p className="text-[14px] text-[#6B6B80] mt-1.5">
-            Sign in to access your Contour dashboard
+            Sign in to access your Contr.studio dashboard
           </p>
         </div>
 
@@ -97,7 +97,7 @@ export default function LoginForm() {
                 id="username"
                 type="text"
                 placeholder="Enter your username"
-                className="h-12 w-full rounded-xl border-[1.5px] border-[#E6E8F0] bg-white pl-10 pr-4 text-[14px] text-[#1A1A2E] placeholder:text-[#6B6B80]/60 focus-visible:border-[#C5F135] focus-visible:ring-[3px] focus-visible:ring-[#C5F135]/20 transition-all"
+                className="h-12 w-full rounded-xl border-[1.5px] border-[#E6E8F0] bg-white pl-10 pr-4 text-[14px] text-[#1A1A2E] placeholder:text-[#6B6B80]/60 focus-visible:border-[#F2485A] focus-visible:ring-[3px] focus-visible:ring-[#F2485A]/20 transition-all"
                 disabled={isLoading}
                 {...register("username")}
               />
@@ -118,7 +118,7 @@ export default function LoginForm() {
                 id="password"
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
-                className="h-12 w-full rounded-xl border-[1.5px] border-[#E6E8F0] bg-white pl-10 pr-10 text-[14px] text-[#1A1A2E] placeholder:text-[#6B6B80]/60 focus-visible:border-[#C5F135] focus-visible:ring-[3px] focus-visible:ring-[#C5F135]/20 transition-all"
+                className="h-12 w-full rounded-xl border-[1.5px] border-[#E6E8F0] bg-white pl-10 pr-10 text-[14px] text-[#1A1A2E] placeholder:text-[#6B6B80]/60 focus-visible:border-[#F2485A] focus-visible:ring-[3px] focus-visible:ring-[#F2485A]/20 transition-all"
                 disabled={isLoading}
                 {...register("password")}
               />
@@ -143,7 +143,7 @@ export default function LoginForm() {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-[#E6E8F0] text-[#C5F135] focus:ring-[#C5F135] focus:ring-offset-0 accent-[#C5F135]"
+                className="w-4 h-4 rounded border-[#E6E8F0] text-[#F2485A] focus:ring-[#F2485A] focus:ring-offset-0 accent-[#F2485A]"
               />
               <span className="text-[13px] text-[#6B6B80]">Remember me</span>
             </label>
@@ -158,7 +158,7 @@ export default function LoginForm() {
           {/* CTA */}
           <Button
             type="submit"
-            className="w-full h-12 rounded-[12px] bg-[#C5F135] hover:bg-[#B8E620] active:bg-[#8FBF00] text-[#1A1A2E] text-[15px] font-semibold group transition-all"
+            className="w-full h-12 rounded-[12px] bg-[#F2485A] hover:bg-[#D93D4E] active:bg-[#C13145] text-[#1A1A2E] text-[15px] font-semibold group transition-all"
             disabled={isLoading}
           >
             {isLoading ? (

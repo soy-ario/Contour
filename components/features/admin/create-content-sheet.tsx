@@ -279,7 +279,7 @@ export default function CreateContentSheet({
                     value={selectedClientId}
                     onValueChange={(val) => setValue("clientId", val || "")}
                   >
-                    <SelectTrigger className="w-full border-[#ECECF4] bg-white text-sm text-[#111827] focus:ring-[#C5F135] rounded-xl h-10">
+                    <SelectTrigger className="w-full border-[#ECECF4] bg-white text-sm text-[#111827] focus:ring-[#F2485A] rounded-xl h-10">
                       <SelectValue placeholder="Select a Client Brand" />
                     </SelectTrigger>
                     <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
@@ -303,7 +303,7 @@ export default function CreateContentSheet({
               <Input
                 placeholder="e.g. Summer Collection Launch Reel"
                 {...register("title", { required: "Title is required" })}
-                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] rounded-xl h-10"
+                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#F2485A] rounded-xl h-10"
               />
               {errors.title && (
                 <span className="text-[10px] text-rose-500">{errors.title.message}</span>
@@ -316,7 +316,7 @@ export default function CreateContentSheet({
               <Input
                 placeholder="e.g. Fashion, Behind the scenes, Q&A"
                 {...register("topic")}
-                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] rounded-xl h-10"
+                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#F2485A] rounded-xl h-10"
               />
             </div>
 
@@ -328,7 +328,7 @@ export default function CreateContentSheet({
                   value={selectedPlatform}
                   onValueChange={(val) => setValue("platform", val as Platform)}
                 >
-                  <SelectTrigger className="w-full border-[#ECECF4] bg-white text-sm text-[#111827] focus:ring-[#C5F135] rounded-xl h-10">
+                  <SelectTrigger className="w-full border-[#ECECF4] bg-white text-sm text-[#111827] focus:ring-[#F2485A] rounded-xl h-10">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
@@ -347,7 +347,7 @@ export default function CreateContentSheet({
                   value={selectedContentType}
                   onValueChange={(val) => setValue("contentType", val as ContentType)}
                 >
-                  <SelectTrigger className="w-full border-[#ECECF4] bg-white text-sm text-[#111827] focus:ring-[#C5F135] rounded-xl h-10">
+                  <SelectTrigger className="w-full border-[#ECECF4] bg-white text-sm text-[#111827] focus:ring-[#F2485A] rounded-xl h-10">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
@@ -367,7 +367,7 @@ export default function CreateContentSheet({
               <Textarea
                 placeholder="Write caption copy, call to actions, etc..."
                 {...register("caption")}
-                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] min-h-[100px] rounded-xl"
+                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#F2485A] min-h-[100px] rounded-xl"
               />
             </div>
 
@@ -377,7 +377,7 @@ export default function CreateContentSheet({
               <Textarea
                 placeholder="Hook: [text]\nBody: [text]\nCTA: [text]"
                 {...register("script")}
-                className="border-[#ECECF4] bg-white text-sm font-mono placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] min-h-[120px] rounded-xl"
+                className="border-[#ECECF4] bg-white text-sm font-mono placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#F2485A] min-h-[120px] rounded-xl"
               />
             </div>
 
@@ -387,7 +387,7 @@ export default function CreateContentSheet({
               <Input
                 placeholder="e.g. summerfashion, stylingtips, agency"
                 {...register("hashtagsString")}
-                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] rounded-xl h-10"
+                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#F2485A] rounded-xl h-10"
               />
             </div>
 
@@ -397,7 +397,7 @@ export default function CreateContentSheet({
               <Input
                 placeholder="e.g. https://images.unsplash.com/photo-1, https://..."
                 {...register("assetUrlsString")}
-                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] rounded-xl h-10"
+                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#F2485A] rounded-xl h-10"
               />
               <span className="text-[10px] text-[#9CA3AF] block mt-1">
                 Enter comma-separated public URLs. Full upload directly to R2 bucket will be integrated in Phase 9.
@@ -412,7 +412,7 @@ export default function CreateContentSheet({
                 min="0"
                 placeholder="0"
                 {...register("adSpend")}
-                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] rounded-xl h-10"
+                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#F2485A] rounded-xl h-10"
               />
             </div>
 
@@ -422,7 +422,7 @@ export default function CreateContentSheet({
               <Textarea
                 placeholder="Enter notes visible only to the agency team..."
                 {...register("notes")}
-                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] min-h-[70px] rounded-xl"
+                className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#F2485A] min-h-[70px] rounded-xl"
               />
             </div>
 

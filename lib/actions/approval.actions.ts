@@ -103,8 +103,10 @@ export async function approveContentAction(
       await sendContentApprovedEmail(email, content.title);
     }
 
-    revalidatePath("/content");
-    revalidatePath(`/clients/${content.clientId}/content`);
+    revalidatePath("/admin/content");
+    revalidatePath("/client/content");
+    revalidatePath(`/admin/clients/${content.clientId}/content`);
+    revalidatePath("/client/content");
 
     return { success: true, data: updatedContent };
   } catch (error) {
@@ -177,8 +179,10 @@ export async function rejectContentAction(
       await sendContentRejectedEmail(email, content.title, comment);
     }
 
-    revalidatePath("/content");
-    revalidatePath(`/clients/${content.clientId}/content`);
+    revalidatePath("/admin/content");
+    revalidatePath("/client/content");
+    revalidatePath(`/admin/clients/${content.clientId}/content`);
+    revalidatePath("/client/content");
 
     return { success: true, data: updatedContent };
   } catch (error) {
@@ -251,8 +255,10 @@ export async function requestChangesAction(
       await sendChangesRequestedEmail(email, content.title, comment);
     }
 
-    revalidatePath("/content");
-    revalidatePath(`/clients/${content.clientId}/content`);
+    revalidatePath("/admin/content");
+    revalidatePath("/client/content");
+    revalidatePath(`/admin/clients/${content.clientId}/content`);
+    revalidatePath("/client/content");
 
     return { success: true, data: updatedContent };
   } catch (error) {
@@ -282,8 +288,10 @@ export async function addCommentAction(
       },
     });
 
-    revalidatePath("/content");
-    revalidatePath(`/clients/${content.clientId}/content`);
+    revalidatePath("/admin/content");
+    revalidatePath("/client/content");
+    revalidatePath(`/admin/clients/${content.clientId}/content`);
+    revalidatePath("/client/content");
 
     return { success: true, data: event };
   } catch (error) {

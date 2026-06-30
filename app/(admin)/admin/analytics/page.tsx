@@ -64,6 +64,13 @@ export default async function AdminAnalyticsPage() {
     postCount: s.postCount,
     storyCount: s.storyCount,
     reelCount: s.reelCount,
+    videoViews: Number(s.videoViews),
+    watchTimeSeconds: Number(s.watchTimeSeconds),
+    profileVisits: Number(s.profileVisits),
+    websiteClicks: Number(s.websiteClicks),
+    pageLikes: Number(s.pageLikes),
+    profileViews: Number(s.profileViews),
+    subscribers: Number(s.subscribers),
   }));
 
   const formattedTopContent = topContent.map((c) => ({

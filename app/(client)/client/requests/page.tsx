@@ -77,7 +77,7 @@ export default async function ClientRequestsPage() {
                   <Link
                     key={req.id}
                     href={`/client/requests/${req.id}`}
-                    className="flex items-center justify-between gap-4 px-4 py-3.5 rounded-xl border border-[#ECECF4] hover:border-[#C5F135]/60 transition-all"
+                    className="flex items-center justify-between gap-4 px-4 py-3.5 rounded-xl border border-[#ECECF4] hover:border-[#F2485A]/60 transition-all"
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-9 h-9 rounded-xl bg-[#F4F4FA] flex items-center justify-center shrink-0">

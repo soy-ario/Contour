@@ -72,52 +72,52 @@ export default async function AdminDashboardPage() {
         <StatCard
           label="TOTAL CLIENTS"
           value={clients.length}
-          icon={<Users className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+          icon={<Users className="w-[18px] h-[18px] text-[#C13145]" />}
           meta="Currently active"
           trend={[10, 15, 12, 18, 22, 20, 25]}
         />
         <StatCard
           label="ACTIVE CLIENTS"
           value={activeClients}
-          icon={<UserCheck className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+          icon={<UserCheck className="w-[18px] h-[18px] text-[#C13145]" />}
           meta="Currently active"
         />
         <StatCard
           label="ONBOARDING"
           value={onboardingClients}
-          icon={<UserPlus className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+          icon={<UserPlus className="w-[18px] h-[18px] text-[#C13145]" />}
           meta="In progress"
         />
         <StatCard
           label="PAUSED"
           value={pausedClients}
-          icon={<PauseCircle className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+          icon={<PauseCircle className="w-[18px] h-[18px] text-[#C13145]" />}
           meta="On hold"
         />
         <StatCard
           label="MONTHLY REVENUE"
           value={formatCurrency(monthlyRevenue)}
-          icon={<DollarSign className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+          icon={<DollarSign className="w-[18px] h-[18px] text-[#C13145]" />}
           meta="This month"
           trend={[5000, 5200, 4800, 5400, 5800, 5600, 6100]}
         />
         <StatCard
           label="OUTSTANDING"
           value={formatCurrency(outstanding)}
-          icon={<Clock className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+          icon={<Clock className="w-[18px] h-[18px] text-[#C13145]" />}
           meta="Pending payments"
         />
         <StatCard
           label="CONTENT ITEMS"
           value={formatNumber(contentCount)}
-          icon={<FileText className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+          icon={<FileText className="w-[18px] h-[18px] text-[#C13145]" />}
           meta="Total created"
           trend={[5, 8, 6, 12, 10, 15, 14]}
         />
         <StatCard
           label="PENDING APPROVALS"
           value={pendingApprovals}
-          icon={<AlertCircle className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+          icon={<AlertCircle className="w-[18px] h-[18px] text-[#C13145]" />}
           meta="Awaiting review"
         />
       </div>
@@ -142,13 +142,13 @@ export default async function AdminDashboardPage() {
           <div className="space-y-4">
             {clients.map((client) => {
               const score = client.healthScore ?? 0;
-              const scoreColor = score >= 70 ? "#C5F135" : score >= 40 ? "#E07A2F" : "#ef4444";
+              const scoreColor = score >= 70 ? "#F2485A" : score >= 40 ? "#E07A2F" : "#ef4444";
               return (
                 <div key={client.id}>
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-[#F0F8D0] flex items-center justify-center shrink-0">
-                        <span className="text-[10px] font-bold text-[#4A6A10]">
+                      <div className="w-8 h-8 rounded-full bg-[#FFE3E3] flex items-center justify-center shrink-0">
+                        <span className="text-[10px] font-bold text-[#A02838]">
                           {getInitials(client.brandName)}
                         </span>
                       </div>
@@ -201,7 +201,7 @@ export default async function AdminDashboardPage() {
           {latestContent.length > 0 ? (
             <div className="space-y-2">
               {latestContent.map((content) => (
-                <div key={content.id} className="flex items-center justify-between gap-3 p-2.5 rounded-lg border border-[#ECECF4] hover:border-[#C5F135]/50 transition-colors">
+                <div key={content.id} className="flex items-center justify-between gap-3 p-2.5 rounded-lg border border-[#ECECF4] hover:border-[#F2485A]/50 transition-colors">
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-[#111827] truncate">{content.title}</p>
                     <p className="text-xs text-[#6B7280]">{content.client.brandName}</p>
@@ -221,7 +221,7 @@ export default async function AdminDashboardPage() {
               </p>
               <Link
                 href="/admin/content"
-                className="inline-flex items-center gap-1.5 mt-4 h-9 px-5 rounded-full bg-[#C5F135] text-[#111827] text-xs font-semibold hover:bg-[#B8E52F] transition-colors"
+                className="inline-flex items-center gap-1.5 mt-4 h-9 px-5 rounded-full bg-[#F2485A] text-white text-xs font-semibold hover:bg-[#D93D4E] transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Create Content

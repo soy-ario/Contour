@@ -1,13 +1,18 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Toaster } from "sonner";
+import { Inter, Satisfy } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const satisfy = Satisfy({ weight: "400", subsets: ["latin"], variable: "--font-accent" });
 
 export const metadata: Metadata = {
   title: {
-    default: "Contour",
-    template: "%s | Contour",
+    default: "Contr.studio",
+    template: "%s | Contr.studio",
   },
-  description: "Agency operations, approvals, analytics, and client reporting for Contour.",
+  description: "Agency operations, approvals, analytics, and client reporting for Contr.studio.",
 };
 
 export default function RootLayout({
@@ -18,10 +23,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className="h-full antialiased"
+      className={`${inter.variable} ${satisfy.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        <NuqsAdapter>{children}</NuqsAdapter>
+      <body className="min-h-full flex flex-col font-sans">
+        <NuqsAdapter>
+          {children}
+          <Toaster position="top-right" richColors />
+        </NuqsAdapter>
       </body>
     </html>
   );

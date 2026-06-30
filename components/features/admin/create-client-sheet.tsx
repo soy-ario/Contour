@@ -187,7 +187,7 @@ export default function CreateClientDialog({
               <button
                 type="button"
                 onClick={() => onOpenChange(false)}
-                className="flex items-center justify-center w-8 h-8 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] bg-white transition-all shrink-0"
+                className="flex items-center justify-center w-8 h-8 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#F2485A] bg-white transition-all shrink-0"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 6 6 18" />
@@ -215,7 +215,7 @@ export default function CreateClientDialog({
               <Input
                 id="brandName"
                 {...register("brandName")}
-                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                 placeholder="e.g. Acme Corp"
               />
               {errors.brandName && (
@@ -229,7 +229,7 @@ export default function CreateClientDialog({
                 <Input
                   id="industry"
                   {...register("industry")}
-                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                   placeholder="e.g. E-Commerce"
                 />
                 {errors.industry && (
@@ -242,7 +242,7 @@ export default function CreateClientDialog({
                 <Input
                   id="website"
                   {...register("website")}
-                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                   placeholder="https://example.com"
                 />
                 {errors.website && (
@@ -256,7 +256,7 @@ export default function CreateClientDialog({
               <Textarea
                 id="description"
                 {...register("description")}
-                className="flex w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135] min-h-[80px]"
+                className="flex w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A] min-h-[80px]"
                 placeholder="Brief summary of agency scope or brand focus..."
               />
               {errors.description && (
@@ -274,7 +274,7 @@ export default function CreateClientDialog({
               <Input
                 id="contactName"
                 {...register("contactName")}
-                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                 placeholder="Jane Smith"
               />
               {errors.contactName && (
@@ -289,7 +289,7 @@ export default function CreateClientDialog({
                   id="contactEmail"
                   type="email"
                   {...register("contactEmail")}
-                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                   placeholder="jane@acme.com"
                 />
                 {errors.contactEmail && (
@@ -302,7 +302,7 @@ export default function CreateClientDialog({
                 <Input
                   id="contactPhone"
                   {...register("contactPhone")}
-                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                   placeholder="+1 (555) 000-0000"
                 />
                 {errors.contactPhone && (
@@ -324,7 +324,7 @@ export default function CreateClientDialog({
                     id="username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                    className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                     placeholder="e.g. acme_admin"
                   />
                 </div>
@@ -335,7 +335,7 @@ export default function CreateClientDialog({
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                    className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                     placeholder="Min. 8 characters"
                   />
                 </div>
@@ -355,7 +355,7 @@ export default function CreateClientDialog({
                   type="number"
                   step="0.01"
                   {...register("monthlyRetainer")}
-                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                 />
                 {errors.monthlyRetainer && (
                   <p className="text-xs text-rose-500">{errors.monthlyRetainer.message}</p>
@@ -369,7 +369,7 @@ export default function CreateClientDialog({
                   type="number"
                   step="0.01"
                   {...register("monthlyBudget")}
-                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                   placeholder="e.g. 5000"
                 />
                 {errors.monthlyBudget && (
@@ -385,7 +385,7 @@ export default function CreateClientDialog({
                   id="contractStart"
                   type="date"
                   {...register("contractStart")}
-                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                 />
                 {errors.contractStart && (
                   <p className="text-xs text-rose-500">{errors.contractStart.message}</p>
@@ -398,7 +398,7 @@ export default function CreateClientDialog({
                   id="contractEnd"
                   type="date"
                   {...register("contractEnd")}
-                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                 />
                 {errors.contractEnd && (
                   <p className="text-xs text-rose-500">{errors.contractEnd.message}</p>
@@ -411,7 +411,7 @@ export default function CreateClientDialog({
               <Input
                 id="marketingTheme"
                 {...register("marketingTheme")}
-                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                 placeholder="e.g. Wellness, High Performance, Luxury"
               />
               {errors.marketingTheme && (
@@ -435,7 +435,7 @@ export default function CreateClientDialog({
             <Button
               type="submit"
               disabled={isPending}
-              className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold flex items-center gap-2 hover:brightness-95 transition-all disabled:opacity-50"
+              className="h-11 px-5 bg-[#F2485A] rounded-[14px] text-white font-semibold flex items-center gap-2 hover:brightness-95 transition-all disabled:opacity-50"
             >
               {isPending ? (
                 <>

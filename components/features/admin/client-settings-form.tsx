@@ -281,7 +281,7 @@ function ConnectPlatformDialog({
               <select
                 value={platform}
                 onChange={(e) => { setPlatform(e.target.value); setError(null); }}
-                className="w-full h-11 appearance-none bg-white border border-[#E5E7EB] rounded-[14px] px-3.5 pr-10 text-sm font-medium text-[#111827] outline-none focus:ring-2 focus:ring-[#C5F135]/40 focus:border-transparent cursor-pointer"
+                className="w-full h-11 appearance-none bg-white border border-[#E5E7EB] rounded-[14px] px-3.5 pr-10 text-sm font-medium text-[#111827] outline-none focus:ring-2 focus:ring-[#F2485A]/40 focus:border-transparent cursor-pointer"
               >
                 <option value="INSTAGRAM">Instagram</option>
                 <option value="FACEBOOK">Facebook</option>
@@ -299,7 +299,7 @@ function ConnectPlatformDialog({
               value={accountId}
               onChange={(e) => setAccountId(e.target.value)}
               placeholder={config.accountIdPlaceholder}
-              className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+              className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
             />
           </div>
           <div className="space-y-1.5">
@@ -308,7 +308,7 @@ function ConnectPlatformDialog({
               value={accountName}
               onChange={(e) => setAccountName(e.target.value)}
               placeholder="e.g. @brand_username"
-              className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+              className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
             />
           </div>
           <div className="space-y-1.5">
@@ -317,7 +317,7 @@ function ConnectPlatformDialog({
               value={accessToken}
               onChange={(e) => setAccessToken(e.target.value)}
               placeholder={config.tokenPlaceholder}
-              className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+              className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
             />
           </div>
           <div className="flex items-center justify-end gap-3 pt-2">
@@ -331,7 +331,7 @@ function ConnectPlatformDialog({
             <button
               type="submit"
               disabled={connecting}
-              className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold flex items-center gap-2 hover:brightness-95 transition-all disabled:opacity-50"
+              className="h-11 px-5 bg-[#F2485A] rounded-[14px] text-white font-semibold flex items-center gap-2 hover:brightness-95 transition-all disabled:opacity-50"
             >
               {connecting ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
               Connect
@@ -533,7 +533,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
                 name="brandName"
                 defaultValue={defaultValues.brandName}
                 required
-                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
               />
             </FormField>
             <FormField label="Industry">
@@ -541,7 +541,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
                 name="industry"
                 defaultValue={defaultValues.industry}
                 placeholder="e.g. SaaS, E-commerce, Healthcare"
-                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
               />
             </FormField>
             <FormField label="Website">
@@ -549,7 +549,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
                 name="website"
                 defaultValue={defaultValues.website}
                 placeholder="https://example.com"
-                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
               />
             </FormField>
           </div>
@@ -559,14 +559,14 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
                 name="marketingTheme"
                 defaultValue={defaultValues.marketingTheme}
                 placeholder="e.g. Seasonal campaign, product launch"
-                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
               />
             </FormField>
             <FormField label="About the Brand">
               <textarea
                 name="description"
                 defaultValue={defaultValues.description}
-                className="flex h-[140px] w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 py-2.5 text-sm text-[#111827] outline-none resize-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                className="flex h-[140px] w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 py-2.5 text-sm text-[#111827] outline-none resize-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
               />
             </FormField>
           </div>
@@ -697,7 +697,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
                       value={credForm.username}
                       onChange={(e) => setCredForm((p) => ({ ...p, username: e.target.value }))}
                       placeholder="e.g. acme_client"
-                      className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                      className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                     />
                   </FormField>
                   <FormField label="Temporary Password *">
@@ -706,7 +706,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
                       value={credForm.password}
                       onChange={(e) => setCredForm((p) => ({ ...p, password: e.target.value }))}
                       placeholder="Min 6 characters"
-                      className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                      className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                     />
                   </FormField>
                 </div>
@@ -714,7 +714,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
                   <button
                     type="submit"
                     disabled={creatingUser}
-                    className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold flex items-center gap-2 hover:brightness-95 transition-all disabled:opacity-50"
+                    className="h-11 px-5 bg-[#F2485A] rounded-[14px] text-white font-semibold flex items-center gap-2 hover:brightness-95 transition-all disabled:opacity-50"
                   >
                     {creatingUser ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserCheck className="w-4 h-4" />}
                     Provision Portal User
@@ -769,7 +769,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
                 type="number"
                 step="0.01"
                 defaultValue={defaultValues.monthlyRetainer}
-                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
               />
             </FormField>
             <FormField label="Monthly Ad Spend Budget ($USD)">
@@ -778,7 +778,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
                 type="number"
                 step="0.01"
                 defaultValue={defaultValues.monthlyBudget}
-                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
               />
             </FormField>
             <FormField label="Total Paid Retainer ($USD)">
@@ -787,7 +787,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
                 type="number"
                 step="0.01"
                 defaultValue={defaultValues.amountPaid}
-                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
               />
             </FormField>
             <FormField label="Invoice Status">
@@ -795,7 +795,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
                 <select
                   name="paymentStatus"
                   defaultValue={defaultValues.paymentStatus}
-                  className="w-full h-11 appearance-none bg-white border border-[#E5E7EB] rounded-[14px] px-3.5 pr-10 text-sm font-medium text-[#111827] outline-none focus:ring-2 focus:ring-[#C5F135]/40 focus:border-transparent cursor-pointer"
+                  className="w-full h-11 appearance-none bg-white border border-[#E5E7EB] rounded-[14px] px-3.5 pr-10 text-sm font-medium text-[#111827] outline-none focus:ring-2 focus:ring-[#F2485A]/40 focus:border-transparent cursor-pointer"
                 >
                   <option value="PENDING">Pending</option>
                   <option value="PAID">Paid</option>
@@ -810,7 +810,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
                 name="contractStart"
                 type="date"
                 defaultValue={defaultValues.contractStart}
-                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
               />
             </FormField>
             <FormField label="Contract End Date">
@@ -818,7 +818,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
                 name="contractEnd"
                 type="date"
                 defaultValue={defaultValues.contractEnd}
-                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
               />
             </FormField>
           </div>
@@ -833,7 +833,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
           <button
             type="button"
             onClick={() => setShowConnectModal(true)}
-            className="h-10 px-4 bg-[#C5F135] rounded-[14px] text-[#111827] text-sm font-semibold flex items-center gap-2 hover:brightness-95 transition-all"
+            className="h-10 px-4 bg-[#F2485A] rounded-[14px] text-white text-sm font-semibold flex items-center gap-2 hover:brightness-95 transition-all"
           >
             + Connect Platform
           </button>
@@ -998,7 +998,7 @@ export default function ClientSettingsForm({ client }: { client: ClientSettings 
           type="submit"
           form="settings-form"
           disabled={saving}
-          className="h-11 px-6 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold flex items-center gap-2 hover:brightness-95 transition-all disabled:opacity-50"
+          className="h-11 px-6 bg-[#F2485A] rounded-[14px] text-white font-semibold flex items-center gap-2 hover:brightness-95 transition-all disabled:opacity-50"
         >
           {saving && <Loader2 className="w-4 h-4 animate-spin" />}
           Save Changes

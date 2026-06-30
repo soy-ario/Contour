@@ -1,21 +1,17 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import type { Platform } from "@prisma/client";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 
 interface ConnectSocialAccountModalProps {
   open: boolean;
@@ -25,14 +21,14 @@ interface ConnectSocialAccountModalProps {
   onSuccess?: () => void;
 }
 
-interface SocialAccountFormValues {
-  accountId: string;
-  accountName: string;
-  accessToken: string;
-  refreshToken: string;
-  tokenExpiresAt: string;
-  scope: string;
-}
+const PLATFORM_NAMES: Record<string, string> = {
+  INSTAGRAM: "Instagram",
+  FACEBOOK: "Facebook",
+  LINKEDIN: "LinkedIn",
+  TIKTOK: "TikTok",
+  YOUTUBE: "YouTube",
+  X: "X (Twitter)",
+};
 
 export default function ConnectSocialAccountModal({
   open,
@@ -41,195 +37,152 @@ export default function ConnectSocialAccountModal({
   platform,
   onSuccess,
 }: ConnectSocialAccountModalProps) {
-  const [isPending, startTransition] = React.useTransition();
-  const [serverError, setServerError] = React.useState<string | null>(null);
+  const [connecting, setConnecting] = React.useState(false);
+  const [showManual, setShowManual] = React.useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<SocialAccountFormValues>({
-    defaultValues: {
-      accountId: "",
-      accountName: "",
-      accessToken: "",
-      refreshToken: "",
-      tokenExpiresAt: "",
-      scope: "",
-    },
-  });
-
-  React.useEffect(() => {
-    if (open) {
-      reset();
-    }
-  }, [open, reset]);
-
-  const handleOpenChange = (newOpen: boolean) => {
-    if (!newOpen) {
-      setServerError(null);
-    }
-    onOpenChange(newOpen);
-  };
-
-  const onSubmit = async (data: SocialAccountFormValues) => {
+  const handleOAuthConnect = async () => {
     if (!platform) return;
-    setServerError(null);
+    setConnecting(true);
 
-    startTransition(async () => {
-      try {
-        const response = await fetch(`/api/clients/${clientId}/social-accounts`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            platform,
-            accountId: data.accountId,
-            accountName: data.accountName || undefined,
-            accessToken: data.accessToken,
-            refreshToken: data.refreshToken || undefined,
-            tokenExpiresAt: data.tokenExpiresAt ? new Date(data.tokenExpiresAt).toISOString() : undefined,
-            scope: data.scope || undefined,
-          }),
-        });
+    try {
+      const res = await fetch(
+        `/api/auth/connect/${platform.toLowerCase()}?clientId=${clientId}&role=admin`
+      );
+      const data = await res.json();
 
-        const result = await response.json();
-
-        if (response.ok && result.success) {
-          toast.success(`Successfully connected ${platform.toLowerCase()}`);
-          onOpenChange(false);
-          if (onSuccess) onSuccess();
-        } else {
-          setServerError(result.error?.message || "Failed to connect social account");
-        }
-      } catch {
-        setServerError("A network error occurred. Please try again.");
+      if (!res.ok) {
+        toast.error(data.error || "Failed to initiate OAuth");
+        setConnecting(false);
+        return;
       }
-    });
+
+      window.location.href = data.url;
+    } catch {
+      toast.error("Failed to initiate OAuth connection");
+      setConnecting(false);
+    }
   };
 
-  const getPlatformLabel = (p: Platform | null) => {
-    if (!p) return "";
-    return p.charAt(0) + p.slice(1).toLowerCase();
-  };
+  const platformLabel = platform ? PLATFORM_NAMES[platform] ?? platform.toLowerCase() : "";
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-lg bg-zinc-950 border-zinc-800 text-foreground">
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-800 text-foreground">
         <DialogHeader>
           <DialogTitle className="text-lg font-bold text-foreground">
-            Connect {getPlatformLabel(platform)} Account
+            Connect {platformLabel}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            Connect via manual API credential inputs. In production, this will trigger the platform OAuth consent flow.
+            Authorize Contour to access your {platformLabel} analytics data.
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-2">
-          {serverError && (
-            <div className="p-3 bg-red-950/30 border border-red-500/20 rounded-md text-sm text-red-400">
-              {serverError}
-            </div>
-          )}
+        <div className="py-6 space-y-4">
+          <Button
+            onClick={handleOAuthConnect}
+            disabled={connecting || !platform}
+            className="w-full h-12 bg-[#F2485A] text-white font-semibold hover:brightness-95 transition-all flex items-center justify-center gap-2"
+          >
+            {connecting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <ExternalLink className="w-4 h-4" />
+            )}
+            {connecting ? "Redirecting..." : `Continue with ${platformLabel}`}
+          </Button>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1.5 md:col-span-2">
-              <Label htmlFor="accountId">Native Account / Page ID *</Label>
-              <Input
-                id="accountId"
-                {...register("accountId", { required: "Native Account ID is required" })}
-                className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
-                placeholder="e.g. 17841400008460056"
-              />
-              {errors.accountId && (
-                <p className="text-xs text-rose-500">{errors.accountId.message}</p>
-              )}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-zinc-800" />
             </div>
-
-            <div className="space-y-1.5 md:col-span-2">
-              <Label htmlFor="accountName">Display Username / Handle</Label>
-              <Input
-                id="accountName"
-                {...register("accountName")}
-                className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
-                placeholder="e.g. acme_co"
-              />
-            </div>
-
-            <div className="space-y-1.5 md:col-span-2">
-              <Label htmlFor="accessToken">Access Token *</Label>
-              <Input
-                id="accessToken"
-                type="password"
-                {...register("accessToken", { required: "Access token is required" })}
-                className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
-                placeholder="Plaintext OAuth access token"
-              />
-              {errors.accessToken && (
-                <p className="text-xs text-rose-500">{errors.accessToken.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-1.5 md:col-span-2">
-              <Label htmlFor="refreshToken">Refresh Token (Optional)</Label>
-              <Input
-                id="refreshToken"
-                type="password"
-                {...register("refreshToken")}
-                className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
-                placeholder="Long-lived refresh token"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="tokenExpiresAt">Expiration Date</Label>
-              <Input
-                id="tokenExpiresAt"
-                type="datetime-local"
-                {...register("tokenExpiresAt")}
-                className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="scope">Scopes</Label>
-              <Input
-                id="scope"
-                {...register("scope")}
-                className="bg-zinc-900 border-zinc-800 text-sm focus-visible:ring-1 focus-visible:ring-zinc-700"
-                placeholder="e.g. instagram_basic,instagram_manage_insights"
-              />
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-zinc-950 px-2 text-muted-foreground">or</span>
             </div>
           </div>
 
-          <DialogFooter className="pt-4 border-t border-zinc-800">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => handleOpenChange(false)}
-              disabled={isPending}
-              className="bg-transparent border-zinc-800 hover:bg-zinc-900 text-foreground text-xs font-semibold"
+          <button
+            onClick={() => setShowManual(!showManual)}
+            className="w-full flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {showManual ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            {showManual ? "Hide manual entry" : "Admin: Connect with existing token"}
+          </button>
+
+          {showManual && (
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!platform) return;
+                const form = e.currentTarget;
+                const formData = new FormData(form);
+
+                try {
+                  const res = await fetch(`/api/clients/${clientId}/social-accounts`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      platform,
+                      accountId: formData.get("accountId"),
+                      accountName: formData.get("accountName") || undefined,
+                      accessToken: formData.get("accessToken"),
+                      refreshToken: formData.get("refreshToken") || undefined,
+                      tokenExpiresAt: formData.get("tokenExpiresAt")
+                        ? new Date(formData.get("tokenExpiresAt") as string).toISOString()
+                        : undefined,
+                    }),
+                  });
+
+                  const result = await res.json();
+                  if (res.ok && result.success) {
+                    toast.success(`Connected ${platformLabel}`);
+                    onOpenChange(false);
+                    onSuccess?.();
+                  } else {
+                    toast.error(result.error?.message || "Failed to connect");
+                  }
+                } catch {
+                  toast.error("Network error");
+                }
+              }}
+              className="space-y-3 p-4 bg-zinc-900/50 rounded-lg border border-zinc-800"
             >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="bg-primary text-primary-foreground hover:bg-primary/95 text-xs font-semibold"
-            >
-              {isPending ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" />
-                  Connecting...
-                </>
-              ) : (
-                "Connect Account"
-              )}
-            </Button>
-          </DialogFooter>
-        </form>
+              <input
+                name="accountId"
+                placeholder="Platform Account ID"
+                required
+                className="w-full h-9 px-3 bg-zinc-900 border border-zinc-800 rounded-md text-xs text-foreground"
+              />
+              <input
+                name="accountName"
+                placeholder="Account Name (optional)"
+                className="w-full h-9 px-3 bg-zinc-900 border border-zinc-800 rounded-md text-xs text-foreground"
+              />
+              <input
+                name="accessToken"
+                placeholder="Access Token"
+                required
+                className="w-full h-9 px-3 bg-zinc-900 border border-zinc-800 rounded-md text-xs text-foreground"
+              />
+              <input
+                name="refreshToken"
+                placeholder="Refresh Token (optional)"
+                className="w-full h-9 px-3 bg-zinc-900 border border-zinc-800 rounded-md text-xs text-foreground"
+              />
+              <input
+                name="tokenExpiresAt"
+                type="datetime-local"
+                className="w-full h-9 px-3 bg-zinc-900 border border-zinc-800 rounded-md text-xs text-foreground"
+              />
+              <Button
+                type="submit"
+                size="sm"
+                className="w-full bg-zinc-800 hover:bg-zinc-700 text-foreground text-xs font-semibold"
+              >
+                Connect
+              </Button>
+            </form>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );

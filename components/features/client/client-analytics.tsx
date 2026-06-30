@@ -23,8 +23,8 @@ import {
   MoreHorizontal,
   Globe,
   Check,
-
 } from "lucide-react";
+import { PlatformSpecificMetricsSection } from "@/components/shared/platform-specific-metrics";
 
 export type MetricKey = "views" | "reach" | "engagement" | "followers";
 
@@ -751,136 +751,10 @@ export default function ClientAnalytics({
           })}
         </div>
 
-        {/* Platform Specific Metrics Section */}
-        {platformFilter !== "all" && (
-          <div className="bg-[#F9FAFB] border border-[#E5E7EB] rounded-2xl p-5">
-            <h3 className="text-sm font-bold text-[#111827] mb-4 flex items-center gap-1.5">
-              <Info className="w-4 h-4 text-[#82D616]" />
-              Platform-Specific Insights:{" "}
-              {PLATFORM_OPTIONS.find((o) => o.value === platformFilter)?.label}
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {platformFilter === "INSTAGRAM" && (
-                <>
-                  <div className="bg-white p-4 rounded-xl border border-[#E5E7EB]">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                      Profile Visits
-                    </span>
-                    <span className="text-2xl font-black text-[#111827] block mt-1">
-                      {formatNumber(platformSpecificMetrics.profileVisits)}
-                    </span>
-                  </div>
-                  <div className="bg-white p-4 rounded-xl border border-[#E5E7EB]">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                      Website Clicks
-                    </span>
-                    <span className="text-2xl font-black text-[#111827] block mt-1">
-                      {formatNumber(platformSpecificMetrics.websiteClicks)}
-                    </span>
-                  </div>
-                </>
-              )}
-              {platformFilter === "FACEBOOK" && (
-                <div className="bg-white p-4 rounded-xl border border-[#E5E7EB]">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                    Page Likes
-                  </span>
-                  <span className="text-2xl font-black text-[#111827] block mt-1">
-                    {formatNumber(platformSpecificMetrics.pageLikes)}
-                  </span>
-                </div>
-              )}
-              {platformFilter === "LINKEDIN" && (
-                <>
-                  <div className="bg-white p-4 rounded-xl border border-[#E5E7EB]">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                      Profile Views
-                    </span>
-                    <span className="text-2xl font-black text-[#111827] block mt-1">
-                      {formatNumber(platformSpecificMetrics.profileViews)}
-                    </span>
-                  </div>
-                  <div className="bg-white p-4 rounded-xl border border-[#E5E7EB]">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                      Post Clicks
-                    </span>
-                    <span className="text-2xl font-black text-[#111827] block mt-1">
-                      {formatNumber(platformSpecificMetrics.clicks)}
-                    </span>
-                  </div>
-                </>
-              )}
-              {platformFilter === "YOUTUBE" && (
-                <>
-                  <div className="bg-white p-4 rounded-xl border border-[#E5E7EB]">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                      Subscribers
-                    </span>
-                    <span className="text-2xl font-black text-[#111827] block mt-1">
-                      {formatNumber(platformSpecificMetrics.subscribers)}
-                    </span>
-                  </div>
-                  <div className="bg-white p-4 rounded-xl border border-[#E5E7EB]">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                      Watch Time
-                    </span>
-                    <span className="text-2xl font-black text-[#111827] block mt-1">
-                      {(platformSpecificMetrics.watchTimeSeconds / 3600).toFixed(1)} hrs
-                    </span>
-                  </div>
-                  <div className="bg-white p-4 rounded-xl border border-[#E5E7EB]">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                      Average CTR
-                    </span>
-                    <span className="text-2xl font-black text-[#111827] block mt-1">
-                      {platformSpecificMetrics.ctr.toFixed(2)}%
-                    </span>
-                  </div>
-                </>
-              )}
-              {platformFilter === "TIKTOK" && (
-                <>
-                  <div className="bg-white p-4 rounded-xl border border-[#E5E7EB]">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                      Profile Views
-                    </span>
-                    <span className="text-2xl font-black text-[#111827] block mt-1">
-                      {formatNumber(platformSpecificMetrics.profileViews)}
-                    </span>
-                  </div>
-                  <div className="bg-white p-4 rounded-xl border border-[#E5E7EB]">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                      Video Watch Time
-                    </span>
-                    <span className="text-2xl font-black text-[#111827] block mt-1">
-                      {(platformSpecificMetrics.watchTimeSeconds / 3600).toFixed(1)} hrs
-                    </span>
-                  </div>
-                </>
-              )}
-              {platformFilter === "X" && (
-                <>
-                  <div className="bg-white p-4 rounded-xl border border-[#E5E7EB]">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                      Profile Visits
-                    </span>
-                    <span className="text-2xl font-black text-[#111827] block mt-1">
-                      {formatNumber(platformSpecificMetrics.profileVisits)}
-                    </span>
-                  </div>
-                  <div className="bg-white p-4 rounded-xl border border-[#E5E7EB]">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">
-                      Link Clicks
-                    </span>
-                    <span className="text-2xl font-black text-[#111827] block mt-1">
-                      {formatNumber(platformSpecificMetrics.clicks)}
-                    </span>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        )}
+        <PlatformSpecificMetricsSection
+          platformFilter={platformFilter}
+          platformSpecificMetrics={platformSpecificMetrics}
+        />
 
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

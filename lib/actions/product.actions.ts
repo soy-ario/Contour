@@ -36,6 +36,7 @@ export async function createProductAction(
     });
 
     revalidatePath(`/admin/clients/${product.clientId}/products`);
+    revalidatePath("/client/products");
 
     return { success: true, data: product };
   } catch (error) {
@@ -80,6 +81,7 @@ export async function updateProductAction(
     });
 
     revalidatePath(`/admin/clients/${existing.clientId}/products`);
+    revalidatePath("/client/products");
 
     return { success: true, data: updated };
   } catch (error) {
@@ -116,6 +118,7 @@ export async function deleteProductAction(
     });
 
     revalidatePath(`/admin/clients/${existing.clientId}/products`);
+    revalidatePath("/client/products");
 
     return { success: true };
   } catch (error) {

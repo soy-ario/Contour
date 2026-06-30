@@ -59,7 +59,7 @@ function SettingsSidebar({ active, onNavigate }: SettingsSidebarProps) {
             onClick={() => onNavigate(item.id)}
             className={`w-full flex items-center gap-2.5 h-10 px-3 rounded-xl text-sm font-medium transition-all text-left ${
               isActive
-                ? "bg-[#C5F135] text-[#111827]"
+                ? "bg-[#F2485A] text-white"
                 : isDanger
                   ? "text-rose-500 hover:bg-rose-50"
                   : "text-[#6B7280] hover:text-[#111827] hover:bg-white"
@@ -120,7 +120,7 @@ function StyledInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <Input
       {...props}
-      className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+      className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
     />
   );
 }
@@ -130,7 +130,7 @@ function StyledSelect({ options, ...props }: { options: { value: string; label: 
     <div className="relative">
       <select
         {...props}
-        className="w-full h-11 appearance-none bg-white border border-[#E5E7EB] rounded-[14px] px-3.5 pr-10 text-sm font-medium text-[#111827] outline-none focus:ring-2 focus:ring-[#C5F135]/40 focus:border-transparent cursor-pointer"
+        className="w-full h-11 appearance-none bg-white border border-[#E5E7EB] rounded-[14px] px-3.5 pr-10 text-sm font-medium text-[#111827] outline-none focus:ring-2 focus:ring-[#F2485A]/40 focus:border-transparent cursor-pointer"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value}>{o.label}</option>
@@ -148,7 +148,7 @@ function Toggle({ enabled, onChange, label }: { enabled: boolean; onChange: (v: 
         type="button"
         onClick={() => onChange(!enabled)}
         className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
-          enabled ? "bg-[#C5F135]" : "bg-[#E5E7EB]"
+          enabled ? "bg-[#F2485A]" : "bg-[#E5E7EB]"
         }`}
       >
         <span
@@ -199,7 +199,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
   };
 
   // Agency state
-  const [agencyName, setAgencyName] = React.useState("Contour");
+  const [agencyName, setAgencyName] = React.useState("Contr.");
   const [agencyWebsite, setAgencyWebsite] = React.useState("https://contour.agency");
   const [agencyEmail, setAgencyEmail] = React.useState("hello@contour.agency");
   const [agencyPhone, setAgencyPhone] = React.useState("+1 (555) 000-0000");
@@ -475,8 +475,8 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
       toast.success("All client data permanently wiped.");
       setDangerActionLoading(null);
     } else if (action === "delete_agency") {
-      const phrase = window.prompt("CRITICAL: To permanently delete this Contour agency instance, type 'DELETE CONTOUR' to confirm:");
-      if (phrase === "DELETE CONTOUR") {
+      const phrase = window.prompt("CRITICAL: To permanently delete this Contr. agency instance, type 'DELETE CONTR.' to confirm:");
+      if (phrase === "DELETE CONTR.") {
         setDangerActionLoading("delete_agency");
         await new Promise((resolve) => setTimeout(resolve, 2500));
         toast.success("Agency deleted. Session destroyed.");
@@ -491,17 +491,17 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
     <SectionCard title="Agency Profile" subtitle="Configure agency branding and operational information.">
       <div className="space-y-6">
         <div className="flex items-start gap-6">
-          <div className="w-20 h-20 rounded-2xl bg-[#C5F135] flex items-center justify-center shrink-0">
+          <div className="w-20 h-20 rounded-2xl bg-[#F2485A] flex items-center justify-center shrink-0">
             <span className="text-2xl font-bold text-[#111827]">
               {agencyName ? agencyName.charAt(0).toUpperCase() : "C"}
             </span>
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-[#111827]">{agencyName || "Contour"}</p>
+            <p className="text-sm font-semibold text-[#111827]">{agencyName || "Contr."}</p>
             <p className="text-xs text-[#6B7280] mt-0.5">Agency Operations & Analytics</p>
             <button
               type="button"
-              className="mt-3 h-9 px-4 rounded-xl border border-[#E5E7EB] text-sm font-medium text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] bg-white transition-all flex items-center gap-2"
+              className="mt-3 h-9 px-4 rounded-xl border border-[#E5E7EB] text-sm font-medium text-[#6B7280] hover:text-[#111827] hover:border-[#F2485A] bg-white transition-all flex items-center gap-2"
             >
               <Upload className="w-3.5 h-3.5" />
               Change Logo
@@ -531,7 +531,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
           <Textarea
             value={agencyDescription}
             onChange={(e) => setAgencyDescription(e.target.value)}
-            className="flex w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135] min-h-[80px]"
+            className="flex w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A] min-h-[80px]"
           />
         </FormField>
         <div className="flex justify-end pt-2">
@@ -539,7 +539,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
             type="button"
             onClick={handleSaveAgency}
             disabled={agencySaving}
-            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold text-sm hover:brightness-95 transition-all flex items-center gap-2 disabled:opacity-50"
+            className="h-11 px-5 bg-[#F2485A] rounded-[14px] text-white font-semibold text-sm hover:brightness-95 transition-all flex items-center gap-2 disabled:opacity-50"
           >
             {agencySaving && <Loader2 className="w-4 h-4 animate-spin" />}
             Save Changes
@@ -553,7 +553,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
     <SectionCard title="Admin Account" subtitle="Manage your personal account.">
       <div className="space-y-6">
         <div className="flex items-center gap-4 p-4 bg-[#F9FAFB] rounded-2xl border border-[#ECECF4]">
-          <div className="w-12 h-12 rounded-full bg-[#C5F135] flex items-center justify-center text-sm font-bold text-[#111827] shrink-0">
+          <div className="w-12 h-12 rounded-full bg-[#F2485A] flex items-center justify-center text-sm font-bold text-white shrink-0">
             {adminName ? adminName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) : "AR"}
           </div>
           <div>
@@ -591,7 +591,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
             type="button"
             onClick={handleUpdateCredentials}
             disabled={accountSaving}
-            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold text-sm hover:brightness-95 transition-all flex items-center gap-2 disabled:opacity-50"
+            className="h-11 px-5 bg-[#F2485A] rounded-[14px] text-white font-semibold text-sm hover:brightness-95 transition-all flex items-center gap-2 disabled:opacity-50"
           >
             {accountSaving && <Loader2 className="w-4 h-4 animate-spin" />}
             Update Credentials
@@ -602,7 +602,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
   );
 
   const renderClientPortal = () => (
-    <SectionCard title="Client Portal" subtitle="Configure how clients access Contour.">
+    <SectionCard title="Client Portal" subtitle="Configure how clients access Contr.">
       <div className="space-y-6">
         <FormField label="Portal URL">
           <div className="relative">
@@ -637,7 +637,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
             type="button"
             onClick={handleSavePortal}
             disabled={portalSaving}
-            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold text-sm hover:brightness-95 transition-all flex items-center gap-2 disabled:opacity-50"
+            className="h-11 px-5 bg-[#F2485A] rounded-[14px] text-white font-semibold text-sm hover:brightness-95 transition-all flex items-center gap-2 disabled:opacity-50"
           >
             {portalSaving && <Loader2 className="w-4 h-4 animate-spin" />}
             Save Portal Settings
@@ -678,7 +678,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
         <div className="space-y-3 pt-2">
           <h3 className="text-sm font-semibold text-[#111827]">Report Features</h3>
           <Toggle enabled={genInsights} label="Generate AI Monthly Insights" onChange={setGenInsights} />
-          <Toggle enabled={includeBranding} label="Include Contour Branding" onChange={setIncludeBranding} />
+          <Toggle enabled={includeBranding} label="Include Contr. Branding" onChange={setIncludeBranding} />
         </div>
         <div className="space-y-2">
           <h3 className="text-sm font-semibold text-[#111827]">Export Formats</h3>
@@ -688,7 +688,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
                 type="checkbox"
                 checked={formatPdf}
                 onChange={(e) => setFormatPdf(e.target.checked)}
-                className="w-4 h-4 rounded border-[#E5E7EB] text-[#C5F135] focus:ring-[#C5F135]/40"
+                className="w-4 h-4 rounded border-[#E5E7EB] text-[#F2485A] focus:ring-[#F2485A]/40"
               />
               <span className="text-sm text-[#111827]">PDF</span>
             </label>
@@ -697,7 +697,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
                 type="checkbox"
                 checked={formatCsv}
                 onChange={(e) => setFormatCsv(e.target.checked)}
-                className="w-4 h-4 rounded border-[#E5E7EB] text-[#C5F135] focus:ring-[#C5F135]/40"
+                className="w-4 h-4 rounded border-[#E5E7EB] text-[#F2485A] focus:ring-[#F2485A]/40"
               />
               <span className="text-sm text-[#111827]">CSV</span>
             </label>
@@ -708,7 +708,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
             type="button"
             onClick={handleSaveReporting}
             disabled={reportingSaving}
-            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold text-sm hover:brightness-95 transition-all flex items-center gap-2 disabled:opacity-50"
+            className="h-11 px-5 bg-[#F2485A] rounded-[14px] text-white font-semibold text-sm hover:brightness-95 transition-all flex items-center gap-2 disabled:opacity-50"
           >
             {reportingSaving && <Loader2 className="w-4 h-4 animate-spin" />}
             Save Report Settings
@@ -743,7 +743,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
             return (
               <div
                 key={p.value}
-                className="grid grid-cols-[1fr_120px_120px_100px] gap-4 items-center px-4 py-3 rounded-xl border border-[#ECECF4] hover:border-[#C5F135]/50 transition-colors"
+                className="grid grid-cols-[1fr_120px_120px_100px] gap-4 items-center px-4 py-3 rounded-xl border border-[#ECECF4] hover:border-[#F2485A]/50 transition-colors"
               >
                 <span className="text-sm font-medium text-[#111827]">{p.label}</span>
                 <div>
@@ -771,7 +771,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
                   ) : (
                     <button
                       type="button"
-                      className="h-8 px-3 rounded-lg bg-[#C5F135] text-xs font-semibold text-[#111827] hover:brightness-95 transition-all"
+                      className="h-8 px-3 rounded-lg bg-[#F2485A] text-xs font-semibold text-white hover:brightness-95 transition-all"
                     >
                       Connect
                     </button>
@@ -854,7 +854,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
             type="button"
             onClick={handleSavePreferences}
             disabled={preferencesSaving}
-            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold text-sm hover:brightness-95 transition-all flex items-center gap-2 disabled:opacity-50"
+            className="h-11 px-5 bg-[#F2485A] rounded-[14px] text-white font-semibold text-sm hover:brightness-95 transition-all flex items-center gap-2 disabled:opacity-50"
           >
             {preferencesSaving && <Loader2 className="w-4 h-4 animate-spin" />}
             Save Preferences
@@ -923,7 +923,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
             </div>
             <button
               type="button"
-              className="h-9 px-4 rounded-xl bg-[#C5F135] text-[#111827] text-xs font-semibold hover:brightness-95 transition-all flex items-center gap-1.5"
+              className="h-9 px-4 rounded-xl bg-[#F2485A] text-white text-xs font-semibold hover:brightness-95 transition-all flex items-center gap-1.5"
             >
               <Key className="w-3.5 h-3.5" />
               Generate API Key
@@ -970,7 +970,7 @@ export default function AdminSettingsForm({ user, platformCounts, defaultSection
         <div className="flex items-center justify-between p-4 rounded-2xl bg-rose-50 border border-rose-200">
           <div>
             <p className="text-sm font-semibold text-rose-800">Delete Agency</p>
-            <p className="text-xs text-rose-600 mt-0.5">Permanently delete the entire Contour workspace. Requires typing <span className="font-mono font-bold">DELETE CONTOUR</span> to confirm.</p>
+            <p className="text-xs text-rose-600 mt-0.5">Permanently delete the entire Contr. workspace. Requires typing <span className="font-mono font-bold">DELETE CONTR.</span> to confirm.</p>
           </div>
           <DangerButton onClick={() => handleDangerZoneAction("delete_agency")}>
             {dangerActionLoading === "delete_agency" ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5 inline" /> : <Trash2 className="w-3.5 h-3.5 mr-1.5 inline" />}

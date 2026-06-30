@@ -131,7 +131,7 @@ export default function InternalNotes({ clientId, initialNotes }: InternalNotesP
               value={newContent}
               onChange={(e) => setNewContent(e.target.value)}
               placeholder="Type your operational internal notes here..."
-              className="border-gray-200 text-sm focus-visible:ring-1 focus-visible:ring-[#C5F135] min-h-[90px]"
+              className="border-gray-200 text-sm focus-visible:ring-1 focus-visible:ring-[#F2485A] min-h-[90px]"
             />
             <div className="flex items-center gap-2 justify-end">
               <Button
@@ -215,7 +215,7 @@ export default function InternalNotes({ clientId, initialNotes }: InternalNotesP
                         <Textarea
                           value={editingContent}
                           onChange={(e) => setEditingContent(e.target.value)}
-                          className="border-gray-200 text-sm focus-visible:ring-1 focus-visible:ring-[#C5F135] min-h-[70px]"
+                          className="border-gray-200 text-sm focus-visible:ring-1 focus-visible:ring-[#F2485A] min-h-[70px]"
                         />
                         <div className="flex items-center gap-2 justify-end">
                           <Button

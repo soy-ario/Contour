@@ -119,7 +119,7 @@ export default function ContentCalendarView({
         <div className="flex items-center gap-3">
           <button
             onClick={handlePrevMonth}
-            className="flex items-center justify-center w-7 h-7 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] bg-white transition-all"
+            className="flex items-center justify-center w-7 h-7 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#F2485A] bg-white transition-all"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
@@ -128,7 +128,7 @@ export default function ContentCalendarView({
           </h2>
           <button
             onClick={handleNextMonth}
-            className="flex items-center justify-center w-7 h-7 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] bg-white transition-all"
+            className="flex items-center justify-center w-7 h-7 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#F2485A] bg-white transition-all"
           >
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
@@ -138,8 +138,8 @@ export default function ContentCalendarView({
           className={cn(
             "h-7 px-3 rounded-lg text-xs font-medium transition-all border",
             isCurrentMonthActive
-              ? "bg-[#F2F8D7] text-[#111827] border-[#C5F135]"
-              : "bg-white text-[#6B7280] border-[#ECECF4] hover:text-[#111827] hover:border-[#C5F135]"
+              ? "bg-[#F2F8D7] text-[#111827] border-[#F2485A]"
+              : "bg-white text-[#6B7280] border-[#ECECF4] hover:text-[#111827] hover:border-[#F2485A]"
           )}
         >
           Today
@@ -181,7 +181,7 @@ export default function ContentCalendarView({
                     className={cn(
                       "text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full leading-none",
                       isDayToday
-                        ? "bg-[#C5F135] text-[#111827] font-bold"
+                        ? "bg-[#F2485A] text-white font-bold"
                         : isCurrentMonth
                         ? "text-[#6B7280]"
                         : "text-[#D1D5DB]"

@@ -3,12 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { encrypt } from "@/lib/crypto";
 import { Platform, ConnectionStatus } from "@prisma/client";
 import { createAuditLog } from "@/lib/services/audit.service";
-import { auth } from "@/lib/auth";
+import { getPlatformClient } from "@/lib/services/platforms";
+import { PlatformNotConfiguredError, PlatformAuthError } from "@/lib/services/platforms/platform-client";
 
 interface RouteParams {
-  params: Promise<{
-    platform: string;
-  }>;
+  params: Promise<{ platform: string }>;
 }
 
 export async function GET(req: NextRequest, { params }: RouteParams) {
@@ -16,140 +15,76 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     const { platform: rawPlatform } = await params;
     const platformUpper = rawPlatform.toUpperCase();
 
-    // Validate Platform
     if (!Object.values(Platform).includes(platformUpper as Platform)) {
-      return NextResponse.json(
-        { error: `Invalid platform: ${rawPlatform}` },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: `Invalid platform: ${rawPlatform}` }, { status: 400 });
     }
 
     const platform = platformUpper as Platform;
-
-    // Retrieve OAuth code and state
     const searchParams = req.nextUrl.searchParams;
     const code = searchParams.get("code");
     const state = searchParams.get("state");
+    const error = searchParams.get("error");
 
-    if (!code) {
-      return NextResponse.json(
-        { error: "Authorization code is missing" },
-        { status: 400 }
-      );
+    if (error) {
+      const redirectError = new URL(`/admin/clients?oauth_error=${error}`, req.nextUrl.origin);
+      return NextResponse.redirect(redirectError);
     }
 
-    // Parse state to extract clientId and destination role
+    if (!code) {
+      return NextResponse.json({ error: "Authorization code is missing" }, { status: 400 });
+    }
+
     let clientId = "";
     let role = "admin";
 
     if (state) {
       try {
-        // Try parsing state as JSON
         const parsed = JSON.parse(state);
         clientId = parsed.clientId || "";
         role = parsed.role || "admin";
       } catch {
-        // Fall back to split by colon or assume direct client ID
-        if (state.includes(":")) {
-          const parts = state.split(":");
-          clientId = parts[0];
-          role = parts[1] || "admin";
-        } else {
-          clientId = state;
-        }
+        clientId = state;
       }
     }
 
     if (!clientId) {
-      return NextResponse.json(
-        { error: "Client identifier (state) is missing" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Client identifier (state) is missing" }, { status: 400 });
     }
 
-    // Verify client exists
-    const client = await prisma.client.findUnique({
-      where: { id: clientId },
-    });
-
+    const client = await prisma.client.findUnique({ where: { id: clientId } });
     if (!client) {
-      return NextResponse.json(
-        { error: `Client not found for ID: ${clientId}` },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: `Client not found: ${clientId}` }, { status: 404 });
     }
 
-    // Simulate/Retrieve platform OAuth details
-    let accountId = "";
-    let accountName = "";
-    let username = "";
-    let profileUrl = "";
-    let profileImageUrl = "";
-    let accessToken = "";
-    let refreshToken = "";
-    const expiresInSeconds = 5184000; // default 60 days
+    const platformClient = getPlatformClient(platform);
+    const redirectUri = `${process.env.BETTER_AUTH_URL ?? "http://localhost:3000"}/api/auth/callback/${rawPlatform.toLowerCase()}`;
 
-    // Check if we have real oauth config in environment variables, otherwise simulate
-    const hasRealConfig =
-      process.env[`${platform}_CLIENT_ID`] &&
-      process.env[`${platform}_CLIENT_SECRET`];
+    const tokenResult = await platformClient.exchangeCode(code, redirectUri);
+    const profile = await platformClient.fetchProfile(tokenResult.accessToken);
 
-    if (hasRealConfig) {
-      // In production, fetch using platform credentials
-      // e.g. POST to exchange code for token
-      // Here we stub out the HTTP request with the credentials
-      console.log(`Exchanging OAuth code for platform: ${platform} with credentials`);
-      accessToken = `live_token_${platform.toLowerCase()}_${Math.random().toString(36).substring(7)}`;
-      refreshToken = `live_refresh_${platform.toLowerCase()}_${Math.random().toString(36).substring(7)}`;
-      accountId = `act_live_${Math.floor(Math.random() * 100000000)}`;
-      username = `live_${platform.toLowerCase()}_user`;
-      accountName = `Live Acme ${platform.charAt(0) + platform.slice(1).toLowerCase()}`;
-      profileUrl = `https://${platform.toLowerCase()}.com/${username}`;
-      profileImageUrl = "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=150&h=150&fit=crop";
-    } else {
-      // Simulated OAuth Exchange
-      accessToken = `mock_token_${platform.toLowerCase()}_${Math.random().toString(36).substring(7)}`;
-      refreshToken = `mock_refresh_${platform.toLowerCase()}_${Math.random().toString(36).substring(7)}`;
-      accountId = `act_mock_${Math.floor(Math.random() * 100000000)}`;
-      username = `mock_${platform.toLowerCase()}_user`;
-      accountName = `Mock Acme ${platform.charAt(0) + platform.slice(1).toLowerCase()}`;
-      profileUrl = `https://${platform.toLowerCase()}.com/${username}`;
-      profileImageUrl = "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=150&h=150&fit=crop";
-    }
-
-    const tokenExpiresAt = new Date(Date.now() + expiresInSeconds * 1000);
-
-    // Encrypt the credentials
-    const accessTokenEnc = encrypt(accessToken);
-    const refreshTokenEnc = encrypt(refreshToken);
-
-    // Upsert Social Account
-    const existing = await prisma.socialAccount.findUnique({
-      where: {
-        clientId_platform: {
-          clientId,
-          platform,
-        },
-      },
-    });
+    const accessTokenEnc = encrypt(tokenResult.accessToken);
+    const refreshTokenEnc = tokenResult.refreshToken ? encrypt(tokenResult.refreshToken) : null;
 
     const accountData = {
-      accountId,
-      accountName,
+      accountId: profile.platformAccountId,
+      accountName: profile.platformUsername,
       accessTokenEnc,
-      refreshTokenEnc,
-      tokenExpiresAt,
-      expiresAt: tokenExpiresAt,
-      username,
-      profileUrl,
-      profileImageUrl,
+      refreshTokenEnc: refreshTokenEnc ?? undefined,
+      tokenExpiresAt: tokenResult.expiresAt,
+      expiresAt: tokenResult.expiresAt,
+      username: profile.platformUsername,
+      profileUrl: `https://${platform.toLowerCase()}.com/${profile.platformUsername}`,
+      profileImageUrl: (profile.profileData as any)?.profile_picture_url ?? (profile.profileData as any)?.avatar_url ?? null,
       status: ConnectionStatus.CONNECTED,
       syncError: null,
       lastSyncAt: new Date(),
     };
 
-    let socialAccountId = "";
+    const existing = await prisma.socialAccount.findUnique({
+      where: { clientId_platform: { clientId, platform } },
+    });
 
+    let socialAccountId: string;
     if (existing) {
       const updated = await prisma.socialAccount.update({
         where: { id: existing.id },
@@ -158,34 +93,24 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
       socialAccountId = updated.id;
     } else {
       const created = await prisma.socialAccount.create({
-        data: {
-          clientId,
-          platform,
-          ...accountData,
-        },
+        data: { clientId, platform, ...accountData },
       });
       socialAccountId = created.id;
     }
 
-    // Get current user session for auditing if available
-    const session = await auth.api.getSession({ headers: req.headers });
-    const actorId = session?.user?.id || "system";
-
     await createAuditLog({
-      actorId,
+      actorId: "system",
       action: "SOCIAL_ACCOUNT_CONNECTED",
       entityType: "SocialAccount",
       entityId: socialAccountId,
       afterSnapshot: {
         id: socialAccountId,
         platform,
-        accountId,
-        accountName,
-        username,
+        accountId: profile.platformAccountId,
+        username: profile.platformUsername,
       },
     });
 
-    // Redirect user back to settings dashboard
     const redirectPath =
       role === "client"
         ? `/client/settings?connected=true&platform=${platform.toLowerCase()}`
@@ -193,10 +118,15 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     return NextResponse.redirect(new URL(redirectPath, req.nextUrl.origin));
   } catch (error) {
-    console.error("[GET /api/auth/callback/[platform]] OAuth callback error:", error);
-    return NextResponse.json(
-      { error: "OAuth authentication callback failed" },
-      { status: 500 }
-    );
+    console.error("[GET /api/auth/callback/[platform]]", error);
+
+    if (error instanceof PlatformNotConfiguredError) {
+      return NextResponse.json({ error: error.message }, { status: 501 });
+    }
+    if (error instanceof PlatformAuthError) {
+      return NextResponse.json({ error: error.message }, { status: 401 });
+    }
+
+    return NextResponse.json({ error: "OAuth authentication failed" }, { status: 500 });
   }
 }

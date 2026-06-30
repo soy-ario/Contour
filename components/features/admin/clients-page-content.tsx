@@ -64,7 +64,7 @@ function Sparkline({ data }: { data: number[] }) {
     <svg width={width} height={height} className="overflow-visible shrink-0">
       <polyline
         fill="none"
-        stroke="#C5F135"
+        stroke="#F2485A"
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -172,7 +172,7 @@ export default function ClientsPageContent({
         <div className="flex items-center justify-end">
           <Button
             onClick={handleCreateNew}
-            className="h-10 px-5 rounded-xl bg-[#C5F135] hover:bg-[#B8E620] active:bg-[#8FBF00] text-[#111827] text-sm font-semibold flex items-center gap-2 shadow-sm"
+            className="h-10 px-5 rounded-xl bg-[#F2485A] hover:bg-[#D93D4E] active:bg-[#C13145] text-white text-sm font-semibold flex items-center gap-2 shadow-sm"
           >
             <Plus className="w-4 h-4" />
             New Client
@@ -182,27 +182,27 @@ export default function ClientsPageContent({
         {/* KPI Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <KpiCard
-            icon={<Briefcase className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+            icon={<Briefcase className="w-[18px] h-[18px] text-[#C13145]" />}
             label="TOTAL PORTFOLIOS"
             value={stats.total}
             meta={`${totalDeltaPercent}% new this month`}
             trend={[10, 15, 12, 18, 22, 20, 25]}
           />
           <KpiCard
-            icon={<Activity className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+            icon={<Activity className="w-[18px] h-[18px] text-[#C13145]" />}
             label="ACTIVE RETAINERS"
             value={stats.active}
             meta={`${activePercent}% active contracts`}
             trend={[20, 25, 22, 28, 30, 26, 32]}
           />
           <KpiCard
-            icon={<UserPlus className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+            icon={<UserPlus className="w-[18px] h-[18px] text-[#C13145]" />}
             label="ONBOARDING PIPELINE"
             value={stats.onboarding}
             meta="In progress"
           />
           <KpiCard
-            icon={<PauseCircle className="w-[18px] h-[18px] text-[#5B7A1A]" />}
+            icon={<PauseCircle className="w-[18px] h-[18px] text-[#C13145]" />}
             label="PAUSED ACCOUNTS"
             value={stats.paused}
             meta="On hold"
@@ -221,11 +221,11 @@ export default function ClientsPageContent({
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <button className="flex items-center gap-1.5 h-9 px-3.5 rounded-xl border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] text-sm font-medium transition-all bg-white">
+              <button className="flex items-center gap-1.5 h-9 px-3.5 rounded-xl border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#F2485A] text-sm font-medium transition-all bg-white">
                 <Filter className="w-3.5 h-3.5" />
                 Filter
               </button>
-              <button className="flex items-center gap-1.5 h-9 px-3.5 rounded-xl border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] text-sm font-medium transition-all bg-white">
+              <button className="flex items-center gap-1.5 h-9 px-3.5 rounded-xl border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#F2485A] text-sm font-medium transition-all bg-white">
                 <Download className="w-3.5 h-3.5" />
                 Export
               </button>

@@ -11,12 +11,4 @@ export const loginSchema = z.object({
     .max(128, "Password must be at most 128 characters"),
 });
 
-export const mfaVerifySchema = z.object({
-  code: z
-    .string()
-    .length(6, "MFA code must be exactly 6 digits")
-    .regex(/^\d+$/, "MFA code must contain only digits"),
-});
-
 export type LoginInput = z.infer<typeof loginSchema>;
-export type MfaVerifyInput = z.infer<typeof mfaVerifySchema>;

@@ -141,7 +141,7 @@ export default function RequestThread({ request }: RequestThreadProps) {
                   return (
                     <div key={comment.id} className={cn(
                       "bg-white border rounded-[20px] p-5",
-                      isAdmin ? "border-[#C5F135]/40" : "border-[#ECECF4]"
+                      isAdmin ? "border-[#F2485A]/40" : "border-[#ECECF4]"
                     )}>
                       <div className="flex items-center justify-between mb-3 pb-3 border-b border-[#ECECF4]">
                         <div className="flex items-center gap-2">
@@ -153,7 +153,7 @@ export default function RequestThread({ request }: RequestThreadProps) {
                           </div>
                           <span className="text-sm font-semibold text-[#111827]">{authorName}</span>
                           {isAdmin && (
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#C5F135] text-[#111827]">
+                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F2485A] text-white">
                               Agency
                             </span>
                           )}
@@ -180,7 +180,7 @@ export default function RequestThread({ request }: RequestThreadProps) {
                 <Textarea
                   {...register("body")}
                   placeholder="Provide additional details or respond to agency feedback..."
-                  className="border-[#ECECF4] text-sm placeholder:text-[#9CA3AF] focus-visible:ring-[#C5F135] min-h-[100px]"
+                  className="border-[#ECECF4] text-sm placeholder:text-[#9CA3AF] focus-visible:ring-[#F2485A] min-h-[100px]"
                 />
                 {errors.body && <p className="text-xs text-rose-500">{errors.body.message}</p>}
                 <div className="flex justify-end">

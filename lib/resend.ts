@@ -22,7 +22,7 @@ export async function sendEmail({ to, subject, html }: EmailPayload): Promise<vo
     }
 
     const { error } = await resend.emails.send({
-      from: "Contour <noreply@contour.com>", // Can be configured with custom domain later
+      from: "Contr. <noreply@contr.com>", // Can be configured with custom domain later
       to: toArray,
       subject,
       html,

@@ -64,7 +64,7 @@ export default function CreateRequestDialog({ clientId }: CreateRequestDialogPro
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
         render={
-          <Button className="inline-flex items-center gap-2 h-10 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] text-sm font-semibold hover:brightness-95 transition-all">
+          <Button className="inline-flex items-center gap-2 h-10 px-5 bg-[#F2485A] rounded-[14px] text-white text-sm font-semibold hover:brightness-95 transition-all">
             <Plus className="w-4 h-4" />
             New Request
           </Button>
@@ -96,7 +96,7 @@ export default function CreateRequestDialog({ clientId }: CreateRequestDialogPro
               id="title"
               {...register("title")}
               placeholder="e.g. Update wellness campaign assets"
-              className="border-[#ECECF4] text-sm placeholder:text-[#9CA3AF] focus-visible:ring-[#C5F135]"
+              className="border-[#ECECF4] text-sm placeholder:text-[#9CA3AF] focus-visible:ring-[#F2485A]"
             />
             {errors.title && <p className="text-xs text-rose-500">{errors.title.message}</p>}
           </div>
@@ -107,7 +107,7 @@ export default function CreateRequestDialog({ clientId }: CreateRequestDialogPro
               id="body"
               {...register("body")}
               placeholder="Please provide details about your request..."
-              className="border-[#ECECF4] text-sm placeholder:text-[#9CA3AF] focus-visible:ring-[#C5F135] min-h-[120px]"
+              className="border-[#ECECF4] text-sm placeholder:text-[#9CA3AF] focus-visible:ring-[#F2485A] min-h-[120px]"
             />
             {errors.body && <p className="text-xs text-rose-500">{errors.body.message}</p>}
           </div>

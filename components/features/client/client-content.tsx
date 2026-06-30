@@ -183,7 +183,7 @@ export default function ClientContent({ data }: { data: ContentPageData }) {
                       </div>
 
                       {/* Review button */}
-                      <div className="h-10 px-4 bg-white border border-[#E5E7EB] rounded-xl flex items-center gap-1.5 text-[13px] font-medium text-[#111827] shrink-0 group-hover:border-[#C5F135]/60 transition-all">
+                      <div className="h-10 px-4 bg-white border border-[#E5E7EB] rounded-xl flex items-center gap-1.5 text-[13px] font-medium text-[#111827] shrink-0 group-hover:border-[#F2485A]/60 transition-all">
                         Review Content
                         <ChevronRight className="w-3.5 h-3.5 text-[#9CA3AF]" />
                       </div>
@@ -272,7 +272,7 @@ export default function ClientContent({ data }: { data: ContentPageData }) {
               </div>
               <Link
                 href="/client/analytics"
-                className="text-[14px] font-medium text-[#C5F135] hover:text-[#B0D42E] transition-colors"
+                className="text-[14px] font-medium text-[#F2485A] hover:text-[#D93D4E] transition-colors"
               >
                 View Full Report →
               </Link>
@@ -481,7 +481,7 @@ function ContentCalendarCard({ data }: { data: ContentPageData }) {
                 <div key={`${wi}-${di}`} className={cn("bg-white min-h-[100px] p-2", isT && "bg-[#F2F8D7]/30")}>
                   <span className={cn(
                     "inline-flex w-6 h-6 items-center justify-center text-[12px] font-medium rounded-full mb-1",
-                    isT ? "bg-[#C5F135] text-white" : "text-[#111827]"
+                    isT ? "bg-[#F2485A] text-white" : "text-[#111827]"
                   )}>
                     {day ?? ""}
                   </span>

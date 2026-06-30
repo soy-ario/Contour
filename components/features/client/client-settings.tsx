@@ -73,11 +73,11 @@ function cardClasses() {
 }
 
 function inputClasses() {
-  return "w-full h-12 border border-[#E5E7EB] rounded-xl bg-white px-3.5 text-[14px] text-[#111827] placeholder:text-[#9CA3AF] outline-none focus:border-[#C5F135] focus:ring-1 focus:ring-[#C5F135]/30 transition-all";
+  return "w-full h-12 border border-[#E5E7EB] rounded-xl bg-white px-3.5 text-[14px] text-[#111827] placeholder:text-[#9CA3AF] outline-none focus:border-[#F2485A] focus:ring-1 focus:ring-[#F2485A]/30 transition-all";
 }
 
 function selectClasses() {
-  return "w-full h-12 border border-[#E5E7EB] rounded-xl bg-white px-3.5 text-[14px] text-[#111827] outline-none focus:border-[#C5F135] focus:ring-1 focus:ring-[#C5F135]/30 transition-all appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%228%22%20viewBox%3D%220%200%2012%208%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M1%201.5L6%206.5L11%201.5%22%20stroke%3D%22%239CA3AF%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_14px_center] pr-10";
+  return "w-full h-12 border border-[#E5E7EB] rounded-xl bg-white px-3.5 text-[14px] text-[#111827] outline-none focus:border-[#F2485A] focus:ring-1 focus:ring-[#F2485A]/30 transition-all appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%228%22%20viewBox%3D%220%200%2012%208%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M1%201.5L6%206.5L11%201.5%22%20stroke%3D%22%239CA3AF%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_14px_center] pr-10";
 }
 
 /* ─── CONNECT SOCIAL MODAL ─────────────────────── */
@@ -149,7 +149,7 @@ function ConnectPlatformDialog({
           <div className="space-y-1.5">
             <label className="text-sm font-semibold text-[#111827]">Platform</label>
             <div className="relative">
-              <select value={platform} onChange={e => { setPlatform(e.target.value); setError(null); }} className="w-full h-11 appearance-none bg-white border border-[#E5E7EB] rounded-[14px] px-3.5 pr-10 text-sm font-medium text-[#111827] outline-none focus:ring-2 focus:ring-[#C5F135]/40 focus:border-transparent cursor-pointer">
+              <select value={platform} onChange={e => { setPlatform(e.target.value); setError(null); }} className="w-full h-11 appearance-none bg-white border border-[#E5E7EB] rounded-[14px] px-3.5 pr-10 text-sm font-medium text-[#111827] outline-none focus:ring-2 focus:ring-[#F2485A]/40 focus:border-transparent cursor-pointer">
                 <option value="INSTAGRAM">Instagram</option>
                 <option value="FACEBOOK">Facebook</option>
                 <option value="LINKEDIN">LinkedIn</option>
@@ -162,19 +162,19 @@ function ConnectPlatformDialog({
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-semibold text-[#111827]">{config.aidLabel} *</label>
-            <input value={accountId} onChange={e => setAccountId(e.target.value)} placeholder={config.aidPlaceholder} className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]" />
+            <input value={accountId} onChange={e => setAccountId(e.target.value)} placeholder={config.aidPlaceholder} className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]" />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-semibold text-[#111827]">Display Name</label>
-            <input value={accountName} onChange={e => setAccountName(e.target.value)} placeholder="e.g. @brand_username" className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]" />
+            <input value={accountName} onChange={e => setAccountName(e.target.value)} placeholder="e.g. @brand_username" className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]" />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-semibold text-[#111827]">{config.tokenLabel} *</label>
-            <input value={accessToken} onChange={e => setAccessToken(e.target.value)} placeholder={config.tokenPlaceholder} className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]" />
+            <input value={accessToken} onChange={e => setAccessToken(e.target.value)} placeholder={config.tokenPlaceholder} className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]" />
           </div>
           <div className="flex items-center justify-end gap-3 pt-2">
             <button type="button" onClick={onClose} className="h-11 px-5 border border-[#E5E7EB] rounded-[14px] text-sm font-semibold text-[#6B7280] bg-white hover:bg-[#F9FAFB] transition-colors">Cancel</button>
-            <button type="submit" disabled={connecting} className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold flex items-center gap-2 hover:brightness-95 transition-all disabled:opacity-50">
+            <button type="submit" disabled={connecting} className="h-11 px-5 bg-[#F2485A] rounded-[14px] text-white font-semibold flex items-center gap-2 hover:brightness-95 transition-all disabled:opacity-50">
               {connecting && <Loader2 className="w-4 h-4 animate-spin" />}
               Connect
             </button>
@@ -434,7 +434,7 @@ export default function ClientSettings({ data }: { data: SettingsData }) {
                 })}
                 <button
                   onClick={() => setShowConnect(true)}
-                  className="w-9 h-9 rounded-lg border border-dashed border-[#D1D5DB] flex items-center justify-center text-[#9CA3AF] hover:border-[#C5F135] hover:text-[#C5F135] transition-all"
+                  className="w-9 h-9 rounded-lg border border-dashed border-[#D1D5DB] flex items-center justify-center text-[#9CA3AF] hover:border-[#F2485A] hover:text-[#F2485A] transition-all"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                 </button>
@@ -502,7 +502,7 @@ export default function ClientSettings({ data }: { data: SettingsData }) {
                   <button
                     onClick={handleSave}
                     disabled={!dirty || saving}
-                    className="h-12 px-6 rounded-xl bg-[#C5F135] text-[#111827] font-semibold text-[14px] border-none hover:brightness-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="h-12 px-6 rounded-xl bg-[#F2485A] text-white font-semibold text-[14px] border-none hover:brightness-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
                   >
                     {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
                     Save Preferences

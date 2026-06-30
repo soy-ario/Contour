@@ -1,6 +1,6 @@
-# Contour Platform — Agency Operations & Client Analytics Portal
+# Contr. Platform — Agency Operations & Client Analytics Portal
 
-Contour is a centralized agency operating system designed to streamline client management, creative content workflows, social media analytics synchronization, and client-agency collaboration. Built on a modern server-actions-driven Next.js architecture, Contour provides a premium administrative panel for agency owners and a dedicated, isolated portal for clients.
+Contr. is a centralized agency operating system designed to streamline client management, creative content workflows, social media analytics synchronization, and client-agency collaboration. Built on a modern server-actions-driven Next.js architecture, Contr. provides a premium administrative panel for agency owners and a dedicated, isolated portal for clients.
 
 ---
 

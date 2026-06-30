@@ -130,7 +130,7 @@ export default function ClientTopbar({ brandName, contractStart, contractEnd }: 
                 {item.label}
               </span>
               <span className={cn(
-                "absolute bottom-0 left-2 right-2 h-0.5 bg-[#C5F135] rounded-full transition-all duration-300 ease-in-out",
+                "absolute bottom-0 left-2 right-2 h-0.5 bg-[#F2485A] rounded-full transition-all duration-300 ease-in-out",
                 isActive ? "opacity-100 scale-x-100" : "opacity-0 scale-x-0"
               )} />
             </Link>
@@ -173,8 +173,8 @@ export default function ClientTopbar({ brandName, contractStart, contractEnd }: 
                 },
               }}
               modifiersStyles={{
-                contractPeriod: { backgroundColor: "#F0FDF4", borderRadius: "4px", fontWeight: "600" },
-                hoverRange: { backgroundColor: "#E8F5E9", borderRadius: "4px" },
+                contractPeriod: { backgroundColor: "#FFE5E5", borderRadius: "4px", fontWeight: "600" },
+                hoverRange: { backgroundColor: "#FFEAEA", borderRadius: "4px" },
               }}
             />
           </PopoverContent>

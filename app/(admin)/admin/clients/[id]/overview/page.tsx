@@ -59,7 +59,7 @@ function OnboardingProgressSection({ status }: { status: ClientStatus }) {
         <div className="relative min-w-[680px]">
           <div className="absolute left-0 right-0 top-[14px] h-[2px] bg-[#ECECF4] rounded-full z-0" />
           <div
-            className="absolute left-0 top-[14px] h-[2px] bg-[#C5F135] rounded-full transition-all duration-500 z-0"
+            className="absolute left-0 top-[14px] h-[2px] bg-[#F2485A] rounded-full transition-all duration-500 z-0"
             style={{ width: `${Math.max(0, completedCount) / (steps.length - 1) * 100}%` }}
           />
 
@@ -74,16 +74,16 @@ function OnboardingProgressSection({ status }: { status: ClientStatus }) {
                     className={cn(
                       "w-7 h-7 rounded-full flex items-center justify-center border-2 transition-all duration-300",
                       isCompleted || (isAllComplete && isCurrent)
-                        ? "bg-[#C5F135] border-[#C5F135]"
+                        ? "bg-[#F2485A] border-[#F2485A]"
                         : isCurrent
-                        ? "bg-white border-[#C5F135]"
+                        ? "bg-white border-[#F2485A]"
                         : "bg-white border-[#ECECF4]"
                     )}
                   >
                     {isCompleted || (isAllComplete && isCurrent) ? (
                       <Check className="w-3.5 h-3.5 text-[#111827] stroke-[3]" />
                     ) : (
-                      <span className={cn("text-[11px] font-bold", isCurrent ? "text-[#C5F135]" : "text-[#9CA3AF]")}>
+                      <span className={cn("text-[11px] font-bold", isCurrent ? "text-[#F2485A]" : "text-[#9CA3AF]")}>
                         {idx + 1}
                       </span>
                     )}
@@ -91,7 +91,7 @@ function OnboardingProgressSection({ status }: { status: ClientStatus }) {
                   <span
                     className={cn(
                       "text-xs font-semibold mt-2.5 text-center whitespace-nowrap",
-                      isCompleted || (isAllComplete && isCurrent) ? "text-[#111827]" : isCurrent ? "text-[#C5F135]" : "text-[#9CA3AF]"
+                      isCompleted || (isAllComplete && isCurrent) ? "text-[#111827]" : isCurrent ? "text-[#F2485A]" : "text-[#9CA3AF]"
                     )}
                   >
                     {step.label}
@@ -116,7 +116,7 @@ function Sparkline({ data }: { data: number[] }) {
   const points = data.map((v, i) => `${(i / (data.length - 1)) * w},${h - ((v - min) / range) * h}`);
   return (
     <svg width={w} height={h} className="overflow-visible shrink-0">
-      <polyline fill="none" stroke="#C5F135" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" points={points.join(" ")} />
+      <polyline fill="none" stroke="#F2485A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" points={points.join(" ")} />
     </svg>
   );
 }
@@ -204,7 +204,7 @@ function ProfileDetails({ client }: { client: ClientProfileData }) {
         {/* Business Details */}
         <div className="space-y-5 flex flex-col">
           <div className="flex items-center gap-2.5">
-            <div className="w-1 h-5 rounded-full bg-[#C5F135]" />
+            <div className="w-1 h-5 rounded-full bg-[#F2485A]" />
             <h3 className="text-xs font-semibold text-[#6B7280] tracking-[0.08em] uppercase">Business Details</h3>
           </div>
           <div className="flex-1 space-y-4">
@@ -221,7 +221,7 @@ function ProfileDetails({ client }: { client: ClientProfileData }) {
         {/* Financial & Contract */}
         <div className="space-y-5 flex flex-col md:border-l md:border-[#ECECF4] md:pl-8">
           <div className="flex items-center gap-2.5">
-            <div className="w-1 h-5 rounded-full bg-[#C5F135]" />
+            <div className="w-1 h-5 rounded-full bg-[#F2485A]" />
             <h3 className="text-xs font-semibold text-[#6B7280] tracking-[0.08em] uppercase">Financial & Contract</h3>
           </div>
           <div className="flex-1 space-y-0">
@@ -234,7 +234,7 @@ function ProfileDetails({ client }: { client: ClientProfileData }) {
           </div>
           <Link
             href={`/admin/clients/${client.id}/settings`}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#C5F135] hover:text-[#B8E52F] transition-colors self-end"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#F2485A] hover:text-[#D93D4E] transition-colors self-end"
           >
             View Billing
             <ArrowUpRight className="w-3 h-3" />
@@ -361,7 +361,7 @@ function RecentActivity({ items, clientId }: { items: ActivityItem[]; clientId: 
         <h2 className="text-xl font-bold text-[#111827]">Recent Activity</h2>
         <Link
           href={`/admin/clients/${clientId}/analytics`}
-          className="text-xs font-semibold text-[#C5F135] hover:text-[#B8E52F] transition-colors flex items-center gap-1"
+          className="text-xs font-semibold text-[#F2485A] hover:text-[#D93D4E] transition-colors flex items-center gap-1"
         >
           View All
           <ArrowUpRight className="w-3 h-3" />

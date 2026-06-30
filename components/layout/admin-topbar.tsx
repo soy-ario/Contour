@@ -94,7 +94,7 @@ export default function AdminTopbar({
               }
             >
               <Bell className="w-4 h-4" />
-              <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-[#C5F135] rounded-full flex items-center justify-center text-[7px] font-extrabold text-[#111827]">
+              <span className="absolute top-1 right-1 w-3.5 h-3.5 bg-[#F2485A] rounded-full flex items-center justify-center text-[7px] font-extrabold text-white">
                 3
               </span>
             </DropdownMenuTrigger>
@@ -129,7 +129,7 @@ export default function AdminTopbar({
               <button className="flex items-center gap-2 h-9 pl-2 pr-3 rounded-xl hover:bg-[#F4F4FA] transition-colors" />
             }
           >
-            <Avatar className="w-7 h-7 bg-[#C5F135] text-[#111827]">
+            <Avatar className="w-7 h-7 bg-[#F2485A] text-white">
               <AvatarFallback className="text-[10px] font-bold">
                 {getInitials(user.name)}
               </AvatarFallback>

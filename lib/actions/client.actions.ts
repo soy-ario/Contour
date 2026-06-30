@@ -325,7 +325,7 @@ export async function resetClientPasswordAction(clientId: string) {
     const clientUser = await prisma.user.findFirst({ where: { clientId } });
     if (!clientUser) return { success: false, error: "No portal user exists for this client." };
 
-    const newPassword = `Contour#${String(Date.now()).slice(-6)}!X8`;
+    const newPassword = `Contr.#${String(Date.now()).slice(-6)}!X8`;
     const passwordHash = await bcrypt.hash(newPassword, 12);
 
     await prisma.$transaction([

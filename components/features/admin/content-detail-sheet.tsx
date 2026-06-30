@@ -247,7 +247,7 @@ export default function ContentDetailSheet({
       <SheetContent className="sm:max-w-md md:max-w-lg overflow-y-auto bg-white text-[#111827] p-0 flex flex-col h-full scrollbar-thin">
         {loading ? (
           <div className="flex-1 flex items-center justify-center h-full">
-            <div className="w-8 h-8 border-2 border-t-transparent border-[#C5F135] rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-t-transparent border-[#F2485A] rounded-full animate-spin" />
           </div>
         ) : !content ? (
           <div className="flex-1 flex items-center justify-center p-6 text-[#9CA3AF] h-full">
@@ -430,7 +430,7 @@ export default function ContentDetailSheet({
                     placeholder="Enter notes visible only to the agency team..."
                     value={notesText}
                     onChange={(e) => setNotesText(e.target.value)}
-                    className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] min-h-[80px] rounded-xl"
+                    className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#F2485A] min-h-[80px] rounded-xl"
                   />
                   <div className="flex justify-end pt-2">
                     <Button
@@ -455,7 +455,7 @@ export default function ContentDetailSheet({
                     placeholder="Ask a question or add feedback..."
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#C5F135] rounded-xl flex-1 h-10"
+                    className="border-[#ECECF4] bg-white text-sm placeholder:text-[#9CA3AF] focus-visible:ring-1 focus-visible:ring-[#F2485A] rounded-xl flex-1 h-10"
                   />
                   <Button
                     type="submit"
@@ -553,7 +553,7 @@ export default function ContentDetailSheet({
                         type="datetime-local"
                         value={scheduleDate}
                         onChange={(e) => setScheduleDate(e.target.value)}
-                        className="border-[#ECECF4] bg-white text-sm focus-visible:ring-1 focus-visible:ring-[#C5F135] rounded-xl flex-1 h-10"
+                        className="border-[#ECECF4] bg-white text-sm focus-visible:ring-1 focus-visible:ring-[#F2485A] rounded-xl flex-1 h-10"
                       />
                       <Button
                         onClick={() => handleAction("schedule", { scheduledDate: scheduleDate }, "Content scheduled")}

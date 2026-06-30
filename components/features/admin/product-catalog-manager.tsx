@@ -321,7 +321,7 @@ export default function ProductCatalogManager({
           </div>
           <button
             onClick={handleOpenAdd}
-            className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold flex items-center gap-2 hover:brightness-95 transition-all"
+            className="h-11 px-5 bg-[#F2485A] rounded-[14px] text-white font-semibold flex items-center gap-2 hover:brightness-95 transition-all"
           >
             <Plus className="w-4 h-4" />
             Add Product
@@ -343,7 +343,7 @@ export default function ProductCatalogManager({
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full h-11 appearance-none bg-white border border-[#E5E7EB] rounded-[14px] px-3.5 pr-10 text-sm font-medium text-[#6B7280] outline-none focus:ring-2 focus:ring-[#C5F135]/40 focus:border-transparent cursor-pointer"
+              className="w-full h-11 appearance-none bg-white border border-[#E5E7EB] rounded-[14px] px-3.5 pr-10 text-sm font-medium text-[#6B7280] outline-none focus:ring-2 focus:ring-[#F2485A]/40 focus:border-transparent cursor-pointer"
             >
               <option value="All Categories">All Categories</option>
               {categoriesList.map((cat) => (
@@ -358,7 +358,7 @@ export default function ProductCatalogManager({
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full h-11 appearance-none bg-white border border-[#E5E7EB] rounded-[14px] px-3.5 pr-10 text-sm font-medium text-[#6B7280] outline-none focus:ring-2 focus:ring-[#C5F135]/40 focus:border-transparent cursor-pointer"
+              className="w-full h-11 appearance-none bg-white border border-[#E5E7EB] rounded-[14px] px-3.5 pr-10 text-sm font-medium text-[#6B7280] outline-none focus:ring-2 focus:ring-[#F2485A]/40 focus:border-transparent cursor-pointer"
             >
               <option value="All Statuses">All Statuses</option>
               <option value="ACTIVE">Active</option>
@@ -483,7 +483,7 @@ export default function ProductCatalogManager({
                                   href={product.url}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-xs text-[#6B7280] hover:text-[#C5F135] flex items-center gap-1 mt-0.5"
+                                  className="text-xs text-[#6B7280] hover:text-[#F2485A] flex items-center gap-1 mt-0.5"
                                 >
                                   <span>View store</span>
                                   <ExternalLink className="w-2.5 h-2.5" />
@@ -601,7 +601,7 @@ export default function ProductCatalogManager({
               <button
                 type="button"
                 onClick={() => setDialogOpen(false)}
-                className="flex items-center justify-center w-8 h-8 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#C5F135] bg-white transition-all shrink-0"
+                className="flex items-center justify-center w-8 h-8 rounded-lg border border-[#ECECF4] text-[#6B7280] hover:text-[#111827] hover:border-[#F2485A] bg-white transition-all shrink-0"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 6 6 18" />
@@ -622,7 +622,7 @@ export default function ProductCatalogManager({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Purifying Gel Cleanser"
-                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                 />
               </div>
 
@@ -636,7 +636,7 @@ export default function ProductCatalogManager({
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     placeholder="e.g. Skincare"
-                    className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                    className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -650,7 +650,7 @@ export default function ProductCatalogManager({
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
                     placeholder="e.g. 29.99"
-                    className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                    className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                   />
                 </div>
               </div>
@@ -665,7 +665,7 @@ export default function ProductCatalogManager({
                       id="prodStatus"
                       value={status}
                       onChange={(e) => setStatus(e.target.value as "ACTIVE" | "INACTIVE" | "DISCONTINUED")}
-                      className="w-full h-11 appearance-none bg-white border border-[#E5E7EB] rounded-[14px] px-3.5 pr-10 text-sm font-medium text-[#111827] outline-none focus:ring-2 focus:ring-[#C5F135]/40 focus:border-transparent cursor-pointer"
+                      className="w-full h-11 appearance-none bg-white border border-[#E5E7EB] rounded-[14px] px-3.5 pr-10 text-sm font-medium text-[#111827] outline-none focus:ring-2 focus:ring-[#F2485A]/40 focus:border-transparent cursor-pointer"
                     >
                       <option value="ACTIVE">Active</option>
                       <option value="INACTIVE">Inactive</option>
@@ -685,7 +685,7 @@ export default function ProductCatalogManager({
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
                   placeholder="https://example.com/image.jpg"
-                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                 />
               </div>
 
@@ -698,7 +698,7 @@ export default function ProductCatalogManager({
                   value={productUrl}
                   onChange={(e) => setProductUrl(e.target.value)}
                   placeholder="https://example.com/products/gel"
-                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135]"
+                  className="flex h-11 w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A]"
                 />
               </div>
 
@@ -711,7 +711,7 @@ export default function ProductCatalogManager({
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Brief description of the product and benefits..."
-                  className="flex w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#C5F135]/40 focus-visible:border-[#C5F135] min-h-[70px]"
+                  className="flex w-full rounded-[14px] border border-[#E5E7EB] bg-white px-3.5 text-sm text-[#111827] outline-none focus-visible:ring-2 focus-visible:ring-[#F2485A]/40 focus-visible:border-[#F2485A] min-h-[70px]"
                 />
               </div>
             </div>
@@ -727,7 +727,7 @@ export default function ProductCatalogManager({
               <button
                 type="submit"
                 disabled={isSaving}
-                className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold flex items-center gap-2 hover:brightness-95 transition-all disabled:opacity-50"
+                className="h-11 px-5 bg-[#F2485A] rounded-[14px] text-white font-semibold flex items-center gap-2 hover:brightness-95 transition-all disabled:opacity-50"
               >
                 {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                 {editingProduct ? "Save Changes" : "Create Product"}

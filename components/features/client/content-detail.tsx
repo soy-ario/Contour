@@ -312,7 +312,7 @@ export default function ContentDetailComponent({ content: initialContent }: Cont
           {/* Right - Actions & Discussion */}
           <div className="space-y-6">
             {/* Approval Card */}
-            <div className={cn("bg-white border rounded-[24px] p-6", isPending ? "border-[#C5F135]/50" : "border-[#ECECF4]")}>
+            <div className={cn("bg-white border rounded-[24px] p-6", isPending ? "border-[#F2485A]/50" : "border-[#ECECF4]")}>
               <span className="text-xs font-bold text-[#6B7280] uppercase tracking-wider block mb-4">Approval Actions</span>
               {isPending ? (
                 <div className="space-y-4">
@@ -320,7 +320,7 @@ export default function ContentDetailComponent({ content: initialContent }: Cont
                     placeholder="Add feedback or a note (optional for approve, required for changes/rejection)..."
                     value={actionComment}
                     onChange={(e) => setActionComment(e.target.value)}
-                    className="border-[#ECECF4] text-sm placeholder:text-[#9CA3AF] focus-visible:ring-[#C5F135] min-h-[90px]"
+                    className="border-[#ECECF4] text-sm placeholder:text-[#9CA3AF] focus-visible:ring-[#F2485A] min-h-[90px]"
                   />
                   <div className="flex flex-col gap-2">
                     <Button onClick={handleApprove} disabled={submitting}
@@ -374,7 +374,7 @@ export default function ContentDetailComponent({ content: initialContent }: Cont
                     placeholder="Post comment to thread..."
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
-                    className="border-[#ECECF4] text-sm placeholder:text-[#9CA3AF] min-h-[50px] flex-1 py-2 focus-visible:ring-[#C5F135]"
+                    className="border-[#ECECF4] text-sm placeholder:text-[#9CA3AF] min-h-[50px] flex-1 py-2 focus-visible:ring-[#F2485A]"
                   />
                   <Button type="submit" disabled={submitting || !commentText.trim()}
                     className="bg-[#111827] text-white hover:bg-[#1F2937] text-xs font-semibold h-[50px] px-3 shrink-0 rounded-xl">

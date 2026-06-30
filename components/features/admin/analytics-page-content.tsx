@@ -63,6 +63,13 @@ interface SnapshotItem {
   postCount: number;
   storyCount: number;
   reelCount: number;
+  videoViews: number;
+  watchTimeSeconds: number;
+  profileVisits: number;
+  websiteClicks: number;
+  pageLikes: number;
+  profileViews: number;
+  subscribers: number;
 }
 
 interface TopContentItem {
@@ -109,17 +116,17 @@ type SortMetric = "reach" | "engagement" | "views" | "shares";
 type ChartMetric = "views" | "reach" | "impressions" | "engagement";
 
 const KPI_CONFIG: { key: ChartMetric; label: string; icon: React.ReactNode }[] = [
-  { key: "views", label: "Views", icon: <Eye className="w-[18px] h-[18px] text-[#5B7A1A]" /> },
-  { key: "reach", label: "Reach", icon: <Radio className="w-[18px] h-[18px] text-[#5B7A1A]" /> },
+  { key: "views", label: "Views", icon: <Eye className="w-[18px] h-[18px] text-[#C13145]" /> },
+  { key: "reach", label: "Reach", icon: <Radio className="w-[18px] h-[18px] text-[#C13145]" /> },
   {
     key: "impressions",
     label: "Impressions",
-    icon: <Monitor className="w-[18px] h-[18px] text-[#5B7A1A]" />,
+    icon: <Monitor className="w-[18px] h-[18px] text-[#C13145]" />,
   },
   {
     key: "engagement",
     label: "Engagement",
-    icon: <MousePointer2 className="w-[18px] h-[18px] text-[#5B7A1A]" />,
+    icon: <MousePointer2 className="w-[18px] h-[18px] text-[#C13145]" />,
   },
 ];
 
@@ -263,12 +270,43 @@ export default function AnalyticsPageContent({
   }, [filteredSnapshots, previousPeriodSnapshots]);
 
   const platformBreakdown = React.useMemo(() => {
-    const map = new Map<string, { views: number; reach: number; engagement: number }>();
+    const map = new Map<string, {
+      views: number;
+      reach: number;
+      impressions: number;
+      engagement: number;
+      likes: number;
+      comments: number;
+      shares: number;
+      saves: number;
+      followers: number;
+      followerGrowth: number;
+      avgEngagementRate: number | null;
+      postCount: number;
+      profileViews: number;
+      subscribers: number;
+    }>();
     filteredSnapshots.forEach((s) => {
-      const existing = map.get(s.platform) || { views: 0, reach: 0, engagement: 0 };
-      existing.views += s.totalViews;
-      existing.reach += s.totalReach;
-      existing.engagement += s.totalEngagement;
+      const existing = map.get(s.platform) || {
+        views: 0, reach: 0, impressions: 0, engagement: 0,
+        likes: 0, comments: 0, shares: 0, saves: 0,
+        followers: 0, followerGrowth: 0,
+        avgEngagementRate: null, postCount: 0,
+        profileViews: 0, subscribers: 0,
+      };
+      existing.views += Number(s.totalViews);
+      existing.reach += Number(s.totalReach);
+      existing.impressions += Number(s.totalImpressions);
+      existing.engagement += Number(s.totalEngagement);
+      existing.likes += Number(s.totalLikes);
+      existing.comments += Number(s.totalComments);
+      existing.shares += Number(s.totalShares);
+      existing.saves += Number(s.totalSaves);
+      existing.followers = Math.max(existing.followers, Number(s.followerCountEnd ?? 0));
+      existing.followerGrowth += Number(s.followerGrowth);
+      existing.postCount += Number(s.postCount);
+      existing.profileViews += Number(s.profileViews);
+      existing.subscribers += Number(s.subscribers);
       map.set(s.platform, existing);
     });
     const totalReach = Array.from(map.values()).reduce((sum, p) => sum + p.reach, 0);
@@ -278,7 +316,18 @@ export default function AnalyticsPageContent({
         label: PLATFORM_LABELS[platform as keyof typeof PLATFORM_LABELS] || platform,
         views: data.views,
         reach: data.reach,
+        impressions: data.impressions,
         engagement: data.engagement,
+        likes: data.likes,
+        comments: data.comments,
+        shares: data.shares,
+        saves: data.saves,
+        followers: data.followers,
+        followerGrowth: data.followerGrowth,
+        postCount: data.postCount,
+        profileViews: data.profileViews,
+        subscribers: data.subscribers,
+        engagementRate: data.reach > 0 ? ((data.engagement / data.reach) * 100) : null,
         pct: totalReach > 0 ? (data.reach / totalReach) * 100 : 0,
       }))
       .sort((a, b) => b.reach - a.reach);
@@ -423,7 +472,7 @@ export default function AnalyticsPageContent({
         <div className="flex items-center gap-3">
           {/* Client Filter */}
           <Select value={filterClient} onValueChange={(val) => setFilterClient(val)}>
-            <SelectTrigger className="w-[220px] h-10 rounded-xl border border-[#ECECF4] text-sm text-[#111827] bg-white focus:ring-[#C5F135] px-3.5">
+            <SelectTrigger className="w-[220px] h-10 rounded-xl border border-[#ECECF4] text-sm text-[#111827] bg-white focus:ring-[#F2485A] px-3.5">
               <SelectValue placeholder="All Clients" />
             </SelectTrigger>
             <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
@@ -438,7 +487,7 @@ export default function AnalyticsPageContent({
 
           {/* Platform Filter */}
           <Select value={filterPlatform} onValueChange={(val) => setFilterPlatform(val || "all")}>
-            <SelectTrigger className="w-[180px] h-10 rounded-xl border border-[#ECECF4] text-sm text-[#111827] bg-white focus:ring-[#C5F135] px-3.5">
+            <SelectTrigger className="w-[180px] h-10 rounded-xl border border-[#ECECF4] text-sm text-[#111827] bg-white focus:ring-[#F2485A] px-3.5">
               <SelectValue placeholder="All Platforms" />
             </SelectTrigger>
             <SelectContent className="bg-white border-[#ECECF4] text-[#111827] rounded-xl">
@@ -512,7 +561,7 @@ export default function AnalyticsPageContent({
             ) : (
               <div className="space-y-4">
                 {platformBreakdown.map((p) => (
-                  <div key={p.platform} className="space-y-1">
+                  <div key={p.platform} className="bg-[#F9FAFB] rounded-xl p-3 space-y-2">
                     <div className="flex items-center justify-between text-[13px]">
                       <div className="flex items-center gap-2">
                         <PlatformIcon
@@ -521,21 +570,38 @@ export default function AnalyticsPageContent({
                         />
                         <span className="font-semibold text-[#111827]">{p.label}</span>
                       </div>
-                      <span className="text-gray-400 text-xs">
-                        Views: <span className="font-bold text-[#111827]">{formatNumber(p.views)}</span> | Reach:{" "}
-                        <span className="font-bold text-[#111827]">{formatNumber(p.reach)}</span>
+                      <span className="text-gray-500 text-[11px]">
+                        {p.postCount} posts
                       </span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="flex-1 h-2.5 rounded-full bg-[#F4F4FA] overflow-hidden">
+                      <div className="flex-1 h-2 rounded-full bg-[#F4F4FA] overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-[#C5F135] transition-all duration-500"
+                          className="h-full rounded-full bg-[#F2485A] transition-all duration-500"
                           style={{ width: `${Math.max(p.pct, 1)}%` }}
                         />
                       </div>
-                      <span className="text-[13px] font-semibold text-[#111827] w-10 text-right">
+                      <span className="text-[12px] font-semibold text-[#111827] w-10 text-right">
                         {p.pct.toFixed(0)}%
                       </span>
+                    </div>
+                    <div className="grid grid-cols-4 gap-2 text-[11px] text-gray-500">
+                      <div>
+                        <span className="block font-semibold text-[#111827]">{formatNumber(p.reach)}</span>
+                        Reach
+                      </div>
+                      <div>
+                        <span className="block font-semibold text-[#111827]">{formatNumber(p.engagement)}</span>
+                        Engagements
+                      </div>
+                      <div>
+                        <span className="block font-semibold text-[#111827">{p.engagementRate?.toFixed(1) ?? "—"}%</span>
+                        Eng. Rate
+                      </div>
+                      <div>
+                        <span className="block font-semibold text-[#111827]">{formatNumber(p.followers)}</span>
+                        Followers
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -613,7 +679,7 @@ export default function AnalyticsPageContent({
                         </p>
                         <div className="w-16 h-1 rounded-full bg-[#F4F4FA] mt-0.5 ml-auto">
                           <div
-                            className="h-full rounded-full bg-[#C5F135]"
+                            className="h-full rounded-full bg-[#F2485A]"
                             style={{ width: `${Math.max(pct, 2)}%` }}
                           />
                         </div>
@@ -640,7 +706,7 @@ export default function AnalyticsPageContent({
                   onClick={() => setChartMetric(m)}
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                     chartMetric === m
-                      ? "bg-[#C5F135] text-[#111827]"
+                      ? "bg-[#F2485A] text-white"
                       : "text-[#9CA3AF] hover:text-[#6B7280]"
                   }`}
                 >
@@ -683,10 +749,10 @@ export default function AnalyticsPageContent({
                   <Line
                     type="monotone"
                     dataKey={chartMetric}
-                    stroke="#C5F135"
+                    stroke="#F2485A"
                     strokeWidth={2.5}
                     dot={false}
-                    activeDot={{ r: 5, fill: "#C5F135", stroke: "#fff", strokeWidth: 2 }}
+                    activeDot={{ r: 5, fill: "#F2485A", stroke: "#fff", strokeWidth: 2 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -715,7 +781,7 @@ export default function AnalyticsPageContent({
                     </span>
                     <div className="flex-1 h-2.5 rounded-full bg-[#F4F4FA] overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-[#C5F135] transition-all duration-500"
+                        className="h-full rounded-full bg-[#F2485A] transition-all duration-500"
                         style={{ width: `${Math.max(ct.pct, 1)}%` }}
                       />
                     </div>
@@ -731,7 +797,7 @@ export default function AnalyticsPageContent({
           {/* Product Rollup details */}
           <div className="bg-white border border-[#ECECF4] rounded-[20px] p-5">
             <h3 className="text-base font-bold text-[#111827] flex items-center gap-1.5">
-              <Layers className="w-[18px] h-[18px] text-[#5B7A1A]" />
+              <Layers className="w-[18px] h-[18px] text-[#C13145]" />
               Product Attribution Rollup
             </h3>
             <p className="text-[13px] text-[#6B7280] mt-0.5 mb-4">
@@ -757,7 +823,7 @@ export default function AnalyticsPageContent({
                     <div className="flex items-center gap-3">
                       <div className="flex-1 h-2 rounded-full bg-[#F4F4FA] overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-[#C5F135] transition-all duration-500"
+                          className="h-full rounded-full bg-[#F2485A] transition-all duration-500"
                           style={{ width: `${Math.max(p.pct, 1)}%` }}
                         />
                       </div>
@@ -792,7 +858,7 @@ export default function AnalyticsPageContent({
                     </span>
                     <div className="flex-1 h-2.5 rounded-full bg-[#F4F4FA] overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-[#C5F135] transition-all duration-500"
+                        className="h-full rounded-full bg-[#F2485A] transition-all duration-500"
                         style={{ width: `${Math.max(c.pct, 1)}%` }}
                       />
                     </div>

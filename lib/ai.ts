@@ -10,19 +10,33 @@ interface ReportData {
   };
   platformStats: Record<
     string,
-    { reach: number; engagement: number; posts: number }
+    {
+      views: number;
+      reach: number;
+      engagement: number;
+      posts: number;
+      followerGrowth: number;
+      subscribers: number;
+      watchTimeSeconds: number;
+      profileViews: number;
+    }
   >;
   topContent: Array<{
     title: string;
     platform: string;
+    views: number;
     reach: number;
     engagement: number;
     engagementRate: number;
+    watchTimeSecs: number;
+    ctr: number | null;
   }>;
   topProducts: Array<{
     name: string;
     posts: number;
     reach: number;
+    views: number;
+    engagement: number;
   }>;
   contentCount: number;
 }
@@ -30,22 +44,28 @@ interface ReportData {
 export async function generateReportSummary(data: ReportData): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY;
 
-  // If no valid API key, return a structured fallback summary
   if (!apiKey || apiKey.startsWith("dummy") || apiKey.startsWith("sk-dummy")) {
     return generateFallbackSummary(data);
   }
 
   try {
     const platformSummary = Object.entries(data.platformStats)
-      .map(
-        ([platform, stats]) =>
-          `${platform}: ${stats.reach.toLocaleString()} reach, ${stats.engagement.toLocaleString()} engagement, ${stats.posts} posts`
-      )
+      .map(([platform, stats]) => {
+        const parts = [
+          `${platform}: ${stats.reach.toLocaleString()} reach, ${stats.engagement.toLocaleString()} engagements, ${stats.posts} posts`,
+        ];
+        if (stats.subscribers > 0) parts.push(`${stats.subscribers.toLocaleString()} subscribers`);
+        if (stats.watchTimeSeconds > 0) {
+          const hrs = Math.round(stats.watchTimeSeconds / 3600);
+          parts.push(`${hrs}h watch time`);
+        }
+        return parts.join(", ");
+      })
       .join("; ");
 
     const topContentSummary = data.topContent
       .slice(0, 3)
-      .map((c) => `"${c.title}" (${c.platform}) — ${c.engagementRate.toFixed(2)}% ER`)
+      .map((c) => `"${c.title}" (${c.platform}) — ${c.engagementRate.toFixed(2)}% ER${c.ctr ? `, ${(c.ctr * 100).toFixed(1)}% CTR` : ""}`)
       .join(", ");
 
     const topProductSummary = data.topProducts
@@ -70,25 +90,15 @@ Platform Highlights: ${platformSummary || "No platform data this period."}
 Top Content: ${topContentSummary || "No content data this period."}
 Top Products: ${topProductSummary || "No product data this period."}
 
-Write a professional, data-driven executive summary. Highlight key wins, areas of growth, and any notable observations. Use a confident, professional tone.`;
+Write a professional, data-driven executive summary. Highlight key wins, areas of growth, and any notable observations. Mention the top-performing platform. Use a confident, professional tone.`;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: prompt,
-                },
-              ],
-            },
-          ],
+          contents: [{ parts: [{ text: prompt }] }],
         }),
       }
     );
@@ -107,20 +117,33 @@ Write a professional, data-driven executive summary. Highlight key wins, areas o
 
     return generateFallbackSummary(data);
   } catch (error) {
-    console.error("[generateReportSummary] Gemini API error:", error);
+    console.error("[generateReportSummary] API error:", error);
     return generateFallbackSummary(data);
   }
 }
 
 function generateFallbackSummary(data: ReportData): string {
-  const topPlatform = Object.entries(data.platformStats).sort(
+  const platformEntries = Object.entries(data.platformStats).sort(
     (a, b) => b[1].reach - a[1].reach
-  )[0];
+  );
+  const topPlatform = platformEntries[0];
 
   const engagementRate =
     data.metrics.totalReach > 0
       ? ((data.metrics.totalEngagement / data.metrics.totalReach) * 100).toFixed(1)
       : "0.0";
+
+  const platformLines = platformEntries.map(([name, stats]) => {
+    const parts = [`${name}: ${stats.reach.toLocaleString()} reach`];
+    if (stats.subscribers > 0) parts.push(`${stats.subscribers.toLocaleString()} subscribers`);
+    if (stats.watchTimeSeconds > 3600) {
+      const hrs = Math.round(stats.watchTimeSeconds / 3600);
+      parts.push(`${hrs}h watch time`);
+    }
+    return parts.join(", ");
+  });
+
+  const platformDetail = platformLines.length > 0 ? `\nPlatform Breakdown: ${platformLines.join(" | ")}` : "";
 
   return `During ${data.period}, ${data.client} published ${data.contentCount} pieces of content achieving a total reach of ${data.metrics.totalReach.toLocaleString()} and ${data.metrics.totalEngagement.toLocaleString()} total engagements, representing an overall engagement rate of ${engagementRate}%.${
     topPlatform
@@ -130,5 +153,5 @@ function generateFallbackSummary(data: ReportData): string {
     data.topProducts.length > 0
       ? ` The top product this period was "${data.topProducts[0].name}", featured in ${data.topProducts[0].posts} content piece(s) with ${data.topProducts[0].reach.toLocaleString()} attributed reach.`
       : ""
-  } Total follower growth stood at ${data.metrics.totalFollowers.toLocaleString()} and total ad spend was $${data.metrics.totalAdSpend.toLocaleString()}. The data indicates a consistent content cadence with opportunities to expand high-performing formats in the coming period.`;
+  } Total follower growth stood at ${data.metrics.totalFollowers.toLocaleString()} and total ad spend was $${data.metrics.totalAdSpend.toLocaleString()}.${platformDetail}`;
 }

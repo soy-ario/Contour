@@ -56,7 +56,7 @@ export default function StatCard({
       <svg width={width} height={height} className="overflow-visible">
         <polyline
           fill="none"
-          stroke="#C5F135"
+          stroke="#F2485A"
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -85,7 +85,7 @@ export default function StatCard({
     )}>
       <div className="flex items-start gap-3">
         {icon && (
-          <div className="w-10 h-10 rounded-full bg-[#F0F8D0] flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-full bg-[#FFE3E3] flex items-center justify-center shrink-0">
             {icon}
           </div>
         )}

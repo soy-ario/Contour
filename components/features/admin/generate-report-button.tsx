@@ -48,7 +48,7 @@ export default function GenerateReportButton({ clientId }: GenerateReportButtonP
     <button
       onClick={handleGenerate}
       disabled={loading}
-      className="h-11 px-5 bg-[#C5F135] rounded-[14px] text-[#111827] font-semibold flex items-center gap-2 hover:brightness-95 transition-all shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+      className="h-11 px-5 bg-[#F2485A] rounded-[14px] text-white font-semibold flex items-center gap-2 hover:brightness-95 transition-all shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
     >
       {loading ? (
         <Loader2 className="w-4 h-4 animate-spin" />

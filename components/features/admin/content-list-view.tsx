@@ -321,7 +321,7 @@ export default function ContentListView({
                 onClick={() => setPage(pageNum)}
                 className={cn(
                   "w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold transition-all",
-                  page === pageNum ? "bg-[#C5F135] text-[#111827]" : "text-[#6B7280] hover:bg-[#F4F4FA]"
+                  page === pageNum ? "bg-[#F2485A] text-white" : "text-[#6B7280] hover:bg-[#F4F4FA]"
                 )}
               >
                 {pageNum + 1}
@@ -335,7 +335,7 @@ export default function ContentListView({
                 onClick={() => setPage(totalPages - 1)}
                 className={cn(
                   "w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold transition-all",
-                  page === totalPages - 1 ? "bg-[#C5F135] text-[#111827]" : "text-[#6B7280] hover:bg-[#F4F4FA]"
+                  page === totalPages - 1 ? "bg-[#F2485A] text-white" : "text-[#6B7280] hover:bg-[#F4F4FA]"
                 )}
               >
                 {totalPages}
